@@ -83,6 +83,17 @@ approve as you go or add `command(*)` to your allow list — which auto-approves
 Do not use wildcards in path rules — `write_file(C:\repo\*)` crashes with
 "globs not supported". Directory rules are already recursive; write the path bare.
 
+**Rule matching is broken for scoped rules — you will need the wildcards.**
+Tested on Windows, August 2026: `command(git)`, `read_file(<repo path>)`,
+`list_dir(<repo path>)` and `mcp(blender)` all failed to match, one after
+another, each denying a different tool on each run. Only `command(*)` and
+`mcp(*)` actually match. Path rules like `write_file(<repo>)` do still scope
+writes, so keep them — but expect to add the two wildcards before headless agy
+does anything at all.
+
+This is the price of headless. Interactive `agy` prompts and you approve, so it
+sidesteps the whole mess.
+
 **Permissions currently set** in `~/.gemini/antigravity-cli/settings.json`:
 
 ```json
@@ -303,6 +314,13 @@ the one thing a shared repo cannot survive.
 - `agy` 1.1.22 installed, authenticated, returns correct output from `-p="..."`
 - Both MCP servers registered with agy — `agy mcp list` shows Roblox_Studio and
   blender enabled
+- **agy can edit game code.** Given `src/shared/Anomalies.luau` and a new entry
+  to add, it produced the correct edit in 56s, preserved the four existing
+  entries, and the result passed `selene` and `stylua --check` unchanged.
+- **agy can drive Blender through MCP.** Asked for the scene contents and the
+  triangle count of `KeyRack`, it returned `Camera, Cube, KeyRack, Light` and
+  `360` — a number it could only get by querying the live scene and running
+  code in it.
 
 **Verified broken:**
 

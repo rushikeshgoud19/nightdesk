@@ -26,6 +26,7 @@ Anomalies.list = {
 	{ id = "no_reflection", tell = "The lobby mirror behind them is empty." },
 	{ id = "wrong_checkout", tell = "Their checkout date is before their check-in date." },
 	{ id = "too_still", tell = "They have not blinked once since walking in." },
+	{ id = "wet_footprints", tell = "They left wet footprints, but it has not rained tonight." },
 } :: { Anomaly }
 
 local FIRST = { "Halden", "Moss", "Vero", "Quinn", "Adler", "Pike", "Renn", "Cobb" }
