@@ -1,0 +1,12 @@
+{
+  "name": "nightdesk-world",
+  "tree": {
+    "$className": "DataModel",
+    "Workspace": {
+      "$className": "Workspace",
+      "Lobby": {
+        "$path": "src/world/Lobby"
+      }
+    }
+  }
+}

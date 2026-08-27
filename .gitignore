@@ -22,6 +22,8 @@ DevPackages/
 *.rbxlx
 *.rbxm
 *.rbxmx
+# ...except the world, which IS source. Rojo syncback writes these from Studio.
+!src/world/**/*.rbxm
 *.rbxl.lock
 *.rbxlx.lock
 

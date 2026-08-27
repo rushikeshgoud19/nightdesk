@@ -159,6 +159,63 @@ three, so use it rather than Blender's export menu directly.
 blender motel.blend --background --python tools/blender_export.py -- --out assets/
 ```
 
+### Building the world in Studio, and getting it back into git
+
+Hand-writing geometry as JSON is miserable and does not scale past one room. You
+want to drag walls around in Studio. Rojo 7.7 can do that — `rojo syncback` reads
+a `.rbxl` and writes the file system from it.
+
+```bash
+# 1. build the lobby by hand in Studio, then save the place as place.rbxl
+# 2. see exactly what would change, writing nothing:
+rojo syncback --input place.rbxl world.project.json --dry-run --list
+# 3. if it looks right:
+rojo syncback --input place.rbxl world.project.json
+```
+
+**`world.project.json` exists to make this safe.** Syncback writes the file system
+from the place file. Pointed at `default.project.json` it would happily overwrite
+`src/*.luau` with whatever script content is in that `.rbxl` — which is how you
+lose a day to a stale build. `world.project.json` maps *only* `Workspace.Lobby`,
+so the worst a bad syncback can do is scramble some parts. **Code stays one-way,
+permanently.**
+
+Syncback prompts before writing unless you pass `-y`, and `--dry-run --list`
+shows the full file list first. Use it. Verified here: a dry-run against the
+lobby listed 11 files and touched nothing in `src/server`, `src/client`, or
+`src/shared`.
+
+The world lands as `.rbxm` — binary, not diffable. That is the real cost, and it
+is the right trade for geometry: nobody reviews a wall position by reading a
+diff, they look at it. Code stays text.
+
+### Which sync tool — Rojo, Argon, or Lync
+
+Checked rather than assumed, August 2026:
+
+| | stars | open issues | last push | latest release |
+|---|---|---|---|---|
+| **Rojo** | 1712 | 201 | 2026-07-06 | v7.7.0 (2026-07-02) |
+| Argon | 141 | 18 | 2026-07-01 | 2.0.29 (2026-05-19) |
+| Lync | 37 | 9 | 2026-08-17 | 0.30.14 (2026-08-11) |
+
+All three are maintained. **This repo uses Rojo**, for three reasons:
+
+1. **Live two-way sync is a liability for code, not a feature.** Argon's pitch is
+   continuous Studio→file sync. That directly invites editing scripts in Studio,
+   which this project forbids because those edits are unreviewed and undiffable.
+   Syncback gives the same benefit for geometry as a deliberate, inspectable step.
+2. **Argon's two-way sync has a reported reliability history** — non-script
+   objects not syncing back, partial writes, and sync latency degrading from
+   instant to minutes over a session. Some may be fixed; the repo does not say.
+3. **Rojo is 12× the community.** For a repo other people clone, the tool with
+   the most documentation and the most people who can answer a question wins.
+
+Argon is a reasonable choice for someone who genuinely builds inside Studio all
+day and accepts the trade. Lync is the most niche of the three but is the most
+recently released. Neither is an MCP — that is a separate layer, and this repo
+uses both a sync tool and an MCP.
+
 ### Model scripts are the source, not the .blend
 
 Models built procedurally live in `tools/models/*.py` and those scripts are what
