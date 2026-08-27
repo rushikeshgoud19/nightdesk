@@ -17,12 +17,16 @@ local Anomalies = require(Shared:WaitForChild("Anomalies"))
 export type Profile = {
 	takings: number,
 	mistakes: number,
+	sanity: number,
+	shiftStartTakings: number,
+	lastShiftSurvived: boolean?,
 	nightsWorked: number,
 	owned: { [string]: boolean },
 	-- Live shift, nil while the shop is open between nights.
 	current: Anomalies.Guest?,
 	tellVisible: boolean,
 	guestsLeft: number,
+	shiftActive: boolean,
 }
 
 local State = {}
@@ -33,11 +37,14 @@ function State.load(player: Player): Profile
 	local profile: Profile = {
 		takings = 0,
 		mistakes = 0,
+		sanity = 100,
+		shiftStartTakings = 0,
 		nightsWorked = 0,
 		owned = {},
 		current = nil,
 		tellVisible = false,
 		guestsLeft = 0,
+		shiftActive = false,
 	}
 	profiles[player] = profile
 	return profile

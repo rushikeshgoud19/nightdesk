@@ -116,9 +116,13 @@ function ShopUI.render(state)
 		return
 	end
 
+	local outcome = if state.lastShiftSurvived == false
+		then "Broke (Forfeited takings)"
+		else "Survived"
 	statsLabel.Text = string.format(
-		"Night %d finished · %d in the safe\n%d guests a night · %d%% of anomalies show a tell · %d a correct call",
+		"Night %d finished · %s · %d in the safe\n%d guests a night · %d%% of anomalies show a tell · %d a correct call",
 		state.nightsWorked,
+		outcome,
 		state.takings,
 		state.guestsPerShift,
 		math.floor(state.tellChance * 100 + 0.5),

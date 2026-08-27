@@ -83,6 +83,15 @@ function DeskUI.onGuest(guest)
 	-- No tell does not mean the guest is fine. It means you cannot see what is
 	-- wrong yet -- which is what the upgrades are for.
 	tellLabel.Text = guest.tell or "Nothing you can put your finger on."
+
+	if
+		statusLabel.Text == ""
+		or string.find(statusLabel.Text, "night is over")
+		or string.find(statusLabel.Text, "broke")
+	then
+		statusLabel.Text =
+			`Waiting for call...   ·   {guest.takings or 0} in the safe   ·   {guest.sanity or 100} sanity`
+	end
 	setPrompt(true)
 end
 
@@ -93,12 +102,20 @@ function DeskUI.onResult(result)
 		then `Anomaly: {result.tell or "something was off"}`
 		else "That was a real guest."
 	statusLabel.Text =
-		`{verdict} {truth}   ·   {result.takings} in the safe   ·   {result.mistakes} mistakes`
+		`{verdict} {truth}   ·   {result.takings} in the safe   ·   {result.sanity} sanity`
 end
 
-function DeskUI.onShiftEnded()
+function DeskUI.onShiftEnded(result)
 	setPrompt(false)
-	statusLabel.Text = "The night is over."
+	if result and result.survived ~= nil then
+		if result.survived then
+			statusLabel.Text = `The night is over. You survived with {result.sanity} sanity.`
+		else
+			statusLabel.Text = `You broke. Night ended immediately. Takings forfeited.`
+		end
+	else
+		statusLabel.Text = "The night is over."
+	end
 end
 
 return DeskUI

@@ -30,7 +30,6 @@ local shiftEnded = Remotes.get("ShiftEnded")
 
 local rng = Random.new()
 
-local FINE = 60
 local GAP_AFTER_JUDGEMENT = 1.5
 
 local Shift = {}
@@ -49,13 +48,32 @@ local function sendNext(player: Player)
 		return
 	end
 
-	if p.guestsLeft <= 0 then
+	if p.guestsLeft <= 0 or p.sanity <= 0 then
 		p.current = nil
+		p.shiftActive = false
+		p.guestsLeft = 0
+		local survived = p.sanity > 0
+		p.lastShiftSurvived = survived
+		local bonus = 0
+
+		if survived then
+			if p.sanity > 50 then
+				bonus = 50
+				p.takings += bonus
+			end
+		else
+			-- Forfeit this night's takings
+			p.takings = p.shiftStartTakings
+		end
+
 		p.nightsWorked += 1
 		shiftEnded:FireClient(player, {
 			nightsWorked = p.nightsWorked,
 			takings = p.takings,
 			mistakes = p.mistakes,
+			sanity = p.sanity,
+			survived = survived,
+			bonus = bonus,
 		})
 		if onShiftEnd then
 			onShiftEnd(player)
@@ -80,6 +98,8 @@ local function sendNext(player: Player)
 		reservation = guest.reservation,
 		tell = if visible and guest.anomaly then guest.anomaly.tell else nil,
 		guestsLeft = p.guestsLeft,
+		sanity = p.sanity,
+		takings = p.takings,
 	})
 end
 
@@ -104,7 +124,9 @@ local function resolve(player: Player, admitted: boolean)
 	if correct then
 		p.takings += stats.payout
 	else
-		p.takings = math.max(0, p.takings - FINE)
+		-- Letting the wrong thing in is worse than being rude
+		local penalty = if isAnomaly and admitted then 40 else 20
+		p.sanity = math.max(0, p.sanity - penalty)
 		p.mistakes += 1
 	end
 
@@ -114,6 +136,7 @@ local function resolve(player: Player, admitted: boolean)
 		tell = if isAnomaly and guest.anomaly then guest.anomaly.tell else nil,
 		takings = p.takings,
 		mistakes = p.mistakes,
+		sanity = p.sanity,
 	})
 
 	task.wait(GAP_AFTER_JUDGEMENT)
@@ -126,6 +149,9 @@ function Shift.start(player: Player)
 		return
 	end
 	p.guestsLeft = Upgrades.stats(p.owned).guestsPerShift
+	p.sanity = 100
+	p.shiftStartTakings = p.takings
+	p.shiftActive = true
 	sendNext(player)
 end
 
