@@ -127,21 +127,23 @@ Optional, but they save real time on the building side:
 
 ---
 
-## Running Claude Code on GLM 5.2 (free)
+## Running Claude Code on a free OpenRouter model
 
 Optional. Uses [OpenRouter](https://openrouter.ai) as an Anthropic-compatible
 gateway so Claude Code talks to a different model.
 
 ```bash
-cp .env.example .env       # then paste your key into it
+cp .env.example .env       # then put your key in it
 ```
 
 ```powershell
-.\scripts\glm.ps1
+.\scripts\openrouter.ps1                # MiniMax M3 (default)
+.\scripts\openrouter.ps1 -Model glm     # GLM 5.2
 ```
 
 ```bash
-./scripts/glm.sh
+./scripts/openrouter.sh                 # MiniMax M3 (default)
+./scripts/openrouter.sh --glm           # GLM 5.2
 ```
 
 The scripts set the environment for that one shell only — `claude` in any other
@@ -177,25 +179,42 @@ export ANTHROPIC_SMALL_FAST_MODEL="z-ai/glm-5.2:free"
 `ANTHROPIC_AUTH_TOKEN`, not `ANTHROPIC_API_KEY` — the second one is for Anthropic
 direct and must be explicitly empty when you're pointing at a gateway.
 
-### What you're actually getting
+### Which model — measured, not guessed
 
-Worth knowing before you rely on it:
+Both were tested through Claude Code on 2026-08-28, same task: read a Luau file
+and change one value.
 
-- **50 requests/day** on a $0 balance. A single real Claude Code task can spend
-  that in under half an hour. A one-time $10 top-up raises it to **1,000/day**
-  permanently, which is the difference between a toy and a tool.
+| | MiniMax M3 free | GLM 5.2 free |
+|---|---|---|
+| Providers on OpenRouter | several | **Decart only** |
+| Raw API call | 200 first try | 429 on 5 of 6 tries |
+| Claude Code, one-line edit | **succeeded, clean** | **failed after 203s** |
+| Context served | 1M | 256K |
+| Agentic benchmark rank | #108 of 225 | notably better |
+
+GLM is the better model on paper for agentic work. It is also the one that could
+not finish a one-line edit, because it has a single provider whose free pool is
+saturated. Claude Code needs many sequential calls; a model that answers one call
+in six cannot complete a task, and it burns three minutes discovering that.
+
+**Default to MiniMax M3.** It is the weaker model that actually returns. Switch to
+GLM if the pool ever frees up and you want the better reasoning.
+
+Other limits, whichever you pick:
+
+- **50 requests/day** on a $0 balance, shared across *all* `:free` models — you
+  do not get 50 each. A one-time $10 top-up raises it to **1,000/day**
+  permanently. That is the real difference between a toy and a tool.
 - **20 requests/minute**, hard cap, credits or not.
-- The model page advertises a **1M context window**; the OpenRouter listing serves
-  **256K**. Plan for 256K.
-- **16.5% structured-output error rate** on the current free provider. Claude Code
-  leans on tool calls constantly, so expect visible flakiness on long agentic runs
-  — retries, malformed edits, occasional confusion. Tool-call error rate is much
-  better at 2.4%.
+- More keys do not help. OpenRouter governs capacity per account, globally —
+  extra keys or extra accounts change nothing, and the second one breaks their
+  terms.
+- GLM is a reasoning model: it spends output tokens thinking before answering.
+  Give it generous `max_tokens` or it hits the cap mid-thought.
 
-Sensible split: GLM for grunt work — bulk renames, writing out anomaly table
-entries, first-draft boilerplate. Something stronger for architecture and the
-tricky server-authority code, where a 1-in-6 malformed response costs more than
-it saves.
+Sensible split: free models for grunt work — bulk renames, writing out anomaly
+table entries, first-draft boilerplate. Something stronger for architecture and
+the server-authority code, where a malformed edit costs more than it saves.
 
 ### Keys
 
