@@ -1,0 +1,13 @@
+[package]
+name = "rushi/nightdesk"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+# No dependencies yet, and that is deliberate. Add one when there is a present-tense
+# reason for it, not in anticipation.
+#
+# Likely first additions, when the time comes:
+#   Promise    = "evaera/promise@4.0.0"        -- async without callback nesting
+#   ProfileStore = "madstudioroblox/profilestore@1.0.0"  -- session-locked saves (week 4)
+[dependencies]

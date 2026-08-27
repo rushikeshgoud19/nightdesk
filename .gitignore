@@ -1,0 +1,27 @@
+# --- secrets. nothing here is ever committed ---
+.env
+.env.*
+!.env.example
+*.key
+
+# --- generated toolchain files ---
+roblox.yml          # selene generate-roblox-std output, per-clone
+sourcemap.json      # rojo sourcemap, regenerated on demand
+Packages/           # wally install output
+ServerPackages/
+DevPackages/
+
+# --- build output ---
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.rbxl.lock
+*.rbxlx.lock
+
+# --- editor / os ---
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

@@ -1,0 +1,29 @@
+{
+  "files.associations": {
+    "*.luau": "luau",
+    "*.lua": "luau"
+  },
+  "[luau]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua",
+    "editor.formatOnSave": true
+  },
+
+  // luau-lsp needs the sourcemap to resolve `require` across the Rojo tree.
+  // Regenerate it with:  rojo sourcemap default.project.json -o sourcemap.json --watch
+  "luau-lsp.sourcemap.enabled": true,
+  "luau-lsp.sourcemap.autogenerate": true,
+  "luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
+  "luau-lsp.sourcemap.includeNonScripts": true,
+
+  // Pull the current Roblox API + globals so the LSP knows what `game` is.
+  "luau-lsp.types.roblox": true,
+  "luau-lsp.platform.type": "roblox",
+
+  "selene.run": "onSave",
+
+  "search.exclude": {
+    "**/Packages": true,
+    "**/sourcemap.json": true,
+    "**/roblox.yml": true
+  }
+}

@@ -1,0 +1,14 @@
+# Selene = the linter. Catches real bugs (typos in globals, unused vars,
+# shadowing) that Luau's type checker lets through.
+#
+# The `roblox` std is generated, not bundled. Run this once after `rokit install`:
+#     selene generate-roblox-std
+# It writes roblox.yml, which is gitignored -- each clone generates its own
+# against the current API dump.
+
+std = "roblox"
+
+[rules]
+# Roblox code legitimately uses `_G`-style shared state far less than plain Lua,
+# so leave this at error.
+global_usage = "warn"

@@ -1,0 +1,11 @@
+# Toolchain pins. `rokit install` reads this and puts the exact versions on PATH.
+# Everyone who clones this repo gets the same tools. Do not rely on globally
+# installed versions.
+#
+# To bump a tool: `rokit add rojo-rbx/rojo` (rewrites the pin to latest).
+
+[tools]
+rojo = "rojo-rbx/rojo@7.7.0"
+wally = "UpliftGames/wally@0.3.2"
+selene = "Kampfkarren/selene@0.31.0"
+stylua = "JohnnyMorganz/stylua@2.5.2"
