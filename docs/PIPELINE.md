@@ -33,9 +33,11 @@ the judging.
 irm https://antigravity.google/cli/install.ps1 | iex
 ```
 
-`agy` is a single Go binary — no Node, no Python. It replaced Gemini CLI, which
-Google retired on 18 June 2026. If you still have `@google/gemini-cli` installed,
-it is dead software; uninstall it.
+`agy` is a single Go binary — no Node, no Python. It installs to
+`%LOCALAPPDATA%\agy\bin` and adds itself to your user PATH, so **open a new
+terminal afterwards** or the command will look missing. It replaced Gemini CLI,
+which Google retired on 18 June 2026; if you still have `@google/gemini-cli`
+installed, that is dead software.
 
 Then, in the repo:
 
@@ -43,9 +45,61 @@ Then, in the repo:
 agy
 ```
 
-`CLAUDE.md` in the repo root carries the project rules. Point `agy` at it so it
-inherits the same constraints — server authority, no editing inside Studio, no
-compatibility layers.
+`AGENTS.md` at the repo root carries the project rules, and `agy` parses it
+automatically on startup — server authority, no editing inside Studio, no
+compatibility layers. `CLAUDE.md` is a one-line `@AGENTS.md` import so both
+agents read the same file and it cannot drift.
+
+**Models available through `agy models`:**
+
+```
+gemini-3.7-flash-{high,medium,low}    gemini-3.1-pro-{high,low}
+gemini-3.6-flash-{high,medium,low}    claude-sonnet-4-6
+gemini-3.5-flash-{high,medium,low}    claude-opus-4-6-thinking
+gpt-oss-120b-medium
+```
+
+Pick per session with `--model`, or `/model` inside the session.
+
+### Run it interactively, not headless
+
+`agy -p "..."` (print mode) **cannot ask for tool permissions**, so it silently
+denies them and produces nothing. The log line is
+`Print mode: soft-denying tool confirmation "RunCommand"`. This is not a
+misconfiguration — print mode has no way to prompt.
+
+For building, run plain `agy` and approve tools as it asks. Reserve `-p` for
+prompts that need no tools at all.
+
+There is also a [known permissions bug on Windows](https://github.com/google-antigravity/antigravity-cli/issues/614):
+the matcher splits on spaces before handling quotes, so a rule like
+`command(git)` fails to match once Windows resolves it to
+`C:\Program Files\Git\cmd\git.exe` — `C:\Program Files` tokenizes as
+`C:\Program`. You will be asked to approve the same command repeatedly, and
+"Yes, permanently" writes a rule that never matches. Until it is fixed, either
+approve as you go or add `command(*)` to your allow list — which auto-approves
+*every* command, so decide that deliberately rather than to stop the prompting.
+
+Do not use wildcards in path rules — `write_file(C:\repo\*)` crashes with
+"globs not supported". Directory rules are already recursive; write the path bare.
+
+**Permissions currently set** in `~/.gemini/antigravity-cli/settings.json`:
+
+```json
+"permissions": {
+  "allow": [
+    "read_file(C:\\Users\\rushi\\Desktop\\nightdesk)",
+    "write_file(C:\\Users\\rushi\\Desktop\\nightdesk)",
+    "command(rojo)", "command(stylua)", "command(selene)",
+    "command(wally)", "command(git)"
+  ],
+  "deny": [
+    "command(rm -rf)", "command(git push --force)", "command(rojo upload)"
+  ]
+}
+```
+
+File writes are scoped to this repo only. Adjust the path for your own clone.
 
 **The loop:**
 
@@ -144,13 +198,24 @@ Straight about which of this was actually run on a machine:
 - `stylua --check` and `selene` pass clean on `src/`
 - Studio installed with the built-in MCP available
 - BlenderMCP addon present in Blender 5.1
+- `agy` 1.1.22 installed, authenticated, `agy models` returns the full list
+- Blender registered as an `agy` MCP server (`agy mcp list` shows it enabled)
+
+**Known-limited, cause understood:**
+
+- `agy -p` (print mode) cannot complete tool-using tasks — it soft-denies every
+  permission because it cannot prompt. Use interactive `agy`. Not a bug in this
+  setup.
 
 **Not yet run end to end:**
 
-- `agy` — documented from Google's install docs, not executed here
-- `tools/blender_export.py` — written against the Blender 5.x Python API, not yet
-  run against a real scene. Expect to fix one thing on first use.
-- Blender MCP connection — addon installed, but the server has not been started
+- Interactive `agy` on a real task — needs a human at the prompt, so it has not
+  been driven here
+- `tools/blender_export.py` — parses clean, written against the Blender 5.x
+  Python API, but never run on a real scene. Expect to fix one thing first use.
+- Blender MCP connection — addon installed and Blender was running, but the
+  server was never started, so `localhost:9876` stayed closed. Start it from the
+  sidebar: `N` → **BlenderMCP** tab → **Connect to MCP server**.
 
-Treat the second list as "should work" rather than "does work", and fix what
+Treat the third list as "should work" rather than "does work", and fix what
 breaks rather than assuming you did it wrong.
