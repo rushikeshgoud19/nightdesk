@@ -143,9 +143,48 @@ irm https://antigravity.google/cli/install.ps1 | iex   # once, installs agy
 agy                                                    # then, in the repo
 ```
 
-`agy` is a single Go binary. It replaced Gemini CLI, which Google retired on
-18 June 2026 — if you still have `@google/gemini-cli` installed, it is dead
-software.
+`agy` is a single Go binary. It installs to `%LOCALAPPDATA%\agy\bin` and adds
+itself to your user PATH, so **open a new terminal afterwards** or the command
+will look missing.
+
+### Gemini CLI does not work — don't waste time on it
+
+If you have `@google/gemini-cli` installed, it is dead software. Google retired it
+on 18 June 2026 and the server now refuses it outright:
+
+```
+reasonCode: 'UNSUPPORTED_CLIENT'
+'This client is no longer supported for Gemini Code Assist for individuals.
+ To continue using Gemini, please migrate to the Antigravity suite of products'
+```
+
+That is a server-side rejection, not a config problem — no amount of re-auth
+fixes it. `agy` is the migration path Google is pointing at. Uninstall the old
+one:
+
+```bash
+npm uninstall -g @google/gemini-cli
+```
+
+### Wire Studio and Blender into agy
+
+Roblox Studio ships its own MCP server. Turn it on in Studio under
+**Assistant Settings → MCP Servers → Enable Studio as MCP server**, then register
+it with `agy` (one time, from anywhere):
+
+```powershell
+agy mcp add Roblox_Studio cmd.exe /c "cd /d %LOCALAPPDATA%\Roblox && .\mcp.bat"
+agy mcp add blender uvx blender-mcp
+agy mcp list
+```
+
+`agy mcp list` should show both as `enabled`. Studio's own **Quick connect**
+panel will generate the same command for other clients (Claude Desktop, ChatGPT,
+VS Code) if you want them wired too.
+
+With those two connected, one `agy` session can read the live Studio data model,
+run Luau in it, drive a playtest, and model assets in Blender — without you
+clicking between three windows.
 
 ### Why not free OpenRouter models
 

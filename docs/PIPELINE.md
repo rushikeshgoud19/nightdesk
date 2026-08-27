@@ -263,14 +263,56 @@ being installed is not enough.
 
 Straight about which of this was actually run on a machine:
 
-**Verified working:**
+### "If Studio has an MCP, why keep Rojo?"
+
+Reasonable question, and the answer is short: **they solve different problems and
+neither replaces the other.**
+
+The Studio MCP lets an agent read and edit the *live data model*. Those edits
+exist in the Studio session and, once saved, inside a binary `.rbxl`. They are not
+files. They do not diff, they do not merge, they cannot be code-reviewed, and two
+people cannot work on them at once.
+
+Rojo is what makes this a repo you can share. Code lives as `.luau` on disk, in
+git, reviewable in a pull request. That is the entire reason a friend can clone
+this and contribute.
+
+Use both, for what each is good at:
+
+| Job | Tool |
+|---|---|
+| Writing and reviewing Luau | files + Rojo |
+| Reading the live tree, running code, playtesting | Studio MCP |
+| Building geometry by hand | Studio, captured with `rojo syncback` |
+| Making assets | Blender + BlenderMCP |
+
+Dropping Rojo would mean the game lives in a binary nobody can review. That is
+the one thing a shared repo cannot survive.
+
+---
+
+**Verified working** (checked on a real machine, not assumed):
 
 - Rojo 7.7.0 → Studio sync, plugin installed, `rojo build` produces a valid place
+- `rojo syncback` round-trips the lobby without touching any code
 - `stylua --check` and `selene` pass clean on `src/`
-- Studio installed with the built-in MCP available
-- BlenderMCP addon present in Blender 5.1
-- `agy` 1.1.22 installed, authenticated, `agy models` returns the full list
-- Blender registered as an `agy` MCP server (`agy mcp list` shows it enabled)
+- Roblox Studio installed; `nightdesk.rbxl` opens with the full tree
+- Studio's MCP server exists at `%LOCALAPPDATA%\Roblox\mcp.bat`
+- BlenderMCP addon live — scene read over the socket, model built, FBX exported
+- `tools/blender_export.py` and `tools/models/keyrack.py` both run for real
+- `agy` 1.1.22 installed, authenticated, returns correct output from `-p="..."`
+- Both MCP servers registered with agy — `agy mcp list` shows Roblox_Studio and
+  blender enabled
+
+**Verified broken:**
+
+- **Gemini CLI (`@google/gemini-cli` 0.42.0)** — server returns
+  `UNSUPPORTED_CLIENT` and instructs you to migrate to Antigravity. Dead, not
+  misconfigured.
+- **`agy -p` with tools** — print mode cannot prompt for permissions, so it
+  soft-denies them and produces nothing. Use interactive `agy`. Also note the
+  prompt must be attached as `-p="..."`; a bare `-p` reading stdin just prints
+  help.
 
 **Known-limited, cause understood:**
 
@@ -280,13 +322,9 @@ Straight about which of this was actually run on a machine:
 
 **Not yet run end to end:**
 
-- Interactive `agy` on a real task — needs a human at the prompt, so it has not
-  been driven here
-- `tools/blender_export.py` — parses clean, written against the Blender 5.x
-  Python API, but never run on a real scene. Expect to fix one thing first use.
-- Blender MCP connection — addon installed and Blender was running, but the
-  server was never started, so `localhost:9876` stayed closed. Start it from the
-  sidebar: `N` → **BlenderMCP** tab → **Connect to MCP server**.
+- Interactive `agy` driving a real task through the Studio MCP — needs a human at
+  the permission prompt, so it has not been driven here.
+- A full playtest. The place opens and the tree is correct; nobody has pressed
+  Play and judged whether the loop is fun.
 
-Treat the third list as "should work" rather than "does work", and fix what
-breaks rather than assuming you did it wrong.
+Fix what breaks rather than assuming you did it wrong.
