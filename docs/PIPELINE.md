@@ -159,6 +159,20 @@ three, so use it rather than Blender's export menu directly.
 blender motel.blend --background --python tools/blender_export.py -- --out assets/
 ```
 
+### Model scripts are the source, not the .blend
+
+Models built procedurally live in `tools/models/*.py` and those scripts are what
+gets committed. A `.blend` is a binary you cannot diff or review; a script is
+text that regenerates the identical mesh, and a reviewer can see that a change
+moved a hook 12mm rather than seeing "binary file changed".
+
+`tools/models/keyrack.py` is the worked example — verified to rebuild the same
+360-triangle mesh when re-run.
+
+Hand-sculpted work is different: commit the `.blend` for that, since no script
+produced it. Exported `.fbx` stays gitignored either way — it is an intermediate
+on the way to a Roblox asset ID.
+
 Then in Studio: **Avatar tab → 3D Importer**, or drag the `.fbx` into the viewport.
 
 The script never modifies your scene. Transforms are applied to a temporary

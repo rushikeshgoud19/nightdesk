@@ -9,13 +9,22 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local NAMES = {
-	-- Server -> client: "here is who just walked up to the desk"
+	-- Server -> client: "here is who just walked up to the desk". Carries the
+	-- tell only when the player's upgrades have earned it; the server decides.
 	"GuestArrived",
 	-- Client -> server: "I say admit" / "I say refuse". Carries a boolean only.
-	-- The client is never told whether the guest is an anomaly, so it cannot leak it.
 	"Judge",
-	-- Server -> client: "you were right/wrong, here is the new score"
+	-- Server -> client: "you were right/wrong, here is the running total"
 	"ShiftUpdate",
+	-- Server -> client: "the night is over, here is the summary" -- opens the shop
+	"ShiftEnded",
+	-- Client -> server: "I want to buy this upgrade". Carries an id string only.
+	-- The server owns the price, the prerequisites, and the wallet.
+	"RequestPurchase",
+	-- Server -> client: full shop state -- owned set, takings, per-item availability
+	"ShopState",
+	-- Client -> server: "close the shop, start the next shift"
+	"StartShift",
 }
 
 local Remotes = {}

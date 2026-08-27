@@ -190,12 +190,27 @@ also sets Future lighting and a 2 AM clock, because the atmosphere is the produc
 
 ## Where this is
 
-Week 1 of the plan: one guest, one desk, four anomalies, admit or refuse, server
-scores it. It runs. It is not fun yet.
+**The shift and the shop both run.** A night is a queue of guests; you admit or
+refuse each one; the night ends, the shop opens on what you earned, you buy an
+upgrade and open again.
 
-Next: the shift timer and guest queue, then co-op, then DataStore persistence,
-then the upgrade tree — in that order, because the upgrade tree is the retention
-spine and it needs saving underneath it before it means anything.
+The upgrade tree buys **information**, not raw power. Without upgrades most
+anomalies show you nothing and you are guessing. Corridor lights and the lobby
+camera raise the chance a tell is visible; rooms add guests and payout. That is
+what makes a purchase feel like the fog lifting, and it is the reason the tree is
+the retention spine rather than a shop bolted on the side.
+
+Assets: `tools/models/keyrack.py` builds the lobby key rack — five hooks, one per
+room in the tree, keys hanging on the ones you own. 360 triangles.
+
+Not done yet, in order:
+
+1. **DataStore persistence** via ProfileStore — the upgrade tree means nothing
+   until it survives logout. This is the next thing that matters.
+2. Co-op: 2–4 players on one desk.
+3. Sanity as a real mechanic rather than a counter.
+4. The anomaly table to 40+ entries.
+5. Atmosphere pass — lighting and spatial audio.
 
 ## Licence
 
