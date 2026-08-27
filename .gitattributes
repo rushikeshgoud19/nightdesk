@@ -1,0 +1,10 @@
+# StyLua is configured for Unix line endings. Without this, git hands Windows
+# clones CRLF files that StyLua immediately rewrites, and every diff is noise.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ogg binary
+*.mp3 binary
+*.rbxl binary
+*.rbxm binary
