@@ -31,3 +31,10 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+
+# --- asset build output ---
+# .blend files are source and belong in git. Exported .fbx are intermediates on
+# the way to a Roblox asset ID -- regenerate them with tools/blender_export.py.
+assets/*.fbx
+assets/*.obj
+assets/*.glb

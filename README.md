@@ -178,8 +178,11 @@ src/shared/    → ReplicatedStorage.Shared       types, anomaly table, remote d
 src/server/    → ServerScriptService.Server     authority: guests, verdicts, economy
 src/client/    → StarterPlayerScripts.Client    rendering and input only
 tools/         blender_export.py — Roblox-ready FBX export
-docs/          PIPELINE.md — how the four tools fit together
-CLAUDE.md      instructions for AI agents working in this repo
+assets/        exported .fbx, ready to import into Studio
+docs/ROBLOX.md the platform reference — architecture, limits, assets, traps
+docs/PIPELINE.md how the four tools fit together
+docs/PROMPT.md copy-paste session starters
+AGENTS.md      project rules — read by agy natively, and by Claude via CLAUDE.md
 ```
 
 `default.project.json` is the map between those folders and the Roblox tree. It

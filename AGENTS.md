@@ -4,6 +4,11 @@ A co-op anomaly-horror game on Roblox. You work the night desk of a highway mote
 and decide which guests are real. Between shifts you spend the takings on the
 motel itself.
 
+> **Read [docs/ROBLOX.md](docs/ROBLOX.md) before writing Roblox code or making
+> assets.** It carries the platform facts, the mesh and texture limits, the asset
+> routes, and the traps — sourced, not remembered. Consulting it is cheaper than
+> guessing and being wrong in a way that only surfaces at 200 concurrent players.
+
 ## Non-negotiables
 
 **Never edit game logic inside Roblox Studio.** Studio is a viewer and a test
