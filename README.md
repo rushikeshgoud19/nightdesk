@@ -10,7 +10,7 @@ rooms, working lights, cameras that show you more.
 
 **This repo is also a template.** If you just want the setup and not the game,
 delete `src/` and keep everything else. The toolchain, the editor config, the
-Studio MCP wiring and the OpenRouter launcher are all game-agnostic.
+Studio and Blender MCP wiring and the asset exporter are all game-agnostic.
 
 ---
 
@@ -127,106 +127,40 @@ Optional, but they save real time on the building side:
 
 ---
 
-## Running Claude Code on a free OpenRouter model
+## The agent pipeline
 
-Optional. Uses [OpenRouter](https://openrouter.ai) as an Anthropic-compatible
-gateway so Claude Code talks to a different model.
+Four tools, each owning one thing — Rojo for source, Studio for runtime, Blender
+for assets, Antigravity for writing Luau. Claude is optional.
 
-```bash
-cp .env.example .env       # then put your key in it
-```
+**[docs/PIPELINE.md](docs/PIPELINE.md)** has the full wiring, and documents two
+lanes: **Lane A** needs no Claude at all, **Lane B** adds Claude as planner and
+reviewer on top of the same machinery.
+
+Short version:
 
 ```powershell
-.\scripts\openrouter.ps1                # MiniMax M3 (default)
-.\scripts\openrouter.ps1 -Model glm     # GLM 5.2
+irm https://antigravity.google/cli/install.ps1 | iex   # once, installs agy
+agy                                                    # then, in the repo
 ```
 
-```bash
-./scripts/openrouter.sh                 # MiniMax M3 (default)
-./scripts/openrouter.sh --glm           # GLM 5.2
-```
+`agy` is a single Go binary. It replaced Gemini CLI, which Google retired on
+18 June 2026 — if you still have `@google/gemini-cli` installed, it is dead
+software.
 
-The scripts set the environment for that one shell only — `claude` in any other
-terminal still uses your normal account.
+### Why not free OpenRouter models
 
-### The endpoint, specifically
+Tried and dropped, so you don't repeat it. GLM 5.2 free has exactly one provider
+(Decart) whose free pool is saturated: **5 of 6 raw calls returned 429**, and
+Claude Code spent **203 seconds** retrying before giving up without completing a
+one-line edit. MiniMax M3 free does work — clean tool calls, correct edits — but
+ranks #108 of 225 on agentic benchmarks, which is exactly the axis that matters
+here. Poolside's coding models answered but would not call tools at all.
 
-This is the part everyone gets wrong. OpenRouter's docs list the Anthropic-format
-endpoint as:
+More API keys do not help: OpenRouter governs capacity per account globally, so
+extra keys and extra accounts change nothing.
 
-```
-https://openrouter.ai/api/v1/messages
-```
-
-That is correct **for raw curl**. It is *not* what goes in `ANTHROPIC_BASE_URL`.
-Claude Code appends `/v1/messages` itself, so the variable takes the API **root**:
-
-```bash
-ANTHROPIC_BASE_URL="https://openrouter.ai/api"      # ✅
-ANTHROPIC_BASE_URL="https://openrouter.ai/api/v1"   # ❌ → /api/v1/v1/messages → 404
-```
-
-The full set:
-
-```bash
-export ANTHROPIC_BASE_URL="https://openrouter.ai/api"
-export ANTHROPIC_AUTH_TOKEN="sk-or-v1-..."   # your key
-export ANTHROPIC_API_KEY=""                  # MUST be blank, or CC falls back to Anthropic auth
-export ANTHROPIC_MODEL="z-ai/glm-5.2:free"
-export ANTHROPIC_SMALL_FAST_MODEL="z-ai/glm-5.2:free"
-```
-
-`ANTHROPIC_AUTH_TOKEN`, not `ANTHROPIC_API_KEY` — the second one is for Anthropic
-direct and must be explicitly empty when you're pointing at a gateway.
-
-### Which model — measured, not guessed
-
-Both were tested through Claude Code on 2026-08-28, same task: read a Luau file
-and change one value.
-
-| | MiniMax M3 free | GLM 5.2 free |
-|---|---|---|
-| Providers on OpenRouter | several | **Decart only** |
-| Raw API call | 200 first try | 429 on 5 of 6 tries |
-| Claude Code, one-line edit | **succeeded, clean** | **failed after 203s** |
-| Context served | 1M | 256K |
-| Agentic benchmark rank | #108 of 225 | notably better |
-
-GLM is the better model on paper for agentic work. It is also the one that could
-not finish a one-line edit, because it has a single provider whose free pool is
-saturated. Claude Code needs many sequential calls; a model that answers one call
-in six cannot complete a task, and it burns three minutes discovering that.
-
-**Default to MiniMax M3.** It is the weaker model that actually returns. Switch to
-GLM if the pool ever frees up and you want the better reasoning.
-
-Other limits, whichever you pick:
-
-- **50 requests/day** on a $0 balance, shared across *all* `:free` models — you
-  do not get 50 each. A one-time $10 top-up raises it to **1,000/day**
-  permanently. That is the real difference between a toy and a tool.
-- **20 requests/minute**, hard cap, credits or not.
-- More keys do not help. OpenRouter governs capacity per account, globally —
-  extra keys or extra accounts change nothing, and the second one breaks their
-  terms.
-- GLM is a reasoning model: it spends output tokens thinking before answering.
-  Give it generous `max_tokens` or it hits the cap mid-thought.
-
-Sensible split: free models for grunt work — bulk renames, writing out anomaly
-table entries, first-draft boilerplate. Something stronger for architecture and
-the server-authority code, where a malformed edit costs more than it saves.
-
-### Keys
-
-`.env` is gitignored. `.env.example` is the only key-shaped file that gets
-committed and it contains a placeholder.
-
-If a key ever lands somewhere public — a chat, a screenshot, a commit, an issue —
-treat it as burned. Delete it at
-[openrouter.ai/settings/keys](https://openrouter.ai/settings/keys) and make a new
-one. It takes ten seconds and there is no partial version of this.
-
----
+`agy` puts Gemini 3.x, Claude Sonnet 4.6, Claude Opus 4.6 and GPT-OSS 120B behind
+one command. That is a better answer than hunting free endpoints.
 
 ## Daily loop
 
@@ -243,7 +177,8 @@ rojo build -o nightdesk.rbxl     # standalone place file when you need one
 src/shared/    → ReplicatedStorage.Shared       types, anomaly table, remote declarations
 src/server/    → ServerScriptService.Server     authority: guests, verdicts, economy
 src/client/    → StarterPlayerScripts.Client    rendering and input only
-scripts/       launchers
+tools/         blender_export.py — Roblox-ready FBX export
+docs/          PIPELINE.md — how the four tools fit together
 CLAUDE.md      instructions for AI agents working in this repo
 ```
 
