@@ -5,9 +5,15 @@
 *.key
 
 # --- generated toolchain files ---
-roblox.yml          # selene generate-roblox-std output, per-clone
-sourcemap.json      # rojo sourcemap, regenerated on demand
-Packages/           # wally install output
+# NOTE: '#' only starts a comment at the START of a line. A trailing comment
+# becomes part of the pattern and silently matches nothing.
+
+# selene generate-roblox-std output, regenerated per clone
+roblox.yml
+# rojo sourcemap, regenerated on demand
+sourcemap.json
+# wally install output
+Packages/
 ServerPackages/
 DevPackages/
 
