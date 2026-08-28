@@ -10,4 +10,5 @@ realm = "shared"
 # Likely first additions, when the time comes:
 #   Promise    = "evaera/promise@4.0.0"        -- async without callback nesting
 #   ProfileStore = "madstudioroblox/profilestore@1.0.0"  -- session-locked saves (week 4)
-[dependencies]
+[server-dependencies]
+ProfileStore = "lm-loleris/profilestore@1.0.3"
