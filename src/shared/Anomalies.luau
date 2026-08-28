@@ -1,6 +1,6 @@
 --!strict
 -- The master anomaly catalog for the Highway Motel.
--- Launch target: 40+ distinct observable tells across 4 escalation tiers.
+-- Launch target: 42 distinct observable tells across 4 escalation tiers.
 --
 -- Every entry defines an unmistakable tell observable via 3D character morphology,
 -- document ledger cross-referencing, rotary telephone verification, or UV blacklight.
@@ -38,111 +38,222 @@ local Anomalies = {}
 
 Anomalies.list = {
 	-- =========================================================================
-	-- TIER 1: ADMINISTRATIVE & DOCUMENT DISCREPANCIES (12)
+	-- TIER 1: SUBTLE ANOMALIES (60%)
 	-- =========================================================================
 	{
-		id = "name_mismatch",
-		tell = "The name on their ID card does not match the reservation registry.",
-		horrorType = "document",
-		tier = 1,
-	},
-	{
-		id = "wrong_checkout",
-		tell = "Their checkout date on the register is dated October 1974.",
-		horrorType = "document",
-		tier = 1,
-	},
-	{
-		id = "reversed_dates",
-		tell = "Their checkout date is earlier than their check-in date.",
-		horrorType = "document",
-		tier = 1,
-	},
-	{
-		id = "invalid_room_109",
-		tell = "They are claiming reservation for Room 109, but the motel only has Rooms 101–108.",
-		horrorType = "document",
-		tier = 1,
-	},
-	{
-		id = "fake_reservation_code",
-		tell = "Their reservation number is an invalid code '#0000'.",
-		horrorType = "document",
-		tier = 1,
-	},
-	{
-		id = "expired_license",
-		tell = "Their driver's license expired in 1989.",
-		horrorType = "document",
-		tier = 1,
-	},
-	{
-		id = "impossible_zip",
-		tell = "Their home address postal code is listed as '00000'.",
-		horrorType = "document",
-		tier = 1,
-	},
-	{
 		id = "forged_signature",
-		tell = "Their guest signature is written as '666-666'.",
+		tell = "Their guest signature is written slightly too perfectly, like a printed font.",
 		horrorType = "document",
 		tier = 1,
 	},
 	{
 		id = "redacted_id",
-		tell = "The photo on their identification card is completely blacked out.",
-		horrorType = "document",
-		tier = 1,
-	},
-	{
-		id = "wrong_city",
-		tell = "Their city of origin is listed as 'Abyss Void, Nowhere'.",
-		horrorType = "document",
-		tier = 1,
-	},
-	{
-		id = "negative_stay",
-		tell = "Their scheduled length of stay is listed as -3 nights.",
+		tell = "The photo on their identification card has a very faint distortion over the eyes.",
 		horrorType = "document",
 		tier = 1,
 	},
 	{
 		id = "counterfeit_watermark",
-		tell = "The motel emblem watermark on their document is upside down.",
+		tell = "The motel emblem watermark on their document is missing its left star.",
 		horrorType = "document",
+		tier = 1,
+	},
+	{
+		id = "too_still",
+		tell = "They stand completely rigid while idle and never subtly shift their weight between legs.",
+		horrorType = "behavior",
+		tier = 1,
+	},
+	{
+		id = "no_blinking",
+		tell = "They blink once every 14 seconds instead of a natural human 4-second rate.",
+		horrorType = "behavior",
+		tier = 1,
+	},
+	{
+		id = "dilated_pupils",
+		tell = "Their pupils are dilated exactly 15% wider than normal for this lighting.",
+		horrorType = "visual_face",
+		tier = 1,
+	},
+	{
+		id = "asymmetric_face",
+		tell = "Their left eye sits exactly 3 millimeters lower than their right eye.",
+		horrorType = "visual_face",
+		tier = 1,
+	},
+	{
+		id = "colorless_skin",
+		tell = "Their skin tone is desaturated by exactly 4% compared to natural lighting.",
+		horrorType = "visual_body",
+		tier = 1,
+	},
+	{
+		id = "cold_fog",
+		tell = "A very faint wisp of vapor escapes their mouth when they speak.",
+		horrorType = "visual_face",
+		tier = 1,
+	},
+	{
+		id = "finger_twitch",
+		tell = "Their fingers never curl or relax, staying perfectly straight.",
+		horrorType = "behavior",
+		tier = 1,
+	},
+	{
+		id = "inverted_pulse",
+		tell = "The pulse visible in their neck artery beats in a syncopated, unnatural rhythm.",
+		horrorType = "visual_body",
+		tier = 1,
+	},
+	{
+		id = "subtle_smile",
+		tell = "Their lips are curled into a very faint, unnatural half-smile that never wavers.",
+		horrorType = "visual_face",
+		tier = 1,
+	},
+	{
+		id = "dark_sclera",
+		tell = "The whites of their eyes are exactly 10% darker than natural.",
+		horrorType = "visual_face",
+		tier = 1,
+	},
+	{
+		id = "perfect_symmetry",
+		tell = "Their facial geometry is perfectly, mathematically symmetrical—real faces are not.",
+		horrorType = "visual_face",
+		tier = 1,
+	},
+	{
+		id = "wrong_distance",
+		tell = "They stand exactly 3 studs back from the counter instead of 2.",
+		horrorType = "behavior",
+		tier = 1,
+	},
+	{
+		id = "late_tracking",
+		tell = "Their head tracks your movements with exactly a half-second delay.",
+		horrorType = "behavior",
+		tier = 1,
+	},
+	{
+		id = "button_wrong",
+		tell = "The middle button of their suit jacket is fastened to the wrong buttonhole.",
+		horrorType = "visual_body",
+		tier = 1,
+	},
+	{
+		id = "wrong_cufflink",
+		tell = "Their left and right shirt cuff buttons are mismatched materials (gold and silver).",
+		horrorType = "visual_body",
+		tier = 1,
+	},
+	{
+		id = "uv_occult_rune",
+		tell = "Under UV blacklight, a very faint fingerprint is visible on their forehead.",
+		horrorType = "uv_tool",
+		tier = 1,
+		uvRevealed = true,
+	},
+	{
+		id = "uv_bloodied_hands",
+		tell = "Under UV blacklight, a small smudged ink stain glows on their thumb.",
+		horrorType = "uv_tool",
+		tier = 1,
+		uvRevealed = true,
+	},
+	{
+		id = "uv_counterfeit_seal",
+		tell = "Under UV blacklight, the motel seal on their ID is printed 2 degrees off-center.",
+		horrorType = "uv_tool",
+		tier = 1,
+		uvRevealed = true,
+	},
+	{
+		id = "flickering_presence",
+		tell = "The reception ceiling light dims by just 5% whenever they lean in.",
+		horrorType = "visual_face",
+		tier = 1,
+	},
+	{
+		id = "melting_wax",
+		tell = "The tip of their nose appears to have a very faint, unnatural drooping sheen.",
+		horrorType = "visual_face",
+		tier = 1,
+	},
+	{
+		id = "glitch_silhouette",
+		tell = "Every 30 seconds, a single horizontal static tear line flashes across their suit.",
+		horrorType = "visual_body",
+		tier = 1,
+	},
+	{
+		id = "whispering_vents",
+		tell = "The ventilation duct hums at a slightly lower frequency when they are present.",
+		horrorType = "audio",
 		tier = 1,
 	},
 
 	-- =========================================================================
-	-- TIER 2: MICRO-PHYSIOLOGICAL & UNCANNY TELLS (10)
+	-- TIER 2: NOTICEABLE ANOMALIES (30%)
 	-- =========================================================================
 	{
-		id = "too_still",
-		tell = "They stand completely motionless like a wax mannequin—zero breathing or blinking.",
-		horrorType = "behavior",
+		id = "name_mismatch",
+		tell = "The middle initial on their ID card does not match the reservation registry.",
+		horrorType = "document",
 		tier = 2,
 	},
 	{
-		id = "no_blinking",
-		tell = "Their eyes remain wide open and never blink a single time.",
-		horrorType = "behavior",
+		id = "wrong_checkout",
+		tell = "Their checkout date on the register is dated October 1974.",
+		horrorType = "document",
 		tier = 2,
 	},
 	{
-		id = "dilated_pupils",
-		tell = "Their pupils are abnormally dilated, completely swallowing their irises in pitch blackness.",
-		horrorType = "visual_face",
+		id = "reversed_dates",
+		tell = "Their checkout date is earlier than their check-in date.",
+		horrorType = "document",
 		tier = 2,
 	},
 	{
-		id = "asymmetric_face",
-		tell = "Their left eye is unnaturally sagging much lower than their right eye.",
-		horrorType = "visual_face",
+		id = "invalid_room_109",
+		tell = "They are claiming reservation for Room 109, but the motel only has Rooms 101–108.",
+		horrorType = "document",
+		tier = 2,
+	},
+	{
+		id = "fake_reservation_code",
+		tell = "Their reservation number is an invalid code '#0000'.",
+		horrorType = "document",
+		tier = 2,
+	},
+	{
+		id = "expired_license",
+		tell = "Their driver's license expired in 1989.",
+		horrorType = "document",
+		tier = 2,
+	},
+	{
+		id = "impossible_zip",
+		tell = "Their home address postal code is listed as '00000'.",
+		horrorType = "document",
+		tier = 2,
+	},
+	{
+		id = "wrong_city",
+		tell = "Their city of origin is listed as 'Abyss Void, Nowhere'.",
+		horrorType = "document",
+		tier = 2,
+	},
+	{
+		id = "negative_stay",
+		tell = "Their scheduled length of stay is listed as -3 nights.",
+		horrorType = "document",
 		tier = 2,
 	},
 	{
 		id = "no_reflection",
-		tell = "Their physical body is translucent and casts no solid shadow on the counter.",
+		tell = "Their physical body casts no solid shadow on the counter.",
 		horrorType = "visual_body",
 		tier = 2,
 	},
@@ -153,51 +264,31 @@ Anomalies.list = {
 		tier = 2,
 	},
 	{
-		id = "colorless_skin",
-		tell = "Their skin is stark chalk-white with no visible blood circulation.",
+		id = "wet_footprints",
+		tell = "They left faint wet footprints on the lobby runner, despite no rain outside.",
 		horrorType = "visual_body",
 		tier = 2,
 	},
 	{
-		id = "cold_fog",
-		tell = "Freezing vapor breath puffs from their mouth in the heated reception room.",
-		horrorType = "visual_face",
+		id = "phone_occupied_room",
+		tell = "Calling their assigned room connects to a sleeping resident who whispers someone is already in bed.",
+		horrorType = "phone_tool",
 		tier = 2,
+		roomMismatch = true,
+		phoneWhisper = "Who is at the front desk...? I'm already in this room...",
 	},
 	{
-		id = "finger_twitch",
-		tell = "Their hands periodically undergo rapid, unnatural muscular spasms.",
-		horrorType = "behavior",
+		id = "phone_whisper_echo",
+		tell = "Calling their room connects, but you hear a half-second echo of your own breathing.",
+		horrorType = "phone_tool",
 		tier = 2,
-	},
-	{
-		id = "inverted_pulse",
-		tell = "An unnatural rhythmic throbbing is visible in their neck arteries.",
-		horrorType = "visual_body",
-		tier = 2,
+		roomMismatch = true,
+		phoneWhisper = "...kced... eht... ta... si... ohw...",
 	},
 
 	-- =========================================================================
-	-- TIER 3: OVERT & ANALOG HORROR ENTITIES (10)
+	-- TIER 3: OVERT ANOMALIES (10%)
 	-- =========================================================================
-	{
-		id = "frozen_smile",
-		tell = "Their mouth is stretched into an unhinged, ear-to-ear rigid grin with visible rows of teeth.",
-		horrorType = "visual_face",
-		tier = 3,
-	},
-	{
-		id = "hollow_eyes",
-		tell = "Their eyes are pitch-black empty sockets weeping dark residue with glowing crimson pupils.",
-		horrorType = "visual_face",
-		tier = 3,
-	},
-	{
-		id = "faceless",
-		tell = "Their face is a completely featureless, smooth skin mask with no eyes, nose, or mouth.",
-		horrorType = "visual_face",
-		tier = 3,
-	},
 	{
 		id = "snapped_neck",
 		tell = "Their neck is broken at a sharp 90-degree angle, violently twitching and clicking.",
@@ -211,107 +302,12 @@ Anomalies.list = {
 		tier = 3,
 	},
 	{
-		id = "too_tall",
-		tell = "They are unnaturally tall and elongated, hunched menacingly beneath the ceiling spotlight.",
-		horrorType = "visual_body",
-		tier = 3,
-	},
-	{
-		id = "drowned_corpse",
-		tell = "Their skin is decaying blue-gray, dripping wet puddle footprints across the lobby runner.",
-		horrorType = "visual_body",
-		tier = 3,
-	},
-	{
-		id = "whispering_throat",
-		tell = "Distorted analog radio static and faint reversed whispers emit from their throat.",
-		horrorType = "audio",
-		tier = 3,
-	},
-	{
-		id = "weeping_blood",
-		tell = "Dark crimson fluid slowly drips down their forehead and cheeks.",
-		horrorType = "visual_face",
-		tier = 3,
-	},
-	{
-		id = "porcelain_cracks",
-		tell = "Deep black fissures run across their facial skin like shattered porcelain.",
-		horrorType = "visual_face",
-		tier = 3,
-	},
-
-	-- =========================================================================
-	-- TIER 4: TOOL-DETECTED & ENVIRONMENTAL INFILTRATORS (10)
-	-- =========================================================================
-	{
-		id = "uv_occult_rune",
-		tell = "Under UV blacklight, a glowing crimson occult symbol is burned onto their forehead.",
-		horrorType = "uv_tool",
-		tier = 4,
-		uvRevealed = true,
-	},
-	{
-		id = "uv_bloodied_hands",
-		tell = "Under UV blacklight, luminescent blood stains are splattered across their hands and ID.",
-		horrorType = "uv_tool",
-		tier = 4,
-		uvRevealed = true,
-	},
-	{
-		id = "uv_counterfeit_seal",
-		tell = "Under UV blacklight, their ID reveals a glowing biohazard warning rather than a motel crest.",
-		horrorType = "uv_tool",
-		tier = 4,
-		uvRevealed = true,
-	},
-	{
-		id = "phone_occupied_room",
-		tell = "Calling their assigned room connects to a sleeping resident who whispers someone is already in bed.",
-		horrorType = "phone_tool",
-		tier = 4,
-		roomMismatch = true,
-		phoneWhisper = "Who is at the front desk...? I'm already in this room...",
-	},
-	{
 		id = "phone_static_screamer",
 		tell = "Calling their assigned room emits a distorted high-pitched analog scream over the receiver.",
 		horrorType = "phone_tool",
-		tier = 4,
+		tier = 3,
 		roomMismatch = true,
 		phoneWhisper = "[LOUD DISTORTED STATIC SCREAM]",
-	},
-	{
-		id = "phone_whisper_echo",
-		tell = "Calling their room connects to a voice repeating whatever words you speak in reverse.",
-		horrorType = "phone_tool",
-		tier = 4,
-		roomMismatch = true,
-		phoneWhisper = "...kced... eht... ta... si... ohw...",
-	},
-	{
-		id = "flickering_presence",
-		tell = "The reception ceiling light buzzes aggressively and micro-flickers whenever they are near.",
-		horrorType = "visual_face",
-		tier = 4,
-	},
-	{
-		id = "melting_wax",
-		tell = "Their facial features appear to slowly warp and droop under the warmth of the desk lamp.",
-		horrorType = "visual_face",
-		tier = 4,
-	},
-	{
-		id = "glitch_silhouette",
-		tell = "Their physical frame sporadically shifts with analog VHS horizontal tear lines.",
-		horrorType = "visual_body",
-		tier = 4,
-	},
-	{
-		id = "whispering_vents",
-		tell = "Subconscious whispers reverberate from the motel ventilation duct behind them.",
-		horrorType = "audio",
-		tier = 4,
 	},
 } :: { Anomaly }
 
@@ -390,10 +386,7 @@ function Anomalies.roll(rng: Random): Guest
 
 	if anomaly then
 		if anomaly.id == "name_mismatch" then
-			idName = `{FIRST[rng:NextInteger(1, #FIRST)]} {LAST[rng:NextInteger(1, #LAST)]}`
-			while idName == name do
-				idName = `{FIRST[rng:NextInteger(1, #FIRST)]} Miller`
-			end
+			idName = `{FIRST[rng:NextInteger(1, #FIRST)]} M. {LAST[rng:NextInteger(1, #LAST)]}`
 		elseif anomaly.id == "wrong_checkout" then
 			checkOut = "Oct 24, 1974"
 		elseif anomaly.id == "reversed_dates" then
