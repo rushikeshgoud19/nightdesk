@@ -446,9 +446,6 @@ local function buildAnatomicalFacialContours(
 		eyeColor = Color3.fromRGB(30, 30, 30)
 	end
 
-	local isFaceless = false
-	local isHollowEyes = false
-	local isFrozenSmile = false
 	local isDilatedPupils = anomalyId == "dilated_pupils"
 	local isAsymmetricFace = anomalyId == "asymmetric_face"
 	local isSubtleSmile = anomalyId == "subtle_smile"
@@ -1947,7 +1944,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	)
 
 	if anomalyId == "glitch_silhouette" then
-		local glitchPart = makePart(
+		makePart(
 			"GlitchTear",
 			Enum.PartType.Block,
 			Vector3.new(2.5 * widthScale, 0.05 * heightScale, 1.5 * depthScale),
@@ -1957,8 +1954,6 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 			1.0,
 			model
 		)
-	elseif anomalyId == "dilated_pupils" then
-		-- handeled in facial contours
 	end
 
 	if anomalyId == "inverted_pulse" then
@@ -2125,8 +2120,6 @@ function GuestRenderer.arrive(guestData: GuestData)
 	local walkDuration = 2.4
 	local startTime = os.clock()
 	local lastFootstep = 0
-	local isDrowned = guestData.anomalyId == "drowned_corpse"
-		or guestData.anomalyId == "drowned_drifter"
 	local isStill = guestData.anomalyId == "too_still"
 	local isBrokenCervical = guestData.anomalyId == "snapped_neck"
 		or guestData.anomalyId == "broken_cervical"

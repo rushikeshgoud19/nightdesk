@@ -367,6 +367,50 @@ local CITIES = {
 -- Balanced anomaly spawn chance (45%)
 local ANOMALY_CHANCE = 0.45
 
+-- Which horrorTypes actually have something rendered for them.
+--
+-- `visual_face`, `visual_body` and `behavior` are drawn by GuestRenderer. The
+-- other four -- document, uv_tool, phone_tool, audio -- are written as tells but
+-- nothing renders them yet: `horrorType` is sent all the way to the client and
+-- then never branched on. Nineteen of the forty-two tells fall in that gap.
+--
+-- Rolling those anyway produced an anomaly guest who looked, sounded and read
+-- completely normal. That is not a subtle anomaly, it is an unwinnable one, and
+-- it made the ledger, the phone and the UV light pointless props.
+--
+-- This is not a permanent filter. As each system learns to render its tells,
+-- delete that horrorType from this set -- that is the whole migration.
+local IMPLEMENTED_TYPES: { [string]: boolean } = {
+	visual_face = true,
+	visual_body = true,
+	behavior = true,
+}
+
+local rollablePool: { Anomaly }? = nil
+
+-- The rollable subset of Anomalies.list. Built once, then cached.
+function Anomalies.rollable(): { Anomaly }
+	if rollablePool then
+		return rollablePool
+	end
+
+	local pool = {}
+	for _, a in Anomalies.list do
+		if IMPLEMENTED_TYPES[a.horrorType] then
+			table.insert(pool, a)
+		end
+	end
+
+	if #pool == 0 then
+		-- Never return an empty pool: roll would index nil and take the shift
+		-- loop down with it.
+		error("[Anomalies] no rollable anomalies -- IMPLEMENTED_TYPES matches nothing")
+	end
+
+	rollablePool = pool
+	return pool
+end
+
 function Anomalies.roll(rng: Random): Guest
 	local name = `{FIRST[rng:NextInteger(1, #FIRST)]} {LAST[rng:NextInteger(1, #LAST)]}`
 	local reservation = string.format("%04d", rng:NextInteger(1000, 9999))
@@ -375,7 +419,8 @@ function Anomalies.roll(rng: Random): Guest
 
 	local anomaly: Anomaly? = nil
 	if rng:NextNumber() < ANOMALY_CHANCE then
-		anomaly = Anomalies.list[rng:NextInteger(1, #Anomalies.list)]
+		local pool = Anomalies.rollable()
+		anomaly = pool[rng:NextInteger(1, #pool)]
 	end
 
 	local idName = name
