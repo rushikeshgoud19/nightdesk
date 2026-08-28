@@ -367,23 +367,44 @@ local CITIES = {
 -- Balanced anomaly spawn chance (45%)
 local ANOMALY_CHANCE = 0.45
 
--- Which horrorTypes actually have something rendered for them.
+-- Anomalies that currently produce nothing a player could observe.
 --
--- `visual_face`, `visual_body` and `behavior` are drawn by GuestRenderer. The
--- other four -- document, uv_tool, phone_tool, audio -- are written as tells but
--- nothing renders them yet: `horrorType` is sent all the way to the client and
--- then never branched on. Nineteen of the forty-two tells fall in that gap.
+-- An anomaly is observable if EITHER the roll below corrupts a field the ledger
+-- already prints (name_mismatch, wrong_city, reversed_dates and the rest) OR the
+-- client branches on its id to render something. Note that document tells need
+-- no client branch at all -- they work purely by corrupting a printed field --
+-- so filtering by horrorType wrongly condemns the ones that already work.
 --
--- Rolling those anyway produced an anomaly guest who looked, sounded and read
--- completely normal. That is not a subtle anomaly, it is an unwinnable one, and
--- it made the ledger, the phone and the UV light pointless props.
+-- These twelve have neither. Rolling one produces a guest who looks, sounds and
+-- reads completely normal, which is not a subtle anomaly but an unwinnable one.
 --
--- This is not a permanent filter. As each system learns to render its tells,
--- delete that horrorType from this set -- that is the whole migration.
-local IMPLEMENTED_TYPES: { [string]: boolean } = {
-	visual_face = true,
-	visual_body = true,
-	behavior = true,
+-- To bring one back, give it an observable and delete it from this list:
+--   forged_signature / redacted_id / counterfeit_watermark
+--       the ledger needs a signature line, an ID photo and a corruptible seal
+--   impossible_zip / negative_stay
+--       the ledger needs a postal-code line and a stay-length line
+--   perfect_symmetry / flickering_presence
+--       need a branch in GuestRenderer
+--   uv_counterfeit_seal
+--       corrupts uvSymbol, but only occult_rune and bloodied_hands build the UV
+--       parts the reveal actually toggles, so this one has nothing to light up
+--   whispering_vents
+--       needs positional audio
+--   the three phone_* tells
+--       need the rotary phone to answer differently
+local UNOBSERVABLE: { [string]: boolean } = {
+	forged_signature = true,
+	redacted_id = true,
+	counterfeit_watermark = true,
+	impossible_zip = true,
+	negative_stay = true,
+	perfect_symmetry = true,
+	flickering_presence = true,
+	uv_counterfeit_seal = true,
+	whispering_vents = true,
+	phone_occupied_room = true,
+	phone_whisper_echo = true,
+	phone_static_screamer = true,
 }
 
 local rollablePool: { Anomaly }? = nil
@@ -396,7 +417,7 @@ function Anomalies.rollable(): { Anomaly }
 
 	local pool = {}
 	for _, a in Anomalies.list do
-		if IMPLEMENTED_TYPES[a.horrorType] then
+		if not UNOBSERVABLE[a.id] then
 			table.insert(pool, a)
 		end
 	end
