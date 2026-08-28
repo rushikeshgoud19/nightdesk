@@ -129,14 +129,10 @@ DataStoreService: StudioAccessToApisNotAllowed: Cannot write to DataStore from s
 [nightdesk] clerk punched in - night shift active
 ```
 
-No runtime Lua errors. The DataStore warning is expected and not a defect: the
-place reports `PlaceId=0`, so it is an unpublished local file and DataStores
-cannot work. ProfileStore falls back to an in-memory mock.
+No runtime Lua errors.
 
-**Persistence therefore remains unproven.** To test it for real a human must
-publish the place (**File → Publish to Roblox As…**) and enable
-**Game Settings → Security → Studio Access to API Services**. Until then, every
-save/load test passes for the wrong reason.
+The DataStore warning above was from an unpublished local file. **That has since
+been resolved and persistence is now verified working** — see below.
 
 ---
 
@@ -153,3 +149,39 @@ exists.
 
 It is worth re-running the playtest now, because that answer was measured against
 a game you could not actually operate.
+
+
+---
+
+## Persistence: verified working
+
+Previously blocked because the open place reported `PlaceId=0` — an unpublished
+local file, where DataStores cannot work and ProfileStore silently falls back to
+an in-memory mock, so every test passed for the wrong reason.
+
+The place is now published (`PlaceId=106512529474987`) and **Studio Access to API
+Services** is enabled. Both were needed; neither alone is sufficient.
+
+Tested directly against the running engine:
+
+**DataStore reachability**
+
+```
+WROTE 1787950932 | READ BACK 1787950932 | match=true
+```
+
+**Full ProfileStore round trip** — the actual path the game uses:
+
+```
+session 1: takings=777, owned.lights=true, nightsWorked=3, then EndSession
+session 2: same key
+read back: takings=777  lights=true  nights=3  schema=1
+```
+
+All four fields survived, the session lock released cleanly enough for a second
+session to acquire it, and `schemaVersion` persisted. Probe keys were removed
+afterwards.
+
+**An upgrade bought now survives logout.** The retention spine — the entire
+reason this game has a shop rather than just an anomaly loop — is real for the
+first time.

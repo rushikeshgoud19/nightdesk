@@ -122,6 +122,9 @@ Both linters pass clean on `main`. Keep it that way.
 
 **Working now:**
 
+- **Persistence.** ProfileStore, session-locked, `BindToClose` wired. Verified by
+  round trip against the published place: buy an upgrade, log out, log back in,
+  still owned.
 - First-person clerk with full desk interaction — bell, ledger, phone, UV light,
   intercom, CCTV, admit/refuse stamps
 - 42 anomalies, 6 sculpted horror archetypes for guests
@@ -134,9 +137,10 @@ Both linters pass clean on `main`. Keep it that way.
 
 **Not done, roughly in order:**
 
-1. **Persistence.** `State.luau` is in-memory. The upgrade tree means nothing
-   until it survives logout — use [ProfileStore](https://github.com/MadStudioRoblox/ProfileStore),
-   do not hand-roll it, and `BindToClose` is mandatory.
+1. **The art pass.** The project has zero `SurfaceAppearance` instances against
+   154 stock material assignments, which is why guests read as blocky avatars and
+   the lighting blooms out. This is not cosmetic any more: a 4% skin-tone
+   anomaly cannot register when every surface is either black or blown out.
 2. **Co-op.** The design is 2–4 players on one desk; the argument over whether a
    guest is wrong is the social hook. Currently single-player.
 3. **A real playtest.** Nobody has sat down and judged whether the loop is

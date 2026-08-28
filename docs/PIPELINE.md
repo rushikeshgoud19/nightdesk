@@ -297,6 +297,9 @@ the one thing a shared repo cannot survive.
 - BlenderMCP addon live — scene read over the socket, model built, FBX exported
 - `tools/blender_export.py` and `tools/models/keyrack.py` both run for real
 - `agy` 1.1.22 installed, authenticated, returns correct output from `-p="..."`
+- **Persistence round-trips.** Place published (`PlaceId=106512529474987`) with
+  Studio API access on; a ProfileStore session wrote takings/owned/nightsWorked,
+  ended, and a fresh session read all three back with `schemaVersion` intact.
 - Both MCP servers registered with agy — `agy mcp list` shows Roblox_Studio and
   blender enabled
 - **agy can edit game code.** Given `src/shared/Anomalies.luau` and a new entry
