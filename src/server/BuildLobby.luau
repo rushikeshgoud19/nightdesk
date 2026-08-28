@@ -13,12 +13,21 @@
 local Workspace = game:GetService("Workspace")
 
 local function buildLobby(): Model
-	-- Clean up any default Roblox template Baseplate
+	-- Strip what the Studio template left behind. Rojo only manages what the
+	-- project file declares, so template leftovers survive every sync and never
+	-- appear in git -- you find them only by reading the live DataModel.
+	--
+	-- The stray SpawnLocation matters more than the baseplate. Roblox picks at
+	-- random among every enabled neutral SpawnLocation, so a leftover one sends
+	-- roughly half of all spawns somewhere that is not behind the desk -- and
+	-- since the baseplate is destroyed in this same pass, that somewhere has no
+	-- floor under it. This project owns exactly one spawn, and it is named "Spawn".
 	for _, child in Workspace:GetChildren() do
-		if
-			child.Name == "Baseplate"
+		local isBaseplate = child.Name == "Baseplate"
 			or (child:IsA("BasePart") and child.Name:lower():find("baseplate") ~= nil)
-		then
+		local isStraySpawn = child:IsA("SpawnLocation") and child.Name ~= "Spawn"
+
+		if isBaseplate or isStraySpawn then
 			child:Destroy()
 		end
 	end
