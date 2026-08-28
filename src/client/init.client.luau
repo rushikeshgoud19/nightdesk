@@ -1,17 +1,55 @@
 --!strict
--- Client bootstrap. Builds the two screens and routes remotes to them.
--- Owns no game state.
+-- Client bootstrap. Sets up true First-Person FPS character controls,
+-- ambient audio, 3D desk interactions, HUD, and remote handlers.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Remotes = require(Shared:WaitForChild("Remotes"))
 
+local Atmosphere = require(script:WaitForChild("Atmosphere"))
+local DeskCamera = require(script:WaitForChild("DeskCamera"))
+local DeskProps = require(script:WaitForChild("DeskProps"))
 local DeskUI = require(script:WaitForChild("DeskUI"))
 local ShopUI = require(script:WaitForChild("ShopUI"))
+local Viewmodel = require(script:WaitForChild("Viewmodel"))
 
 local player = Players.LocalPlayer
+
+-- Setup authentic First-Person character movement
+local function setupFirstPersonCharacter(char: Model)
+	local hum = char:WaitForChild("Humanoid", 10) :: Humanoid?
+	local hrp = char:WaitForChild("HumanoidRootPart", 10) :: BasePart?
+
+	if hum then
+		hum.WalkSpeed = 13
+		hum.JumpHeight = 0
+		hum.JumpPower = 0
+		hum.AutoRotate = true
+	end
+
+	-- Lock camera to first person
+	player.CameraMode = Enum.CameraMode.LockFirstPerson
+	player.CameraMinZoomDistance = 0.5
+	player.CameraMaxZoomDistance = 0.5
+
+	-- Ensure player spawns behind the front desk facing the counter
+	if char and hrp then
+		hrp.Anchored = false
+		hrp.CanCollide = true
+		char:PivotTo(CFrame.lookAt(Vector3.new(0, 3.5, 7.2), Vector3.new(0, 4.8, 1.8)))
+	end
+end
+
+if player.Character then
+	setupFirstPersonCharacter(player.Character)
+end
+player.CharacterAdded:Connect(setupFirstPersonCharacter)
+
+-- First-person mouse lock
+UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "NightDesk"
@@ -19,6 +57,20 @@ gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 gui.Parent = player:WaitForChild("PlayerGui")
 
+-- First-person center interaction crosshair dot
+local crosshair = Instance.new("Frame")
+crosshair.Name = "CenterCrosshair"
+crosshair.Size = UDim2.fromOffset(4, 4)
+crosshair.Position = UDim2.new(0.5, -2, 0.5, -2)
+crosshair.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+crosshair.BackgroundTransparency = 0.5
+crosshair.BorderSizePixel = 0
+crosshair.Parent = gui
+
+Atmosphere.init()
+DeskProps.init()
+DeskCamera.init()
+Viewmodel.init()
 DeskUI.build(gui)
 ShopUI.build(gui)
 
@@ -27,4 +79,4 @@ Remotes.get("ShiftUpdate").OnClientEvent:Connect(DeskUI.onResult)
 Remotes.get("ShiftEnded").OnClientEvent:Connect(DeskUI.onShiftEnded)
 Remotes.get("ShopState").OnClientEvent:Connect(ShopUI.render)
 
-print("[nightdesk] client up")
+print("[nightdesk] first-person FPS client fully initialized")

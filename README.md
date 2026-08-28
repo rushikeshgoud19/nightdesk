@@ -1,256 +1,173 @@
+<!-- markdownlint-disable MD033 -->
 # nightdesk
 
-A co-op anomaly-horror game for Roblox, built the boring way: source files in git,
-Rojo syncing into Studio, linted and formatted in CI-able commands, and an AI
-agent wired into Studio over MCP.
+Co-op anomaly horror on Roblox. You work the night desk of the Crestview Highway
+Motel at 2am in a rainstorm. Guests arrive. Some of them are not guests. You
+decide who gets a room, and between shifts you spend the takings on the motel.
 
-You work the night desk of a highway motel. Guests arrive one at a time. Some of
-them are not guests. Between shifts you spend the takings on the motel — more
-rooms, working lights, cameras that show you more.
+Built in first person: you stand behind the counter, walk around the lobby, and
+work the job with physical tools — a bell, a ledger, a rotary phone, a UV
+blacklight, an intercom, and two rubber stamps.
 
-**This repo is also a template.** If you just want the setup and not the game,
-delete `src/` and keep everything else. The toolchain, the editor config, the
-Studio and Blender MCP wiring and the asset exporter are all game-agnostic.
+**This repo is also a working agent pipeline** — Rojo + Blender + Antigravity +
+the Roblox Studio MCP, all wired together and documented. If you only want that
+part, delete `src/` and keep the rest.
 
 ---
 
-## Quick start
+## Start here (new contributor)
 
-```bash
-git clone <your-fork> nightdesk
-cd nightdesk
-```
-
-Then, in order:
+Everything is pinned, so you get the same versions as everyone else.
 
 ### 1. Toolchain
 
-[Rokit](https://github.com/rojo-rbx/rokit) pins every tool so your clone and mine
-run identical versions. Install it once, machine-wide:
-
-**Windows (PowerShell):**
 ```powershell
 irm https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.ps1 | iex
 ```
 
-**macOS / Linux:**
-```bash
-curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
-```
-
-Then, in the repo:
-
 ```bash
 rokit install
-```
-
-That reads `rokit.toml` and puts these on your PATH:
-
-| Tool | Version | Job |
-|---|---|---|
-| [Rojo](https://rojo.space) | 7.7.0 | Syncs `src/` into Studio |
-| [Wally](https://wally.run) | 0.3.2 | Package manager |
-| [Selene](https://kampfkarren.github.io/selene/) | 0.31.0 | Linter |
-| [StyLua](https://github.com/JohnnyMorganz/StyLua) | 2.5.2 | Formatter |
-
-One more one-time step — Selene's Roblox standard library is generated per clone,
-not committed:
-
-```bash
 selene generate-roblox-std
-```
-
-### 2. Studio ↔ Rojo
-
-Install the Rojo Studio plugin:
-
-```bash
 rojo plugin install
 ```
 
-Then start the sync server and leave it running:
+That installs Rojo 7.7.0, Wally 0.3.2, Selene 0.31.0 and StyLua 2.5.2 from
+`rokit.toml`, generates Selene's Roblox standard library (gitignored, per-clone),
+and installs the Rojo Studio plugin.
+
+### 2. Run it
 
 ```bash
 rojo serve
 ```
 
-In Studio: open the Rojo plugin, hit **Connect**. Your `src/` tree appears in the
-Explorer. Edit files in VS Code, watch them update live in Studio.
+Open Roblox Studio → any place → Rojo plugin → **Connect** → press Play.
 
-> **The rule that makes this work:** never write game logic in Studio's script
-> editor. Studio is a viewer and a playtest harness. Everything real lives in
-> `src/` and flows one way. Anything typed into Studio is gone on the next sync.
+You spawn behind the reception counter in first person. The lobby builds itself
+on the server at boot.
 
-### 3. Editor
+### 3. The agent (optional, but it's the point)
 
-Open the folder in VS Code and accept the recommended extensions
-(`.vscode/extensions.json`) — luau-lsp, StyLua, Selene, Rojo. `.vscode/settings.json`
-already points luau-lsp at `default.project.json`, so `require` across the tree
-resolves and `game` is typed.
+```powershell
+irm https://antigravity.google/cli/install.ps1 | iex
+```
 
-### 4. Studio MCP — let the agent drive Studio
+Open a **new terminal** afterwards — `agy` adds itself to PATH and the old shell
+won't see it. Then from the repo root:
 
-Roblox ships an MCP server **inside Studio** now. The old standalone
-[`Roblox/studio-rust-mcp-server`](https://github.com/Roblox/studio-rust-mcp-server)
-was archived in April 2026 — don't follow tutorials that tell you to build it.
+```bash
+agy
+```
 
-In Studio:
+`AGENTS.md` loads automatically and carries the architecture and the rules.
+`CLAUDE.md` is a one-line import of it, so Claude Code gets the same brief.
 
-1. **Assistant Settings → MCP Servers**
-2. Turn on **Enable Studio as MCP server**
-3. **Quick connect** → pick your client (Claude Code, Cursor, …)
-
-Quick connect writes the client config for you, with the right paths for your
-machine. That's why this repo does not ship an `.mcp.json` — the command is
-machine-specific and a hardcoded one would just be wrong on your box. If you want
-it repo-scoped instead of global, copy what Quick connect generated into a
-`.mcp.json` at the repo root.
-
-Once connected, the agent can read the Instance tree, write and run Luau in the
-live session, read the console, and start/stop playtests. Keep Studio open — that
-is where the work actually happens.
-
-### 5. Studio plugins worth having
-
-Optional, but they save real time on the building side:
-
-| Plugin | Why |
-|---|---|
-| **Rojo** | Required. Step 2 installed it. |
-| **Building Tools by F3X** | Fast geometry work without fighting the default tools |
-| **ResizeAlign** / **GapFill** | Makes hand-built rooms actually meet at the corners |
-| **Tag Editor** | Manage `CollectionService` tags visually |
-
-> Studio plugins run arbitrary code with full access to your place. Install from
-> the Creator Store, prefer ones with large install counts and a named author, and
-> don't grant script injection permission to anything you haven't heard of.
+Read **[docs/PIPELINE.md](docs/PIPELINE.md)** before your first agy session —
+there are two permission quirks that will otherwise waste an hour.
 
 ---
 
-## The agent pipeline
+## Controls
 
-Four tools, each owning one thing — Rojo for source, Studio for runtime, Blender
-for assets, Antigravity for writing Luau. Claude is optional.
+| Key | Action |
+|---|---|
+| `W A S D` + mouse | Walk and look, first person |
+| `E` / click | Ring the service bell |
+| `F` / click | Inspect the registration ledger |
+| `G` | Intercom — ask the guest one of three questions |
+| `T` / click | Rotary phone — call the assigned room |
+| `Q` | UV blacklight — reveals marks on documents |
+| `C` | Cycle the CCTV monitor |
+| `Z` / click | **ADMIT** stamp |
+| `X` / click | **REFUSE** stamp |
+| `E` (office) | Coffee maker — restores sanity, once per shift |
+| `E` (hallway) | Reset the breaker during a blackout |
+| `E` (lounge) | Vending machine — $5 for a soda |
 
-**[docs/PIPELINE.md](docs/PIPELINE.md)** has the full wiring, and documents two
-lanes: **Lane A** needs no Claude at all, **Lane B** adds Claude as planner and
-reviewer on top of the same machinery.
+---
 
-Short version:
-
-```powershell
-irm https://antigravity.google/cli/install.ps1 | iex   # once, installs agy
-agy                                                    # then, in the repo
-```
-
-`agy` is a single Go binary. It installs to `%LOCALAPPDATA%\agy\bin` and adds
-itself to your user PATH, so **open a new terminal afterwards** or the command
-will look missing.
-
-### Gemini CLI does not work — don't waste time on it
-
-If you have `@google/gemini-cli` installed, it is dead software. Google retired it
-on 18 June 2026 and the server now refuses it outright:
+## How it fits together
 
 ```
-reasonCode: 'UNSUPPORTED_CLIENT'
-'This client is no longer supported for Gemini Code Assist for individuals.
- To continue using Gemini, please migrate to the Antigravity suite of products'
+src/shared/    → ReplicatedStorage.Shared      types, 42 anomalies, remote declarations, shop catalogue
+src/server/    → ServerScriptService.Server    AUTHORITY: shifts, verdicts, economy, lobby construction
+src/client/    → StarterPlayerScripts.Client   RENDERING AND INPUT ONLY
+tools/         Blender asset scripts (the script is the source, not the .blend)
+docs/          the reference material — read ROBLOX.md before writing Roblox code
 ```
 
-That is a server-side rejection, not a config problem — no amount of re-auth
-fixes it. `agy` is the migration path Google is pointing at. Uninstall the old
-one:
+**The one rule everything else follows:** the server decides every verdict and
+every payout. The client renders what it is told and sends intent. Assume every
+client is hostile, because some will be.
+
+The lobby is **built by the server at boot** (`src/server/BuildLobby.luau`), not
+stored as files. That is why `Workspace` looks almost empty in the project config.
+
+---
+
+## Daily commands
 
 ```bash
-npm uninstall -g @google/gemini-cli
+rojo serve                      # sync to Studio, leave running
+stylua src/ tools/              # format
+selene src/ tools/              # lint
+rojo build -o nightdesk.rbxl    # standalone place file
 ```
 
-### Wire Studio and Blender into agy
+Both linters pass clean on `main`. Keep it that way.
 
-Roblox Studio ships its own MCP server. Turn it on in Studio under
-**Assistant Settings → MCP Servers → Enable Studio as MCP server**, then register
-it with `agy` (one time, from anywhere):
+---
 
-```powershell
-agy mcp add Roblox_Studio cmd.exe /c "cd /d %LOCALAPPDATA%\Roblox && .\mcp.bat"
-agy mcp add blender uvx blender-mcp
-agy mcp list
-```
+## Where the project is
 
-`agy mcp list` should show both as `enabled`. Studio's own **Quick connect**
-panel will generate the same command for other clients (Claude Desktop, ChatGPT,
-VS Code) if you want them wired too.
+**Working now:**
 
-With those two connected, one `agy` session can read the live Studio data model,
-run Luau in it, drive a playtest, and model assets in Blender — without you
-clicking between three windows.
+- First-person clerk with full desk interaction — bell, ledger, phone, UV light,
+  intercom, CCTV, admit/refuse stamps
+- 42 anomalies, 6 sculpted horror archetypes for guests
+- Shift loop with sanity: wrong calls drain it, hitting zero ends the night and
+  forfeits the takings, surviving above 50 pays a bonus
+- Between-shift shop. Upgrades buy **information** — without them most anomalies
+  show you nothing. That is the retention spine, not a bolt-on
+- Server-built lobby, atmosphere, rain, footsteps
+- Facility chores: coffee for sanity, breaker resets during blackouts, vending
 
-### Why not free OpenRouter models
+**Not done, roughly in order:**
 
-Tried and dropped, so you don't repeat it. GLM 5.2 free has exactly one provider
-(Decart) whose free pool is saturated: **5 of 6 raw calls returned 429**, and
-Claude Code spent **203 seconds** retrying before giving up without completing a
-one-line edit. MiniMax M3 free does work — clean tool calls, correct edits — but
-ranks #108 of 225 on agentic benchmarks, which is exactly the axis that matters
-here. Poolside's coding models answered but would not call tools at all.
+1. **Persistence.** `State.luau` is in-memory. The upgrade tree means nothing
+   until it survives logout — use [ProfileStore](https://github.com/MadStudioRoblox/ProfileStore),
+   do not hand-roll it, and `BindToClose` is mandatory.
+2. **Co-op.** The design is 2–4 players on one desk; the argument over whether a
+   guest is wrong is the social hook. Currently single-player.
+3. **A real playtest.** Nobody has sat down and judged whether the loop is
+   actually fun. Everything above is verified to *run*, not to be *good*.
 
-More API keys do not help: OpenRouter governs capacity per account globally, so
-extra keys and extra accounts change nothing.
+---
 
-`agy` puts Gemini 3.x, Claude Sonnet 4.6, Claude Opus 4.6 and GPT-OSS 120B behind
-one command. That is a better answer than hunting free endpoints.
+## Why this game
 
-## Daily loop
+Not taste — a market read, written up in `docs/`. Anomaly horror was still
+expanding when this started (roughly 4,000 → 286,000 peak CCU across seven games,
+Dec 2023 → May 2026), the genre differentiates by **workplace setting** rather
+than mechanic, and motels were unclaimed. The upgrade tree exists to fix horror's
+weak day-8-to-28 retention, which is what Roblox's discovery algorithm started
+weighting hardest in June 2026.
 
-```bash
-rojo serve                       # terminal 1, leave running, connect from Studio
-stylua src/                      # format before committing
-selene src/                      # lint
-rojo build -o nightdesk.rbxl     # standalone place file when you need one
-```
+If a change would ship the anomaly loop without the progression layer, that is
+the thing to push back on.
 
-## Layout
+---
 
-```
-src/shared/    → ReplicatedStorage.Shared       types, anomaly table, remote declarations
-src/server/    → ServerScriptService.Server     authority: guests, verdicts, economy
-src/client/    → StarterPlayerScripts.Client    rendering and input only
-tools/         blender_export.py — Roblox-ready FBX export
-assets/        exported .fbx, ready to import into Studio
-docs/ROBLOX.md the platform reference — architecture, limits, assets, traps
-docs/PIPELINE.md how the four tools fit together
-docs/PROMPT.md copy-paste session starters
-AGENTS.md      project rules — read by agy natively, and by Claude via CLAUDE.md
-```
+## Docs
 
-`default.project.json` is the map between those folders and the Roblox tree. It
-also sets Future lighting and a 2 AM clock, because the atmosphere is the product.
-
-## Where this is
-
-**The shift and the shop both run.** A night is a queue of guests; you admit or
-refuse each one; the night ends, the shop opens on what you earned, you buy an
-upgrade and open again.
-
-The upgrade tree buys **information**, not raw power. Without upgrades most
-anomalies show you nothing and you are guessing. Corridor lights and the lobby
-camera raise the chance a tell is visible; rooms add guests and payout. That is
-what makes a purchase feel like the fog lifting, and it is the reason the tree is
-the retention spine rather than a shop bolted on the side.
-
-Assets: `tools/models/keyrack.py` builds the lobby key rack — five hooks, one per
-room in the tree, keys hanging on the ones you own. 360 triangles.
-
-Not done yet, in order:
-
-1. **DataStore persistence** via ProfileStore — the upgrade tree means nothing
-   until it survives logout. This is the next thing that matters.
-2. Co-op: 2–4 players on one desk.
-3. Sanity as a real mechanic rather than a counter.
-4. The anomaly table to 40+ entries.
-5. Atmosphere pass — lighting and spatial audio.
+| File | What it's for |
+|---|---|
+| [AGENTS.md](AGENTS.md) | Architecture and rules. Auto-loaded by `agy` and Claude Code. |
+| [PROJECT_MEMORY.md](PROJECT_MEMORY.md) | Deep narrative state — setting, horror archetypes, subagent roster. |
+| [docs/ROBLOX.md](docs/ROBLOX.md) | Platform reference. Limits, asset routes, traps. Read before writing Roblox code. |
+| [docs/PIPELINE.md](docs/PIPELINE.md) | How Rojo, Blender, Studio MCP and agy fit — and what's verified vs broken. |
+| [docs/PROMPT.md](docs/PROMPT.md) | Copy-paste session starters. |
 
 ## Licence
 
-MIT. Take the setup, ignore the game.
+MIT. Take the pipeline, ignore the game.

@@ -170,35 +170,20 @@ three, so use it rather than Blender's export menu directly.
 blender motel.blend --background --python tools/blender_export.py -- --out assets/
 ```
 
-### Building the world in Studio, and getting it back into git
+### The world is built by the server, not stored as files
 
-Hand-writing geometry as JSON is miserable and does not scale past one room. You
-want to drag walls around in Studio. Rojo 7.7 can do that — `rojo syncback` reads
-a `.rbxl` and writes the file system from it.
+This changed. Earlier the lobby lived as `.rbxm` files under `src/world/` and was
+captured out of Studio with `rojo syncback`. That is gone.
 
-```bash
-# 1. build the lobby by hand in Studio, then save the place as place.rbxl
-# 2. see exactly what would change, writing nothing:
-rojo syncback --input place.rbxl world.project.json --dry-run --list
-# 3. if it looks right:
-rojo syncback --input place.rbxl world.project.json
-```
+The lobby is now constructed at runtime by `src/server/BuildLobby.luau`, which is
+why `Workspace` in `default.project.json` contains only a `SpawnLocation`. The
+geometry is code, so it diffs, reviews and merges like everything else -- which
+the binary `.rbxm` route never did.
 
-**`world.project.json` exists to make this safe.** Syncback writes the file system
-from the place file. Pointed at `default.project.json` it would happily overwrite
-`src/*.luau` with whatever script content is in that `.rbxl` — which is how you
-lose a day to a stale build. `world.project.json` maps *only* `Workspace.Lobby`,
-so the worst a bad syncback can do is scramble some parts. **Code stays one-way,
-permanently.**
-
-Syncback prompts before writing unless you pass `-y`, and `--dry-run --list`
-shows the full file list first. Use it. Verified here: a dry-run against the
-lobby listed 11 files and touched nothing in `src/server`, `src/client`, or
-`src/shared`.
-
-The world lands as `.rbxm` — binary, not diffable. That is the real cost, and it
-is the right trade for geometry: nobody reviews a wall position by reading a
-diff, they look at it. Code stays text.
+`rojo syncback` still exists if you ever want to capture hand-built geometry out
+of Studio. If you bring it back, scope it to a narrow second project file that
+cannot reach `src/`, because pointed at `default.project.json` it will overwrite
+your Luau with whatever script content is in the place file.
 
 ### Which sync tool — Rojo, Argon, or Lync
 

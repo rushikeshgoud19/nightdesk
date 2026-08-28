@@ -8,7 +8,6 @@
 # NOTE: '#' only starts a comment at the START of a line. A trailing comment
 # becomes part of the pattern and silently matches nothing.
 
-# selene generate-roblox-std output, regenerated per clone
 roblox.yml
 # rojo sourcemap, regenerated on demand
 sourcemap.json
@@ -23,7 +22,6 @@ DevPackages/
 *.rbxm
 *.rbxmx
 # ...except the world, which IS source. Rojo syncback writes these from Studio.
-!src/world/**/*.rbxm
 *.rbxl.lock
 *.rbxlx.lock
 
@@ -40,3 +38,7 @@ Thumbs.db
 assets/*.fbx
 assets/*.obj
 assets/*.glb
+
+# python bytecode from tools/
+__pycache__/
+*.pyc

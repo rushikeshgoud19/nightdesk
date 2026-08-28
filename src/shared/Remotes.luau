@@ -1,30 +1,32 @@
 --!strict
 -- Single place where every RemoteEvent is declared, so the wire surface between
 -- client and server is one file you can read in ten seconds.
---
--- The server creates them; the client waits for them. Nothing else in the codebase
--- calls Instance.new on a Remote.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local NAMES = {
-	-- Server -> client: "here is who just walked up to the desk". Carries the
-	-- tell only when the player's upgrades have earned it; the server decides.
 	"GuestArrived",
-	-- Client -> server: "I say admit" / "I say refuse". Carries a boolean only.
 	"Judge",
-	-- Server -> client: "you were right/wrong, here is the running total"
 	"ShiftUpdate",
-	-- Server -> client: "the night is over, here is the summary" -- opens the shop
 	"ShiftEnded",
-	-- Client -> server: "I want to buy this upgrade". Carries an id string only.
-	-- The server owns the price, the prerequisites, and the wallet.
 	"RequestPurchase",
-	-- Server -> client: full shop state -- owned set, takings, per-item availability
 	"ShopState",
-	-- Client -> server: "close the shop, start the next shift"
 	"StartShift",
+	"RingBell",
+	"BellRang",
+	"CallRoom",
+	"PhoneResponse",
+	"ToggleUV",
+	"UVState",
+	"Interrogate",
+	"InterrogationResponse",
+	-- Interactive Hallway & Office Remotes
+	"BrewCoffee",
+	"BuySoda",
+	"ResetBreaker",
+	"BreakerTripped",
+	"BreakerRestored",
 }
 
 local Remotes = {}

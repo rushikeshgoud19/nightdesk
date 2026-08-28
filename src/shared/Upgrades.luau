@@ -1,58 +1,107 @@
 --!strict
--- The upgrade catalogue. This is the retention spine: the reason to come back on
--- day 8 rather than day 1, and the thing the whole game design rests on.
+-- The master upgrade catalogue for the Highway Motel.
 --
--- Upgrades buy INFORMATION, not raw power. Without them most anomalies give you
--- nothing to go on and you are guessing. With them you can actually see what is
--- wrong. That makes every purchase feel like the fog lifting slightly, which is
--- a better hook than a bigger number.
---
--- Balance intent: the first upgrade should land in the second or third shift.
--- The last should be out of reach for a couple of weeks. Nobody finishes this
--- tree in a weekend.
+-- Upgrades buy INFORMATION, SURVEILLANCE, and MOTEL EXPANSION.
+-- Server-authoritative: The server calculates and validates every stat and purchase.
 
 export type Upgrade = {
 	id: string,
 	name: string,
 	blurb: string,
 	cost: number,
-	requires: string?, -- id of an upgrade that must be owned first
+	category: "investigation" | "security" | "expansion",
+	requires: string?,
 }
 
 local Upgrades = {}
 
 Upgrades.list = {
+	-- 1. INVESTIGATION & TOOLS
 	{
-		id = "room_2",
-		name = "Open the second room",
-		blurb = "One more guest each night. More money, more chances to be wrong.",
-		cost = 200,
+		id = "uv_boost",
+		name = "High-Output UV Blacklight",
+		blurb = "Casts a wide ultraviolet beam revealing hidden occult runes and forged seals instantly.",
+		cost = 80,
+		category = "investigation",
+	},
+	{
+		id = "switchboard",
+		name = "Police Dispatch Switchboard",
+		blurb = "Upgrades the rotary phone with direct access to regional highway patrol BOLO records.",
+		cost = 140,
+		category = "investigation",
+		requires = "uv_boost",
 	},
 	{
 		id = "lights",
-		name = "Fix the corridor lights",
-		blurb = "You can finally see faces properly. Tells show far more often.",
-		cost = 350,
+		name = "Commercial Halogen Tube Lights",
+		blurb = "Restores reception lighting. Physical anomaly tells show far more clearly.",
+		cost = 220,
+		category = "investigation",
 	},
 	{
-		id = "room_3",
-		name = "Open the third room",
-		blurb = "Another guest, another judgement call.",
-		cost = 600,
-		requires = "room_2",
+		id = "cheat_sheet",
+		name = "Dossier Anomaly Cheatsheet",
+		blurb = "Pins known anomaly behavioral tell notes directly onto the reception desk.",
+		cost = 300,
+		category = "investigation",
+		requires = "lights",
+	},
+
+	-- 2. SECURITY & SURVEILLANCE
+	{
+		id = "coffee_maker",
+		name = "Commercial Espresso Machine",
+		blurb = "Restores +25% sanity between high-stress anomaly encounters.",
+		cost = 100,
+		category = "security",
 	},
 	{
-		id = "camera",
-		name = "Install the lobby camera",
-		blurb = "The monitor catches what you miss at the desk.",
-		cost = 900,
+		id = "cctv_monitor",
+		name = "CCTV Security Monitor System",
+		blurb = "Installs a CRT surveillance monitor on the desk to cycle external & hallway cameras [C].",
+		cost = 250,
+		category = "security",
 		requires = "lights",
 	},
 	{
+		id = "steel_shutter",
+		name = "Emergency Counter Security Shutter",
+		blurb = "Reinforces the front desk against violent jumpscare breaches, halving sanity damage.",
+		cost = 400,
+		category = "security",
+		requires = "cctv_monitor",
+	},
+
+	-- 3. MOTEL EXPANSION & REVENUE
+	{
+		id = "neon_restoration",
+		name = "Restore Highway Neon Sign",
+		blurb = "Illuminates the highway sign, attracting wealthier travelers and boosting payout +$15/guest.",
+		cost = 120,
+		category = "expansion",
+	},
+	{
+		id = "room_2",
+		name = "Reopen Guest Wing (Room 102)",
+		blurb = "Expands guest capacity by +1 guest each night. More revenue, more judgement calls.",
+		cost = 180,
+		category = "expansion",
+	},
+	{
+		id = "room_3",
+		name = "Reopen Guest Wing (Room 103)",
+		blurb = "Expands motel capacity by +1 guest each night.",
+		cost = 320,
+		category = "expansion",
+		requires = "room_2",
+	},
+	{
 		id = "floor_2",
-		name = "Reopen the second floor",
-		blurb = "Twice the motel. Twice the night.",
-		cost = 2000,
+		name = "Reopen Second Floor (Rooms 201–208)",
+		blurb = "Twice the motel capacity. Unlocks high-stakes multi-entity shifts.",
+		cost = 850,
+		category = "expansion",
 		requires = "room_3",
 	},
 } :: { Upgrade }
@@ -66,17 +115,17 @@ function Upgrades.byId(id: string): Upgrade?
 	return nil
 end
 
--- Derived stats for a given set of owned upgrades. The server is the only caller
--- that matters; the client may compute the same values for display, but nothing
--- the client computes is ever trusted.
 export type Stats = {
 	guestsPerShift: number,
 	tellChance: number,
 	payout: number,
+	hasCCTV: boolean,
+	hasShutter: boolean,
+	hasCoffee: boolean,
 }
 
 local BASE_GUESTS = 4
-local BASE_TELL_CHANCE = 0.4
+local BASE_TELL_CHANCE = 0.40
 local BASE_PAYOUT = 40
 local MAX_TELL_CHANCE = 0.95
 
@@ -89,26 +138,35 @@ function Upgrades.stats(owned: { [string]: boolean }): Stats
 		rooms += 1
 	end
 	if owned.floor_2 then
-		rooms += 2
+		rooms += 3
 	end
 
 	local tell = BASE_TELL_CHANCE
 	if owned.lights then
-		tell += 0.2
+		tell += 0.20
 	end
-	if owned.camera then
-		tell += 0.25
+	if owned.cheat_sheet then
+		tell += 0.20
+	end
+	if owned.uv_boost then
+		tell += 0.15
+	end
+
+	local bonusPayout = 0
+	if owned.neon_restoration then
+		bonusPayout += 15
 	end
 
 	return {
 		guestsPerShift = BASE_GUESTS + rooms,
 		tellChance = math.min(tell, MAX_TELL_CHANCE),
-		payout = BASE_PAYOUT + rooms * 10,
+		payout = BASE_PAYOUT + rooms * 10 + bonusPayout,
+		hasCCTV = owned.cctv_monitor == true,
+		hasShutter = owned.steel_shutter == true,
+		hasCoffee = owned.coffee_maker == true,
 	}
 end
 
--- Whether an upgrade can be bought right now. Returns false plus a reason the UI
--- can show, so the client never has to guess why a button is dead.
 function Upgrades.canBuy(
 	u: Upgrade,
 	owned: { [string]: boolean },
@@ -122,7 +180,7 @@ function Upgrades.canBuy(
 		return false, `Needs: {prereq and prereq.name or u.requires}`
 	end
 	if takings < u.cost then
-		return false, `Costs {u.cost}`
+		return false, `Costs ${u.cost}`
 	end
 	return true, nil
 end

@@ -32,15 +32,12 @@
         "$className": "SpawnLocation",
         "$properties": {
           "Size": [6, 1, 6],
-          "Position": [0, 0.5, -9],
+          "Position": [0, 3.5, 7.5],
           "Anchored": true,
           "Neutral": true,
           "Transparency": 1,
           "CanCollide": false
         }
-      },
-      "Lobby": {
-        "$path": "src/world/Lobby"
       }
     },
     "Lighting": {
@@ -48,12 +45,13 @@
       "$properties": {
         "Technology": "Future",
         "Ambient": [0.03, 0.03, 0.04],
-        "OutdoorAmbient": [0.05, 0.05, 0.06],
+        "OutdoorAmbient": [0.02, 0.02, 0.03],
         "Brightness": 0.4,
-        "ClockTime": 2,
+        "ClockTime": 2.0,
         "GlobalShadows": true,
-        "FogEnd": 220,
-        "FogColor": [0.04, 0.04, 0.05]
+        "ExposureCompensation": -0.1,
+        "FogEnd": 120,
+        "FogColor": [0.03, 0.03, 0.05]
       }
     },
     "SoundService": {
