@@ -45,6 +45,17 @@ local mCityLabel: TextLabel?
 local mDatesLabel: TextLabel?
 local mWatermarkLabel: TextLabel?
 
+local zipLabel: TextLabel?
+local stayLabel: TextLabel?
+local signatureLabel: TextLabel?
+local photoMask: Frame?
+
+local mZipLabel: TextLabel?
+local mStayLabel: TextLabel?
+local mSignatureLabel: TextLabel?
+local mPhotoMask: Frame?
+local currentWatermarkText = "★ OFFICIAL GENUINE CRESTVIEW SEAL ★"
+
 local stampAdmitPart: Model?
 local stampRefusePart: Model?
 local bellModel: Model?
@@ -346,6 +357,52 @@ function DeskProps.init()
 	uvWatermarkLabel.TextTransparency = 1.0
 	uvWatermarkLabel.Parent = paper
 
+	zipLabel = Instance.new("TextLabel")
+	zipLabel.Size = UDim2.new(0.45, 0, 0, 28)
+	zipLabel.Position = UDim2.new(0.05, 0, 0, 240)
+	zipLabel.BackgroundTransparency = 1
+	zipLabel.Font = Enum.Font.RobotoMono
+	zipLabel.Text = "ZIP: 97204"
+	zipLabel.TextColor3 = Color3.fromRGB(24, 20, 18)
+	zipLabel.TextSize = 14
+	zipLabel.TextXAlignment = Enum.TextXAlignment.Left
+	zipLabel.Parent = paper
+
+	stayLabel = Instance.new("TextLabel")
+	stayLabel.Size = UDim2.new(0.45, 0, 0, 28)
+	stayLabel.Position = UDim2.new(0.5, 0, 0, 240)
+	stayLabel.BackgroundTransparency = 1
+	stayLabel.Font = Enum.Font.RobotoMono
+	stayLabel.Text = "STAY: 1 night"
+	stayLabel.TextColor3 = Color3.fromRGB(24, 20, 18)
+	stayLabel.TextSize = 14
+	stayLabel.TextXAlignment = Enum.TextXAlignment.Left
+	stayLabel.Parent = paper
+
+	signatureLabel = Instance.new("TextLabel")
+	signatureLabel.Size = UDim2.new(0.9, 0, 0, 36)
+	signatureLabel.Position = UDim2.new(0.05, 0, 0, 330)
+	signatureLabel.BackgroundTransparency = 1
+	signatureLabel.Font = Enum.Font.SourceSansItalic
+	signatureLabel.Text = "Signature"
+	signatureLabel.TextColor3 = Color3.fromRGB(20, 20, 40)
+	signatureLabel.TextSize = 22
+	signatureLabel.TextXAlignment = Enum.TextXAlignment.Left
+	signatureLabel.Parent = paper
+
+	local photoFrame = Instance.new("Frame")
+	photoFrame.Size = UDim2.fromOffset(60, 80)
+	photoFrame.Position = UDim2.new(0.75, 0, 0, 56)
+	photoFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+	photoFrame.Parent = paper
+	photoMask = Instance.new("Frame")
+	photoMask.Size = UDim2.fromScale(1, 0.4)
+	photoMask.Position = UDim2.fromScale(0, 0.2)
+	photoMask.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	photoMask.BackgroundTransparency = 1.0
+	photoMask.BorderSizePixel = 0
+	photoMask.Parent = photoFrame
+
 	-- 2D Inspect Modal (Brought up on [F] press)
 	inspectModal =
 		Theme.frame(nightDeskGui, UDim2.fromOffset(480, 580), UDim2.new(0.5, -240, 0.5, -290))
@@ -445,6 +502,52 @@ function DeskProps.init()
 	mWatermarkLabel.TextSize = 18
 	mWatermarkLabel.TextTransparency = 1.0
 	mWatermarkLabel.Parent = inspectModal
+
+	mZipLabel = Instance.new("TextLabel")
+	mZipLabel.Size = UDim2.new(0.45, 0, 0, 36)
+	mZipLabel.Position = UDim2.new(0.05, 0, 0, 310)
+	mZipLabel.BackgroundTransparency = 1
+	mZipLabel.Font = Enum.Font.RobotoMono
+	mZipLabel.Text = "ZIP: 97204"
+	mZipLabel.TextColor3 = Color3.fromRGB(20, 18, 16)
+	mZipLabel.TextSize = 16
+	mZipLabel.TextXAlignment = Enum.TextXAlignment.Left
+	mZipLabel.Parent = inspectModal
+
+	mStayLabel = Instance.new("TextLabel")
+	mStayLabel.Size = UDim2.new(0.45, 0, 0, 36)
+	mStayLabel.Position = UDim2.new(0.5, 0, 0, 310)
+	mStayLabel.BackgroundTransparency = 1
+	mStayLabel.Font = Enum.Font.RobotoMono
+	mStayLabel.Text = "STAY: 1 night"
+	mStayLabel.TextColor3 = Color3.fromRGB(20, 18, 16)
+	mStayLabel.TextSize = 16
+	mStayLabel.TextXAlignment = Enum.TextXAlignment.Left
+	mStayLabel.Parent = inspectModal
+
+	mSignatureLabel = Instance.new("TextLabel")
+	mSignatureLabel.Size = UDim2.new(0.9, 0, 0, 46)
+	mSignatureLabel.Position = UDim2.new(0.05, 0, 0, 420)
+	mSignatureLabel.BackgroundTransparency = 1
+	mSignatureLabel.Font = Enum.Font.SourceSansItalic
+	mSignatureLabel.Text = "Signature"
+	mSignatureLabel.TextColor3 = Color3.fromRGB(20, 20, 40)
+	mSignatureLabel.TextSize = 26
+	mSignatureLabel.TextXAlignment = Enum.TextXAlignment.Left
+	mSignatureLabel.Parent = inspectModal
+
+	local mPhotoFrame = Instance.new("Frame")
+	mPhotoFrame.Size = UDim2.fromOffset(80, 100)
+	mPhotoFrame.Position = UDim2.new(0.75, 0, 0, 70)
+	mPhotoFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+	mPhotoFrame.Parent = inspectModal
+	mPhotoMask = Instance.new("Frame")
+	mPhotoMask.Size = UDim2.fromScale(1, 0.4)
+	mPhotoMask.Position = UDim2.fromScale(0, 0.2)
+	mPhotoMask.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	mPhotoMask.BackgroundTransparency = 1.0
+	mPhotoMask.BorderSizePixel = 0
+	mPhotoMask.Parent = mPhotoFrame
 
 	local mCloseBtn = Theme.button(
 		inspectModal,
@@ -575,6 +678,9 @@ function DeskProps.init()
 	phoneResponse.OnClientEvent:Connect(function(data)
 		if data.audioType == "whisper" then
 			Atmosphere.playSound("heartbeat", nil, 0.8)
+		elseif data.audioType == "static" then
+			Atmosphere.playSound("flicker", nil, 1.2)
+			Atmosphere.shakeCamera()
 		end
 	end)
 
@@ -585,11 +691,37 @@ function DeskProps.init()
 		end
 		local text = if data.hasAnomaly
 			then `⚠ WARNING: {data.symbolType or "COUNTERFEIT OCCULT MARK"} ⚠`
-			else "★ OFFICIAL GENUINE CRESTVIEW SEAL ★"
+			else currentWatermarkText
 		local color = if data.hasAnomaly
 			then Color3.fromRGB(255, 40, 40)
 			else Color3.fromRGB(80, 140, 255)
 		local trans = if uvActive then 0.1 else 1.0
+
+		if zipLabel then
+			zipLabel.Text = "ZIP: ---"
+		end
+		if stayLabel then
+			stayLabel.Text = "STAY: ---"
+		end
+		if signatureLabel then
+			signatureLabel.Text = ""
+		end
+		if photoMask then
+			photoMask.BackgroundTransparency = 1.0
+		end
+
+		if mZipLabel then
+			mZipLabel.Text = "ZIP: ---"
+		end
+		if mStayLabel then
+			mStayLabel.Text = "STAY: ---"
+		end
+		if mSignatureLabel then
+			mSignatureLabel.Text = ""
+		end
+		if mPhotoMask then
+			mPhotoMask.BackgroundTransparency = 1.0
+		end
 
 		if uvWatermarkLabel then
 			uvWatermarkLabel.Text = text
@@ -668,6 +800,36 @@ end
 
 function DeskProps.updateLedger(guestData)
 	currentRoomNumber = guestData.roomNumber or 101
+
+	currentWatermarkText = guestData.watermarkText or "★ OFFICIAL GENUINE CRESTVIEW SEAL ★"
+	if zipLabel then
+		zipLabel.Text = `ZIP: {guestData.zipCode or "97204"}`
+	end
+	if stayLabel then
+		stayLabel.Text = `STAY: {guestData.stayLength or "1 night"}`
+	end
+	if signatureLabel then
+		signatureLabel.Font = Enum.Font[guestData.signatureFont or "SourceSansItalic"]
+		signatureLabel.Text = guestData.name
+	end
+	if photoMask then
+		photoMask.BackgroundTransparency = guestData.photoMaskTransparency or 1.0
+	end
+
+	if mZipLabel then
+		mZipLabel.Text = `ZIP: {guestData.zipCode or "97204"}`
+	end
+	if mStayLabel then
+		mStayLabel.Text = `STAY: {guestData.stayLength or "1 night"}`
+	end
+	if mSignatureLabel then
+		mSignatureLabel.Font = Enum.Font[guestData.signatureFont or "SourceSansItalic"]
+		mSignatureLabel.Text = guestData.name
+	end
+	if mPhotoMask then
+		mPhotoMask.BackgroundTransparency = guestData.photoMaskTransparency or 1.0
+	end
+
 	if nameLabel then
 		nameLabel.Text = `NAME: {guestData.name}`
 	end
@@ -729,6 +891,33 @@ function DeskProps.clearLedger()
 	if datesLabel then
 		datesLabel.Text = "IN: ---\nOUT: ---"
 	end
+
+	if zipLabel then
+		zipLabel.Text = "ZIP: ---"
+	end
+	if stayLabel then
+		stayLabel.Text = "STAY: ---"
+	end
+	if signatureLabel then
+		signatureLabel.Text = ""
+	end
+	if photoMask then
+		photoMask.BackgroundTransparency = 1.0
+	end
+
+	if mZipLabel then
+		mZipLabel.Text = "ZIP: ---"
+	end
+	if mStayLabel then
+		mStayLabel.Text = "STAY: ---"
+	end
+	if mSignatureLabel then
+		mSignatureLabel.Text = ""
+	end
+	if mPhotoMask then
+		mPhotoMask.BackgroundTransparency = 1.0
+	end
+
 	if uvWatermarkLabel then
 		uvWatermarkLabel.TextTransparency = 1.0
 	end

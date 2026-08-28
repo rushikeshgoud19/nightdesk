@@ -450,6 +450,8 @@ local function buildAnatomicalFacialContours(
 	local isAsymmetricFace = anomalyId == "asymmetric_face"
 	local isSubtleSmile = anomalyId == "subtle_smile"
 	local isMeltingWax = anomalyId == "melting_wax"
+	local asymX = (anomalyId == "perfect_symmetry") and 0 or (math.random(-2, 2) * 0.008)
+	local asymY = (anomalyId == "perfect_symmetry") and 0 or (math.random(-2, 2) * 0.008)
 
 	makePart(
 		"Cheekbone_L",
@@ -468,7 +470,7 @@ local function buildAnatomicalFacialContours(
 		Enum.PartType.Block,
 		Vector3.new(0.20 * scaleW, 0.14 * scaleH, 0.08 * scaleD),
 		head.CFrame
-			* CFrame.new(0.35 * scaleW, 0.05 * scaleH, 0.50 * scaleD)
+			* CFrame.new((0.35 + asymX) * scaleW, (0.05 + asymY) * scaleH, 0.50 * scaleD)
 			* CFrame.Angles(0, math.rad(-14), math.rad(10)),
 		skinColor,
 		Enum.Material.SmoothPlastic,
@@ -493,7 +495,7 @@ local function buildAnatomicalFacialContours(
 		Enum.PartType.Block,
 		Vector3.new(0.18 * scaleW, 0.26 * scaleH, 0.10 * scaleD),
 		head.CFrame
-			* CFrame.new(0.30 * scaleW, -0.32 * scaleH, 0.44 * scaleD)
+			* CFrame.new((0.30 + asymX) * scaleW, (-0.32 + asymY) * scaleH, 0.44 * scaleD)
 			* CFrame.Angles(0, math.rad(-22), math.rad(18)),
 		skinColor,
 		Enum.Material.SmoothPlastic,
@@ -570,7 +572,7 @@ local function buildAnatomicalFacialContours(
 		Enum.PartType.Block,
 		Vector3.new(0.08 * scaleW, 0.32 * scaleH, 0.18 * scaleD),
 		head.CFrame
-			* CFrame.new(0.55 * scaleW, 0.08 * scaleH, -0.02 * scaleD)
+			* CFrame.new((0.55 + asymX) * scaleW, (0.08 + asymY) * scaleH, -0.02 * scaleD)
 			* CFrame.Angles(0, math.rad(10), 0),
 		skinColor,
 		Enum.Material.SmoothPlastic,
@@ -683,7 +685,7 @@ local function buildAnatomicalFacialContours(
 		"Sclera_R",
 		Enum.PartType.Block,
 		Vector3.new(0.18 * scaleW, 0.11 * scaleH, 0.04 * scaleD),
-		head.CFrame * CFrame.new(0.26 * scaleW, 0.15 * scaleH, 0.53 * scaleD),
+		head.CFrame * CFrame.new((0.26 + asymX) * scaleW, (0.15 + asymY) * scaleH, 0.53 * scaleD),
 		scleraColor,
 		Enum.Material.SmoothPlastic,
 		transparency,
@@ -693,7 +695,7 @@ local function buildAnatomicalFacialContours(
 		"Iris_R",
 		Enum.PartType.Block,
 		Vector3.new(0.10 * scaleW, 0.10 * scaleH, 0.03 * scaleD),
-		head.CFrame * CFrame.new(0.26 * scaleW, 0.15 * scaleH, 0.55 * scaleD),
+		head.CFrame * CFrame.new((0.26 + asymX) * scaleW, (0.15 + asymY) * scaleH, 0.55 * scaleD),
 		eyeColor,
 		Enum.Material.SmoothPlastic,
 		transparency,
@@ -703,7 +705,7 @@ local function buildAnatomicalFacialContours(
 		"Pupil_R",
 		Enum.PartType.Block,
 		Vector3.new(pupilSize * scaleW, pupilSize * scaleH, 0.03 * scaleD),
-		head.CFrame * CFrame.new(0.26 * scaleW, 0.15 * scaleH, 0.56 * scaleD),
+		head.CFrame * CFrame.new((0.26 + asymX) * scaleW, (0.15 + asymY) * scaleH, 0.56 * scaleD),
 		Color3.fromRGB(15, 12, 14),
 		Enum.Material.SmoothPlastic,
 		transparency,
@@ -2114,6 +2116,22 @@ function GuestRenderer.arrive(guestData: GuestData)
 	local targetZ = (guestData.anomalyId == "wrong_distance") and 0.80 or 1.80
 	local targetDeskPos = Vector3.new(0, 4.80, targetZ)
 
+	if guestData.anomalyId == "whispering_vents" then
+		local vent = Workspace:FindFirstChild("Lobby"):FindFirstChild("VentilationDuct")
+		if vent then
+			local sound = Instance.new("Sound")
+			sound.Name = "VentWhisper"
+			sound.SoundId = "rbxassetid://16124508659" -- Spooky whisper
+			sound.Volume = 0.6
+			sound.Looped = true
+			sound.RollOffMode = Enum.RollOffMode.InverseTapered
+			sound.RollOffMinDistance = 5
+			sound.RollOffMaxDistance = 25
+			sound.Parent = vent
+			sound:Play()
+		end
+	end
+
 	local startCF = CFrame.lookAt(SPAWN_POS, targetDeskPos)
 	local targetCF = CFrame.lookAt(targetDeskPos, targetDeskPos + Vector3.new(0, 0, 10))
 
@@ -2252,6 +2270,24 @@ function GuestRenderer.arrive(guestData: GuestData)
 					-- Natural Human Breathing Physics (Ribcage expansion & vertical lift)
 					local breathRate = guestData.anomalyId == "breathing_out_of_sync" and 0.8 or 2.2
 					local breathWave = math.sin(t * breathRate)
+
+					-- Flickering presence
+					if guestData.anomalyId == "flickering_presence" then
+						if math.random() < 0.02 then
+							for _, info in ipairs(currentPartInfos) do
+								if info.part.Parent then
+									info.part.Transparency = 1.0
+								end
+							end
+						else
+							for _, info in ipairs(currentPartInfos) do
+								if info.part.Parent then
+									info.part.Transparency = info.origTransparency
+								end
+							end
+						end
+					end
+
 					state.torsoLift = breathWave * 0.038
 					state.torsoPitch = breathWave * math.rad(1.2)
 					state.armAngleL = breathWave * math.rad(0.6)
@@ -2332,6 +2368,14 @@ function GuestRenderer.arrive(guestData: GuestData)
 end
 
 function GuestRenderer.depart(admitted: boolean)
+	local vent = Workspace:FindFirstChild("Lobby"):FindFirstChild("VentilationDuct")
+	if vent then
+		local snd = vent:FindFirstChild("VentWhisper")
+		if snd then
+			snd:Destroy()
+		end
+	end
+
 	if not currentGuestModel then
 		return
 	end

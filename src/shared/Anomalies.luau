@@ -392,20 +392,7 @@ local ANOMALY_CHANCE = 0.45
 --       needs positional audio
 --   the three phone_* tells
 --       need the rotary phone to answer differently
-local UNOBSERVABLE: { [string]: boolean } = {
-	forged_signature = true,
-	redacted_id = true,
-	counterfeit_watermark = true,
-	impossible_zip = true,
-	negative_stay = true,
-	perfect_symmetry = true,
-	flickering_presence = true,
-	uv_counterfeit_seal = true,
-	whispering_vents = true,
-	phone_occupied_room = true,
-	phone_whisper_echo = true,
-	phone_static_screamer = true,
-}
+local UNOBSERVABLE: { [string]: boolean } = {}
 
 local rollablePool: { Anomaly }? = nil
 
@@ -444,6 +431,11 @@ function Anomalies.roll(rng: Random): Guest
 		anomaly = pool[rng:NextInteger(1, #pool)]
 	end
 
+	local zipCode = string.format("%05d", rng:NextInteger(10000, 99999))
+	local stayLength = "1 night"
+	local signatureFont = "SourceSansItalic"
+	local watermarkText = "★ OFFICIAL CRESTVIEW SEAL ★"
+	local photoMaskTransparency = 1.0
 	local idName = name
 	local checkIn = "Oct 24, 2026"
 	local checkOut = "Oct 25, 2026"
@@ -462,6 +454,16 @@ function Anomalies.roll(rng: Random): Guest
 			roomNum = 109
 		elseif anomaly.id == "fake_reservation_code" then
 			reservation = "0000"
+		elseif anomaly.id == "impossible_zip" then
+			zipCode = "00000"
+		elseif anomaly.id == "negative_stay" then
+			stayLength = "-3 nights"
+		elseif anomaly.id == "forged_signature" then
+			signatureFont = "RobotoMono"
+		elseif anomaly.id == "counterfeit_watermark" then
+			watermarkText = " OFFICIAL CRESTVIEW SEAL ★"
+		elseif anomaly.id == "redacted_id" then
+			photoMaskTransparency = 0.5
 		elseif anomaly.id == "expired_license" then
 			checkOut = "Oct 25, 1989"
 		elseif anomaly.id == "wrong_city" then
@@ -488,6 +490,11 @@ function Anomalies.roll(rng: Random): Guest
 		cityOrigin = city,
 		uvSymbol = uvSymbol,
 		isRoomOccupied = isOccupied,
+		zipCode = zipCode,
+		stayLength = stayLength,
+		signatureFont = signatureFont,
+		watermarkText = watermarkText,
+		photoMaskTransparency = photoMaskTransparency,
 	}
 end
 

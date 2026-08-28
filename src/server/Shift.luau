@@ -113,6 +113,12 @@ local function sendNext(player: Player)
 		checkOutDate = guest.checkOutDate,
 		roomNumber = guest.roomNumber,
 		cityOrigin = guest.cityOrigin,
+		zipCode = guest.zipCode,
+		stayLength = guest.stayLength,
+		signatureFont = guest.signatureFont,
+		watermarkText = guest.watermarkText,
+		photoMaskTransparency = guest.photoMaskTransparency,
+
 		tell = if textVisible and guest.anomaly then guest.anomaly.tell else nil,
 		anomalyId = if guest.anomaly then guest.anomaly.id else nil,
 		horrorType = if guest.anomaly then guest.anomaly.horrorType else nil,
@@ -238,11 +244,16 @@ function Shift.bind()
 				then guest.anomaly.phoneWhisper
 				else `[DISTORTED BREATHING] ...Who is at the front desk? I'm already in room {num}...`
 
+			local aType = "whisper"
+			if guest.anomaly and guest.anomaly.id == "phone_static_screamer" then
+				aType = "static"
+			end
+
 			phoneResponse:FireClient(player, {
 				success = true,
 				isOccupied = true,
 				message = whisper,
-				audioType = "whisper",
+				audioType = aType,
 			})
 		else
 			phoneResponse:FireClient(player, {
