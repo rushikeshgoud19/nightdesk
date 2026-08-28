@@ -20,14 +20,18 @@ end)
 
 Players.PlayerAdded:Connect(function(player)
 	State.load(player)
-	player.CharacterAdded:Wait()
-	task.wait(1)
-	Shift.start(player)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
 	State.release(player)
 	Shop.forget(player)
+end)
+
+game:BindToClose(function()
+	for _, player in Players:GetPlayers() do
+		State.release(player)
+		Shop.forget(player)
+	end
 end)
 
 print("[nightdesk] server initialized with master motel lobby")

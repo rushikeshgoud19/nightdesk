@@ -13,6 +13,16 @@
 local Workspace = game:GetService("Workspace")
 
 local function buildLobby(): Model
+	-- Clean up any default Roblox template Baseplate
+	for _, child in Workspace:GetChildren() do
+		if
+			child.Name == "Baseplate"
+			or (child:IsA("BasePart") and child.Name:lower():find("baseplate") ~= nil)
+		then
+			child:Destroy()
+		end
+	end
+
 	local existing = Workspace:FindFirstChild("Lobby")
 	if existing then
 		existing:Destroy()

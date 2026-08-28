@@ -1,6 +1,6 @@
 --!strict
 -- Client bootstrap. Sets up true First-Person FPS character controls,
--- ambient audio, 3D desk interactions, HUD, and remote handlers.
+-- ambient audio, 3D desk interactions, HUD, CRT overlays, and cinematic intro sequence.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -13,7 +13,9 @@ local Atmosphere = require(script:WaitForChild("Atmosphere"))
 local DeskCamera = require(script:WaitForChild("DeskCamera"))
 local DeskProps = require(script:WaitForChild("DeskProps"))
 local DeskUI = require(script:WaitForChild("DeskUI"))
+local IntroUI = require(script:WaitForChild("IntroUI"))
 local ShopUI = require(script:WaitForChild("ShopUI"))
+local Theme = require(script:WaitForChild("Theme"))
 local Viewmodel = require(script:WaitForChild("Viewmodel"))
 
 local player = Players.LocalPlayer
@@ -55,6 +57,7 @@ local gui = Instance.new("ScreenGui")
 gui.Name = "NightDesk"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
+gui.DisplayOrder = 10
 gui.Parent = player:WaitForChild("PlayerGui")
 
 -- First-person center interaction crosshair dot
@@ -63,14 +66,16 @@ crosshair.Name = "CenterCrosshair"
 crosshair.Size = UDim2.fromOffset(4, 4)
 crosshair.Position = UDim2.new(0.5, -2, 0.5, -2)
 crosshair.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-crosshair.BackgroundTransparency = 0.5
+crosshair.BackgroundTransparency = 0.4
 crosshair.BorderSizePixel = 0
+Theme.corner(crosshair, 2)
 crosshair.Parent = gui
 
 Atmosphere.init()
 DeskProps.init()
 DeskCamera.init()
 Viewmodel.init()
+Theme.attachCRTOverlay(gui)
 DeskUI.build(gui)
 ShopUI.build(gui)
 
@@ -78,5 +83,10 @@ Remotes.get("GuestArrived").OnClientEvent:Connect(DeskUI.onGuest)
 Remotes.get("ShiftUpdate").OnClientEvent:Connect(DeskUI.onResult)
 Remotes.get("ShiftEnded").OnClientEvent:Connect(DeskUI.onShiftEnded)
 Remotes.get("ShopState").OnClientEvent:Connect(ShopUI.render)
+
+-- Display starting cinematic briefing & timecard punch-in on boot
+IntroUI.show(function()
+	print("[nightdesk] clerk punched in - night shift active")
+end)
 
 print("[nightdesk] first-person FPS client fully initialized")

@@ -1,6 +1,6 @@
 --!strict
--- The desk interface: Sleek, non-intrusive HUD with clean horizontal layout,
--- phone subtitle banner, [Z]/[X] verdict hotkeys, and [G] Intercom Dialogue Questioning.
+-- The desk interface: High-fidelity analog horror HUD with dynamic EKG sanity bar,
+-- tactile [Z]/[X] verdict stamps, tape-recorder subtitle banner, and [G] Intercom modal.
 
 local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -23,10 +23,13 @@ local interrogationResponse = Remotes.get("InterrogationResponse")
 local DeskUI = {}
 
 local hudFrame: Frame
+local nightBadge: Frame
 local nightLabel: TextLabel
+local takingsBadge: Frame
 local takingsLabel: TextLabel
 local sanityFill: Frame
 local sanityLabel: TextLabel
+local sanityIcon: TextLabel
 local queueLabel: TextLabel
 local statusLabel: TextLabel
 
@@ -45,7 +48,19 @@ local awaiting = false
 
 local function setPrompt(visible: boolean)
 	awaiting = visible
-	bottomBar.Visible = visible
+	if bottomBar then
+		bottomBar.Visible = visible
+		if visible then
+			bottomBar.Position = UDim2.new(0.5, -420, 1, -12)
+			TweenService:Create(
+				bottomBar,
+				TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+				{
+					Position = UDim2.new(0.5, -420, 1, -94),
+				}
+			):Play()
+		end
+	end
 	if not visible and intercomModal then
 		intercomModal.Visible = false
 		intercomVisible = false
@@ -57,7 +72,7 @@ function DeskUI.send(admitted: boolean)
 		return
 	end
 	setPrompt(false)
-	Atmosphere.playSound("thud", nil, 0.9)
+	Atmosphere.playSound("stamp", nil, 0.9)
 	GuestRenderer.depart(admitted)
 	DeskProps.clearLedger()
 	judge:FireServer(admitted)
@@ -82,150 +97,228 @@ function DeskUI.ask(questionId: string)
 end
 
 function DeskUI.build(gui: ScreenGui)
-	-- 1. Top HUD Bar with non-colliding layout
-	hudFrame = Theme.frame(gui, UDim2.new(1, -48, 0, 44), UDim2.fromOffset(24, 14))
-	hudFrame.BackgroundColor3 = Color3.fromRGB(18, 22, 20)
+	-- 1. Sleek Top HUD Bar
+	hudFrame = Theme.card(
+		gui,
+		UDim2.new(1, -48, 0, 48),
+		UDim2.fromOffset(24, 12),
+		Color3.fromRGB(14, 17, 16),
+		Color3.fromRGB(38, 52, 45)
+	)
 
-	nightLabel = Theme.label(hudFrame, UDim2.fromOffset(190, 44), UDim2.fromOffset(16, 12), 14)
+	-- Night Shift Badge
+	nightBadge = Theme.badge(
+		hudFrame,
+		UDim2.fromOffset(175, 30),
+		UDim2.fromOffset(10, 9),
+		"NIGHT 1 · 02:00 AM",
+		Color3.fromRGB(24, 34, 28),
+		Color3.fromRGB(120, 225, 150)
+	)
+	nightLabel = nightBadge:FindFirstChildWhichIsA("TextLabel") :: TextLabel
 	nightLabel.Font = Enum.Font.GothamBold
-	nightLabel.TextColor3 = Theme.ink
-	nightLabel.Text = "NIGHT SHIFT · 02:00 AM"
 
-	takingsLabel = Theme.label(hudFrame, UDim2.fromOffset(140, 44), UDim2.fromOffset(210, 12), 14)
+	-- Takings Safe Badge
+	takingsBadge = Theme.badge(
+		hudFrame,
+		UDim2.fromOffset(130, 30),
+		UDim2.fromOffset(195, 9),
+		"SAFE: $0",
+		Color3.fromRGB(22, 38, 30),
+		Color3.fromRGB(110, 230, 145)
+	)
+	takingsLabel = takingsBadge:FindFirstChildWhichIsA("TextLabel") :: TextLabel
 	takingsLabel.Font = Enum.Font.GothamBold
-	takingsLabel.TextColor3 = Color3.fromRGB(110, 220, 140)
-	takingsLabel.Text = "SAFE: $0"
 
+	-- EKG Sanity Container
 	local sanityContainer = Instance.new("Frame")
-	sanityContainer.Size = UDim2.fromOffset(230, 24)
-	sanityContainer.Position = UDim2.new(0.5, -115, 0, 10)
+	sanityContainer.Size = UDim2.fromOffset(250, 30)
+	sanityContainer.Position = UDim2.new(0.5, -125, 0, 9)
 	sanityContainer.BackgroundTransparency = 1
 	sanityContainer.Parent = hudFrame
 
-	local sTitle = Theme.label(sanityContainer, UDim2.fromOffset(56, 24), UDim2.new(), 12)
-	sTitle.TextColor3 = Theme.inkSoft
-	sTitle.Text = "SANITY:"
+	sanityIcon = Theme.label(
+		sanityContainer,
+		UDim2.fromOffset(75, 30),
+		UDim2.new(),
+		12,
+		Enum.Font.GothamBold
+	)
+	sanityIcon.TextColor3 = Color3.fromRGB(80, 210, 245)
+	sanityIcon.Text = "♥ SANITY:"
 
-	local sanityBar = Instance.new("Frame")
-	sanityBar.Size = UDim2.fromOffset(120, 8)
-	sanityBar.Position = UDim2.fromOffset(60, 8)
-	sanityBar.BackgroundColor3 = Color3.fromRGB(35, 42, 38)
-	sanityBar.BorderSizePixel = 0
-	sanityBar.Parent = sanityContainer
+	local sanityBarBg = Instance.new("Frame")
+	sanityBarBg.Size = UDim2.fromOffset(125, 10)
+	sanityBarBg.Position = UDim2.fromOffset(80, 10)
+	sanityBarBg.BackgroundColor3 = Color3.fromRGB(25, 32, 30)
+	sanityBarBg.BorderSizePixel = 0
+	Theme.corner(sanityBarBg, 5)
+	Theme.stroke(sanityBarBg, Color3.fromRGB(45, 58, 52), 1, 0.4)
+	sanityBarBg.Parent = sanityContainer
 
 	sanityFill = Instance.new("Frame")
 	sanityFill.Size = UDim2.fromScale(1, 1)
-	sanityFill.BackgroundColor3 = Color3.fromRGB(80, 190, 240)
+	sanityFill.BackgroundColor3 = Color3.fromRGB(75, 205, 235)
 	sanityFill.BorderSizePixel = 0
-	sanityFill.Parent = sanityBar
+	Theme.corner(sanityFill, 5)
+	sanityFill.Parent = sanityBarBg
 
-	sanityLabel =
-		Theme.label(sanityContainer, UDim2.fromOffset(45, 24), UDim2.fromOffset(185, 0), 12)
+	sanityLabel = Theme.label(
+		sanityContainer,
+		UDim2.fromOffset(45, 30),
+		UDim2.fromOffset(212, 0),
+		12,
+		Enum.Font.RobotoMono
+	)
 	sanityLabel.TextColor3 = Theme.inkSoft
 	sanityLabel.Text = "100%"
 
-	queueLabel = Theme.label(hudFrame, UDim2.fromOffset(360, 44), UDim2.new(1, -370, 0, 12), 12)
+	-- Right Controls Guide Badge
+	queueLabel = Theme.label(
+		hudFrame,
+		UDim2.fromOffset(420, 30),
+		UDim2.new(1, -430, 0, 9),
+		12,
+		Enum.Font.RobotoMono
+	)
 	queueLabel.TextColor3 = Theme.inkSoft
 	queueLabel.TextXAlignment = Enum.TextXAlignment.Right
-	queueLabel.Text = "[E] Bell · [F] Zoom · [G] Ask · [T] Phone · [Q] UV"
+	queueLabel.Text = "[E] Bell · [F] Ledger · [G] Ask · [T] Phone · [Q] UV"
 
-	statusLabel = Theme.label(gui, UDim2.fromOffset(850, 26), UDim2.fromOffset(32, 64), 13)
+	-- Status Feedback Banner
+	statusLabel =
+		Theme.label(gui, UDim2.fromOffset(900, 24), UDim2.fromOffset(32, 68), 13, Enum.Font.Code)
 	statusLabel.TextColor3 = Theme.inkSoft
-	statusLabel.Text = "Desk active. Ring bell [E] to summon the next guest in queue."
+	statusLabel.Text = "Shift active. Ring the bell [E] to summon the next guest."
 
-	-- Dedicated Subtitle Box
-	phoneBannerFrame = Theme.frame(gui, UDim2.new(1, -64, 0, 42), UDim2.new(0, 32, 1, -150))
-	phoneBannerFrame.BackgroundColor3 = Color3.fromRGB(12, 14, 18)
-	phoneBannerFrame.BackgroundTransparency = 0.20
+	-- 2. Tape Recorder Subtitle Banner
+	phoneBannerFrame = Theme.card(
+		gui,
+		UDim2.new(1, -64, 0, 46),
+		UDim2.new(0, 32, 1, -155),
+		Color3.fromRGB(10, 12, 14),
+		Color3.fromRGB(65, 80, 72)
+	)
 	phoneBannerFrame.Visible = false
 
-	phoneSubtitleLabel =
-		Theme.label(phoneBannerFrame, UDim2.new(1, -24, 1, 0), UDim2.fromOffset(12, 0), 14)
-	phoneSubtitleLabel.Font = Enum.Font.SpecialElite
-	phoneSubtitleLabel.TextColor3 = Color3.fromRGB(245, 210, 120)
+	phoneSubtitleLabel = Theme.label(
+		phoneBannerFrame,
+		UDim2.new(1, -24, 1, 0),
+		UDim2.fromOffset(14, 0),
+		14,
+		Enum.Font.SpecialElite
+	)
+	phoneSubtitleLabel.TextColor3 = Color3.fromRGB(245, 215, 130)
 	phoneSubtitleLabel.Text = ""
 
-	-- 2. Intercom Questioning Modal
-	intercomModal = Theme.frame(gui, UDim2.fromOffset(440, 170), UDim2.new(0.5, -220, 0.5, -85))
-	intercomModal.BackgroundColor3 = Color3.fromRGB(18, 20, 26)
+	-- 3. Intercom Questioning Modal
+	intercomModal = Theme.card(
+		gui,
+		UDim2.fromOffset(480, 185),
+		UDim2.new(0.5, -240, 0.5, -92),
+		Color3.fromRGB(15, 18, 22),
+		Color3.fromRGB(55, 75, 65)
+	)
 	intercomModal.Visible = false
 
-	local iHeader =
-		Theme.label(intercomModal, UDim2.new(1, -24, 0, 24), UDim2.fromOffset(12, 8), 14)
-	iHeader.Font = Enum.Font.GothamBold
-	iHeader.TextColor3 = Color3.fromRGB(240, 215, 130)
-	iHeader.Text = "DESK INTERCOM · CHOOSE QUESTION [G]"
+	local iHeader = Theme.label(
+		intercomModal,
+		UDim2.new(1, -24, 0, 26),
+		UDim2.fromOffset(14, 10),
+		14,
+		Enum.Font.GothamBold
+	)
+	iHeader.TextColor3 = Color3.fromRGB(245, 215, 130)
+	iHeader.Text = "DESK INTERCOM · SELECT QUESTION [G]"
 
 	local q1 = Theme.button(
 		intercomModal,
-		UDim2.new(1, -24, 0, 34),
-		UDim2.fromOffset(12, 38),
-		'1. "State your purpose of stay."'
+		UDim2.new(1, -28, 0, 36),
+		UDim2.fromOffset(14, 42),
+		'1. "State your purpose of stay."',
+		Color3.fromRGB(25, 32, 38),
+		Theme.ink
 	)
 	q1.Font = Enum.Font.RobotoMono
 	q1.TextSize = 12
-	q1.BackgroundColor3 = Color3.fromRGB(28, 34, 42)
 	q1.Activated:Connect(function()
 		DeskUI.ask("purpose")
 	end)
 
 	local q2 = Theme.button(
 		intercomModal,
-		UDim2.new(1, -24, 0, 34),
-		UDim2.fromOffset(12, 78),
-		'2. "Verify your vehicle license plate."'
+		UDim2.new(1, -28, 0, 36),
+		UDim2.fromOffset(14, 84),
+		'2. "Verify your vehicle license plate."',
+		Color3.fromRGB(25, 32, 38),
+		Theme.ink
 	)
 	q2.Font = Enum.Font.RobotoMono
 	q2.TextSize = 12
-	q2.BackgroundColor3 = Color3.fromRGB(28, 34, 42)
 	q2.Activated:Connect(function()
 		DeskUI.ask("plate")
 	end)
 
 	local q3 = Theme.button(
 		intercomModal,
-		UDim2.new(1, -24, 0, 34),
-		UDim2.fromOffset(12, 118),
-		'3. "Look directly into the reception mirror."'
+		UDim2.new(1, -28, 0, 36),
+		UDim2.fromOffset(14, 126),
+		'3. "Look directly into the reception mirror."',
+		Color3.fromRGB(25, 32, 38),
+		Theme.ink
 	)
 	q3.Font = Enum.Font.RobotoMono
 	q3.TextSize = 12
-	q3.BackgroundColor3 = Color3.fromRGB(28, 34, 42)
 	q3.Activated:Connect(function()
 		DeskUI.ask("mirror")
 	end)
 
-	-- 3. Bottom Verdict Action Strip
-	bottomBar = Theme.frame(gui, UDim2.new(1, -48, 0, 80), UDim2.new(0, 24, 1, -96))
-	bottomBar.BackgroundColor3 = Color3.fromRGB(18, 22, 20)
+	-- 4. Floating Verdict Action Strip
+	bottomBar = Theme.card(
+		gui,
+		UDim2.fromOffset(840, 82),
+		UDim2.new(0.5, -420, 1, -94),
+		Color3.fromRGB(12, 15, 14),
+		Color3.fromRGB(45, 60, 52)
+	)
 	bottomBar.Visible = false
 
-	guestBriefLabel =
-		Theme.label(bottomBar, UDim2.new(0.55, -20, 0, 24), UDim2.fromOffset(16, 12), 15)
-	guestBriefLabel.Font = Enum.Font.GothamBold
+	guestBriefLabel = Theme.label(
+		bottomBar,
+		UDim2.new(0.55, -20, 0, 24),
+		UDim2.fromOffset(18, 12),
+		15,
+		Enum.Font.GothamBold
+	)
+	guestBriefLabel.TextColor3 = Theme.inkBright
 
-	tellHighlightLabel =
-		Theme.label(bottomBar, UDim2.new(0.55, -20, 0, 36), UDim2.fromOffset(16, 38), 13)
-	tellHighlightLabel.TextColor3 = Color3.fromRGB(240, 170, 70)
+	tellHighlightLabel = Theme.label(
+		bottomBar,
+		UDim2.new(0.55, -20, 0, 36),
+		UDim2.fromOffset(18, 38),
+		13,
+		Enum.Font.Code
+	)
+	tellHighlightLabel.TextColor3 = Color3.fromRGB(245, 175, 65)
 	tellHighlightLabel.TextWrapped = true
 
 	admitButton = Theme.button(
 		bottomBar,
-		UDim2.fromOffset(160, 48),
-		UDim2.new(1, -350, 0.5, -24),
-		"ADMIT  [Z]"
+		UDim2.fromOffset(165, 52),
+		UDim2.new(1, -360, 0.5, -26),
+		"ADMIT  [Z]",
+		Color3.fromRGB(48, 145, 75),
+		Theme.inkBright
 	)
-	admitButton.BackgroundColor3 = Color3.fromRGB(50, 140, 70)
-	admitButton.TextColor3 = Theme.ink
 
 	refuseButton = Theme.button(
 		bottomBar,
-		UDim2.fromOffset(160, 48),
-		UDim2.new(1, -180, 0.5, -24),
-		"REFUSE  [X]"
+		UDim2.fromOffset(165, 52),
+		UDim2.new(1, -185, 0.5, -26),
+		"REFUSE  [X]",
+		Color3.fromRGB(180, 50, 45),
+		Theme.inkBright
 	)
-	refuseButton.BackgroundColor3 = Color3.fromRGB(160, 50, 45)
-	refuseButton.TextColor3 = Theme.ink
 
 	admitButton.Activated:Connect(function()
 		DeskUI.send(true)
@@ -260,8 +353,8 @@ function DeskUI.build(gui: ScreenGui)
 			phoneBannerFrame.Visible = true
 			phoneSubtitleLabel.Text = `☎ ROTARY PHONE: {data.message}`
 			phoneSubtitleLabel.TextColor3 = if data.isOccupied
-				then Color3.fromRGB(255, 60, 50)
-				else Color3.fromRGB(120, 220, 140)
+				then Color3.fromRGB(255, 70, 60)
+				else Color3.fromRGB(120, 230, 150)
 			task.delay(6.5, function()
 				if phoneSubtitleLabel.Text == `☎ ROTARY PHONE: {data.message}` then
 					phoneBannerFrame.Visible = false
@@ -274,8 +367,8 @@ function DeskUI.build(gui: ScreenGui)
 		phoneBannerFrame.Visible = true
 		phoneSubtitleLabel.Text = `🎙 GUEST INTERCOM: "{data.answer}"`
 		phoneSubtitleLabel.TextColor3 = if data.isCreepy
-			then Color3.fromRGB(255, 75, 65)
-			else Color3.fromRGB(220, 225, 230)
+			then Color3.fromRGB(255, 80, 70)
+			else Color3.fromRGB(225, 235, 240)
 		if data.isCreepy then
 			Atmosphere.playSound("heartbeat", nil, 0.7)
 		end
@@ -297,22 +390,33 @@ function DeskUI.onGuest(guest)
 
 	if guest.tell then
 		tellHighlightLabel.Text = `OBSERVATION: {guest.tell}`
-		tellHighlightLabel.TextColor3 = Color3.fromRGB(250, 160, 60)
+		tellHighlightLabel.TextColor3 = Color3.fromRGB(250, 165, 60)
 	else
 		tellHighlightLabel.Text =
-			"Observation: Inspect ledger [F], ask question [G], call room [T], or toggle UV [Q]."
+			"Observation: Inspect ledger [F], ask question [G], call room [T], or check UV [Q]."
 		tellHighlightLabel.TextColor3 = Theme.inkSoft
 	end
 
 	takingsLabel.Text = `SAFE: ${guest.takings or 0}`
 	local sVal = guest.sanity or 100
 	sanityLabel.Text = `{sVal}%`
-	TweenService:Create(sanityFill, TweenInfo.new(0.3), { Size = UDim2.fromScale(sVal / 100, 1) })
+
+	local sColor = if sVal > 65
+		then Color3.fromRGB(75, 205, 235)
+		elseif sVal > 30 then Color3.fromRGB(245, 180, 55)
+		else Color3.fromRGB(245, 60, 50)
+	sanityFill.BackgroundColor3 = sColor
+	sanityIcon.TextColor3 = sColor
+	TweenService
+		:Create(sanityFill, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Size = UDim2.fromScale(sVal / 100, 1),
+		})
 		:Play()
 
-	queueLabel.Text = `{guest.guestsLeft} in queue · [G] Ask · [T] Phone · [Q] UV`
+	queueLabel.Text = `{guest.guestsLeft} remaining · [G] Ask · [T] Phone · [Q] UV`
 	statusLabel.Text =
-		"Guest at the desk. Inspect documents, ask questions [G], call room [T], or check UV seal [Q]."
+		"Guest at the desk. Inspect documents, ask questions [G], or test UV seal [Q]."
+	statusLabel.TextColor3 = Theme.inkSoft
 
 	GuestRenderer.arrive(guest)
 	DeskProps.updateLedger(guest)
@@ -326,15 +430,26 @@ function DeskUI.onResult(result)
 
 	local sVal = result.sanity or 100
 	sanityLabel.Text = `{sVal}%`
-	TweenService:Create(sanityFill, TweenInfo.new(0.4), { Size = UDim2.fromScale(sVal / 100, 1) })
+
+	local sColor = if sVal > 65
+		then Color3.fromRGB(75, 205, 235)
+		elseif sVal > 30 then Color3.fromRGB(245, 180, 55)
+		else Color3.fromRGB(245, 60, 50)
+	sanityFill.BackgroundColor3 = sColor
+	sanityIcon.TextColor3 = sColor
+	TweenService
+		:Create(sanityFill, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Size = UDim2.fromScale(sVal / 100, 1),
+		})
 		:Play()
+
 	takingsLabel.Text = `SAFE: ${result.takings or 0}`
 
 	Atmosphere.onSanityChanged(sVal)
 
 	if result.correct then
 		Atmosphere.playSound("cash", nil, 0.8)
-		statusLabel.TextColor3 = Color3.fromRGB(120, 220, 140)
+		statusLabel.TextColor3 = Color3.fromRGB(120, 230, 150)
 		local truth = if result.wasAnomaly
 			then `✓ Correctly refused anomaly ({result.tell or "unnatural entity"}). Safe +$40.`
 			else "✓ Correctly admitted genuine guest. Safe +$40."
@@ -342,7 +457,7 @@ function DeskUI.onResult(result)
 	else
 		Atmosphere.playSound("heartbeat", nil, 0.9)
 		Atmosphere.shakeCamera()
-		statusLabel.TextColor3 = Color3.fromRGB(240, 90, 80)
+		statusLabel.TextColor3 = Color3.fromRGB(245, 80, 70)
 		local reason = if result.wasAnomaly
 			then "✗ Breach! Anomaly was admitted into the motel. Sanity damaged (-40%)."
 			else "✗ Mistake! A genuine paying guest was turned away. Sanity damaged (-20%)."
@@ -358,11 +473,11 @@ function DeskUI.onShiftEnded(result)
 
 	if result and result.survived ~= nil then
 		if result.survived then
-			statusLabel.TextColor3 = Color3.fromRGB(120, 220, 140)
+			statusLabel.TextColor3 = Color3.fromRGB(120, 230, 150)
 			statusLabel.Text =
 				`Shift Completed! You survived Night {result.nightsWorked} with {result.sanity}% sanity. Safe: ${result.takings}`
 		else
-			statusLabel.TextColor3 = Color3.fromRGB(240, 90, 80)
+			statusLabel.TextColor3 = Color3.fromRGB(245, 80, 70)
 			statusLabel.Text =
 				`Sanity broke on Night {result.nightsWorked}. Shift ended immediately.`
 		end
