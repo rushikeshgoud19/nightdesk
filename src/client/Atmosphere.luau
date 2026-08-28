@@ -210,20 +210,44 @@ function Atmosphere.onSanityChanged(sanity: number)
 		:Play()
 end
 
+-- Shake through Humanoid.CameraOffset, never by writing Camera.CFrame.
+--
+-- The old version snapshotted the camera, wrote absolute CFrames for ~150ms,
+-- then restored the snapshot. In first person that fights Roblox's own camera
+-- script, which writes CFrame every RenderStepped -- so the player's look kept
+-- getting yanked back to wherever they were aiming when the shake started, and
+-- the final restore discarded everything they looked at during it. It reads as
+-- "the camera is stuck".
+--
+-- CameraOffset is applied relative to the head, so it composes with player look
+-- instead of overwriting it, and unwinding it is a single assignment.
+local shakeToken = 0
+
 function Atmosphere.shakeCamera()
-	local camera = Workspace.CurrentCamera
-	if not camera then
+	local character = Players.LocalPlayer.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then
 		return
 	end
+
+	-- A shake starting mid-shake invalidates the earlier one, so two cannot fight
+	-- over the offset or leave it stranded away from zero.
+	shakeToken += 1
+	local token = shakeToken
+
 	task.spawn(function()
-		local originalCF = camera.CFrame
 		local rng = Random.new()
 		for _ = 1, 6 do
-			local offset = Vector3.new(rng:NextNumber(-0.15, 0.15), rng:NextNumber(-0.15, 0.15), 0)
-			camera.CFrame = originalCF * CFrame.new(offset)
+			if shakeToken ~= token or humanoid.Parent == nil then
+				return
+			end
+			humanoid.CameraOffset =
+				Vector3.new(rng:NextNumber(-0.15, 0.15), rng:NextNumber(-0.15, 0.15), 0)
 			task.wait(0.025)
 		end
-		camera.CFrame = originalCF
+		if shakeToken == token and humanoid.Parent ~= nil then
+			humanoid.CameraOffset = Vector3.zero
+		end
 	end)
 end
 

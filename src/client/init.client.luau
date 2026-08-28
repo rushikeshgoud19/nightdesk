@@ -4,7 +4,6 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Remotes = require(Shared:WaitForChild("Remotes"))
@@ -32,7 +31,10 @@ local function setupFirstPersonCharacter(char: Model)
 		hum.AutoRotate = true
 	end
 
-	-- Lock camera to first person
+	-- LockFirstPerson already locks the mouse to centre, and Roblox's camera
+	-- script owns MouseBehavior from then on -- it rewrites it every frame and
+	-- releases it for modals. Setting MouseBehavior here by hand was overwritten
+	-- immediately in the best case and fought the modals in the worst.
 	player.CameraMode = Enum.CameraMode.LockFirstPerson
 	player.CameraMinZoomDistance = 0.5
 	player.CameraMaxZoomDistance = 0.5
@@ -49,9 +51,6 @@ if player.Character then
 	setupFirstPersonCharacter(player.Character)
 end
 player.CharacterAdded:Connect(setupFirstPersonCharacter)
-
--- First-person mouse lock
-UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "NightDesk"
