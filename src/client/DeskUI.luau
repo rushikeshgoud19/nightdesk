@@ -97,6 +97,11 @@ function DeskUI.ask(questionId: string)
 end
 
 function DeskUI.build(gui: ScreenGui)
+	-- The stamps are physical props owned by DeskProps, but the verdict and its
+	-- cleanup live here. Give DeskProps the guarded entry point rather than
+	-- letting it fire the remote itself.
+	DeskProps.setVerdictHandler(DeskUI.send)
+
 	-- 1. Sleek Top HUD Bar
 	hudFrame = Theme.card(
 		gui,
@@ -326,20 +331,6 @@ function DeskUI.build(gui: ScreenGui)
 	refuseButton.Activated:Connect(function()
 		DeskUI.send(false)
 	end)
-
-	ContextActionService:BindAction("Desk_Admit", function(_, state)
-		if state == Enum.UserInputState.Begin and awaiting then
-			DeskUI.send(true)
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.Z, Enum.KeyCode.One)
-
-	ContextActionService:BindAction("Desk_Refuse", function(_, state)
-		if state == Enum.UserInputState.Begin and awaiting then
-			DeskUI.send(false)
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.X, Enum.KeyCode.Two)
 
 	ContextActionService:BindAction("Desk_IntercomKey", function(_, state)
 		if state == Enum.UserInputState.Begin and awaiting then

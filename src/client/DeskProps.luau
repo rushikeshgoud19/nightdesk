@@ -2,7 +2,6 @@
 -- 3D Interactive Desk Props: ProximityPrompts + ClickDetectors + Hotkeys for
 -- Service Bell, Green/Red Stamps, Registry Clipboard, Rotary Phone, UV Blacklight, and Vending Machine.
 
-local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
@@ -17,7 +16,6 @@ local Theme = require(script.Parent:WaitForChild("Theme"))
 local Viewmodel = require(script.Parent:WaitForChild("Viewmodel"))
 
 local ringBell = Remotes.get("RingBell")
-local judge = Remotes.get("Judge")
 local callRoom = Remotes.get("CallRoom")
 local toggleUV = Remotes.get("ToggleUV")
 local bellRang = Remotes.get("BellRang")
@@ -25,6 +23,20 @@ local phoneResponse = Remotes.get("PhoneResponse")
 local uvState = Remotes.get("UVState")
 
 local DeskProps = {}
+
+-- DeskUI owns the verdict: it holds the `awaiting` guard and does the cleanup
+-- (hide the bar, walk the guest out, clear the ledger). DeskProps cannot require
+-- it -- DeskUI already requires DeskProps -- so DeskUI injects the handler here,
+-- the same way Shift injects its shift-end handler on the server.
+--
+-- Before this, slamStamp called judge:FireServer directly. Combined with the
+-- ClickDetector on the stamp handles, any click aimed near a stamp in first
+-- person fired a verdict, with no check that a guest was even at the desk.
+local onVerdict: ((boolean) -> ())? = nil
+
+function DeskProps.setVerdictHandler(fn: (boolean) -> ())
+	onVerdict = fn
+end
 
 local ledgerGui: SurfaceGui?
 local nameLabel: TextLabel?
@@ -648,41 +660,6 @@ function DeskProps.init()
 	end
 
 	-- Keybindings
-	ContextActionService:BindAction("RingBellKey", function(_, state)
-		if state == Enum.UserInputState.Begin then
-			DeskProps.ring()
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.E)
-
-	ContextActionService:BindAction("CallPhoneKey", function(_, state)
-		if state == Enum.UserInputState.Begin then
-			DeskProps.callCurrentRoom()
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.T)
-
-	ContextActionService:BindAction("ToggleUVKey", function(_, state)
-		if state == Enum.UserInputState.Begin then
-			DeskProps.toggleUVLight()
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.Q)
-
-	ContextActionService:BindAction("AdmitStampKey", function(_, state)
-		if state == Enum.UserInputState.Begin then
-			DeskProps.slamStamp(true)
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.Z, Enum.KeyCode.One)
-
-	ContextActionService:BindAction("RefuseStampKey", function(_, state)
-		if state == Enum.UserInputState.Begin then
-			DeskProps.slamStamp(false)
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.X, Enum.KeyCode.Two)
-
 	bellRang.OnClientEvent:Connect(function()
 		DeskProps.animateBell()
 	end)
@@ -1034,11 +1011,18 @@ function DeskProps.slamStamp(admit: boolean)
 		twDown:Play()
 		twDown.Completed:Connect(function()
 			Atmosphere.playSound("stamp", hrp, 1.0)
-			judge:FireServer(admit)
+			if onVerdict then
+				onVerdict(admit)
+			end
 			twUp:Play()
 		end)
 	else
-		judge:FireServer(admit)
+		-- No stamp model to animate, but the verdict still goes through the same
+		-- guarded path. Firing the remote directly here was the other half of the
+		-- phantom-judgement bug.
+		if onVerdict then
+			onVerdict(admit)
+		end
 	end
 end
 

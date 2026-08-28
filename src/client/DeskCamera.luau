@@ -183,13 +183,6 @@ function DeskCamera.init()
 	guideLabel.Parent = cctvOverlayGui
 
 	-- Keybinds
-	ContextActionService:BindAction("Desk_Inspect", function(_, state)
-		if state == Enum.UserInputState.Begin then
-			DeskCamera.toggleInspect()
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.F)
-
 	ContextActionService:BindAction("Desk_CCTV", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			DeskCamera.cycleCCTV()
