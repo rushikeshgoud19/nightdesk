@@ -222,34 +222,38 @@ function Theme.attachCRTOverlay(gui: ScreenGui)
 	vignette.Parent = overlay
 
 	-- Live VHS Watermark
+	-- Bottom-left, not top-left. The top strip belongs to the HUD, which spans the
+	-- full width and already shows the clock -- putting the watermark up there
+	-- rendered "REC [02:00:00 AM]" directly through "NIGHT 1 · 02:00 AM" and
+	-- "SAFE: $0" through "SANITY:", making all of it unreadable.
+	--
+	-- The corner is also where a real VHS timecode lives, and it sits left of the
+	-- centred verdict bar rather than under it.
 	local vhsLabel = Instance.new("TextLabel")
 	vhsLabel.Name = "VHS_Timestamp"
-	vhsLabel.Size = UDim2.fromOffset(450, 24)
-	vhsLabel.Position = UDim2.fromOffset(24, 20)
+	vhsLabel.Size = UDim2.fromOffset(420, 22)
+	vhsLabel.Position = UDim2.new(0, 24, 1, -30)
 	vhsLabel.BackgroundTransparency = 1
 	vhsLabel.Font = Enum.Font.RobotoMono
 	vhsLabel.TextSize = 12
 	vhsLabel.TextColor3 = Color3.fromRGB(140, 230, 160)
-	vhsLabel.TextTransparency = 0.4
+	vhsLabel.TextTransparency = 0.45
 	vhsLabel.TextXAlignment = Enum.TextXAlignment.Left
-	vhsLabel.Text = "● REC [02:00:00 AM] · CH-01 FRONT DESK · CRESTVIEW MOTEL"
+	-- The HUD owns the in-fiction clock; this is the tape, so it names the camera.
+	vhsLabel.Text = "● REC · CH-01 FRONT DESK · CRESTVIEW MOTEL"
 	vhsLabel.ZIndex = 101
 	vhsLabel.Parent = overlay
 
+	-- Only the REC dot animates. The elapsed timecode moved out with the clock:
+	-- the HUD is the authority on what time it is in the fiction, and having two
+	-- clocks disagree on screen reads as a bug even when both are "correct".
 	task.spawn(function()
 		local count = 0
 		while overlay.Parent ~= nil do
 			task.wait(1)
 			count += 1
-			local secs = count % 60
-			local mins = math.floor(count / 60) % 60
 			local blink = if count % 2 == 0 then "●" else "○"
-			vhsLabel.Text = string.format(
-				"%s REC [02:%02d:%02d AM] · CH-01 FRONT DESK · CRESTVIEW MOTEL",
-				blink,
-				mins,
-				secs
-			)
+			vhsLabel.Text = blink .. " REC · CH-01 FRONT DESK · CRESTVIEW MOTEL"
 		end
 	end)
 end
