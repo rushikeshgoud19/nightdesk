@@ -32,6 +32,7 @@ export type Guest = {
 	cityOrigin: string,
 	uvSymbol: string?,
 	isRoomOccupied: boolean,
+	licenseExpiry: string,
 }
 
 local Anomalies = {}
@@ -435,6 +436,7 @@ function Anomalies.roll(rng: Random): Guest
 	local stayLength = "1 night"
 	local signatureFont = "SourceSansItalic"
 	local watermarkText = "★ OFFICIAL CRESTVIEW SEAL ★"
+	local licenseExpiry = "Exp. Mar 2029"
 	local photoMaskTransparency = 1.0
 	local idName = name
 	local checkIn = "Oct 24, 2026"
@@ -465,7 +467,7 @@ function Anomalies.roll(rng: Random): Guest
 		elseif anomaly.id == "redacted_id" then
 			photoMaskTransparency = 0.5
 		elseif anomaly.id == "expired_license" then
-			checkOut = "Oct 25, 1989"
+			licenseExpiry = "Exp. Aug 1989"
 		elseif anomaly.id == "wrong_city" then
 			city = "Abyss Void, Nowhere"
 		elseif anomaly.id == "uv_occult_rune" then
@@ -495,6 +497,7 @@ function Anomalies.roll(rng: Random): Guest
 		signatureFont = signatureFont,
 		watermarkText = watermarkText,
 		photoMaskTransparency = photoMaskTransparency,
+		licenseExpiry = licenseExpiry,
 	}
 end
 

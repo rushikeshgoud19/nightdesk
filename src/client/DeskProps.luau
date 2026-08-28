@@ -48,6 +48,7 @@ local mWatermarkLabel: TextLabel?
 local zipLabel: TextLabel?
 local stayLabel: TextLabel?
 local signatureLabel: TextLabel?
+local licenseLabel: TextLabel?
 local photoMask: Frame?
 
 local mZipLabel: TextLabel?
@@ -379,6 +380,17 @@ function DeskProps.init()
 	stayLabel.TextXAlignment = Enum.TextXAlignment.Left
 	stayLabel.Parent = paper
 
+	licenseLabel = Instance.new("TextLabel")
+	licenseLabel.Size = UDim2.new(0.9, 0, 0, 28)
+	licenseLabel.Position = UDim2.new(0.05, 0, 0, 280)
+	licenseLabel.BackgroundTransparency = 1
+	licenseLabel.Font = Enum.Font.RobotoMono
+	licenseLabel.Text = "LICENCE: Exp. Mar 2029"
+	licenseLabel.TextColor3 = Color3.fromRGB(24, 20, 18)
+	licenseLabel.TextSize = 14
+	licenseLabel.TextXAlignment = Enum.TextXAlignment.Left
+	licenseLabel.Parent = paper
+
 	signatureLabel = Instance.new("TextLabel")
 	signatureLabel.Size = UDim2.new(0.9, 0, 0, 36)
 	signatureLabel.Position = UDim2.new(0.05, 0, 0, 330)
@@ -703,6 +715,9 @@ function DeskProps.init()
 		if stayLabel then
 			stayLabel.Text = "STAY: ---"
 		end
+		if licenseLabel then
+			licenseLabel.Text = "LICENCE: ---"
+		end
 		if signatureLabel then
 			signatureLabel.Text = ""
 		end
@@ -808,6 +823,9 @@ function DeskProps.updateLedger(guestData)
 	if stayLabel then
 		stayLabel.Text = `STAY: {guestData.stayLength or "1 night"}`
 	end
+	if licenseLabel then
+		licenseLabel.Text = `LICENCE: {guestData.licenseExpiry or "Exp. Mar 2029"}`
+	end
 	if signatureLabel then
 		signatureLabel.Font = Enum.Font[guestData.signatureFont or "SourceSansItalic"]
 		signatureLabel.Text = guestData.name
@@ -897,6 +915,9 @@ function DeskProps.clearLedger()
 	end
 	if stayLabel then
 		stayLabel.Text = "STAY: ---"
+	end
+	if licenseLabel then
+		licenseLabel.Text = "LICENCE: ---"
 	end
 	if signatureLabel then
 		signatureLabel.Text = ""

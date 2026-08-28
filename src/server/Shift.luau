@@ -118,6 +118,7 @@ local function sendNext(player: Player)
 		signatureFont = guest.signatureFont,
 		watermarkText = guest.watermarkText,
 		photoMaskTransparency = guest.photoMaskTransparency,
+		licenseExpiry = guest.licenseExpiry,
 
 		tell = if textVisible and guest.anomaly then guest.anomaly.tell else nil,
 		anomalyId = if guest.anomaly then guest.anomaly.id else nil,
