@@ -171,6 +171,8 @@ the thing to push back on.
 | [docs/ROBLOX.md](docs/ROBLOX.md) | Platform reference. Limits, asset routes, traps. Read before writing Roblox code. |
 | [docs/PIPELINE.md](docs/PIPELINE.md) | How Rojo, Blender, Studio MCP and agy fit — and what's verified vs broken. |
 | [docs/PROMPT.md](docs/PROMPT.md) | Copy-paste session starters. |
+| [docs/NEXT.md](docs/NEXT.md) | **Start here if you are picking this up.** The plan from here and the prompt for the next session. |
+| [docs/playtest-findings.md](docs/playtest-findings.md) | What the first real playtest found, verified rather than reported. |
 
 ## Licence
 
