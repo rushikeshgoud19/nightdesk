@@ -133,14 +133,6 @@ local IRIS_PALETTES = {
 	Color3.fromRGB(90, 95, 102), -- Steel Gray
 }
 
-local HAIR_ASSETS = {
-	"16630147", -- Ultra-Fabulous Hair
-	"26867012", -- Classic Brown Charmer
-	"13070796", -- Styled Sidepart
-	"24996529", -- Executive Hair
-	"439989001", -- Slicked Back Hair
-}
-
 local HAIR_COLORS = {
 	Color3.fromRGB(22, 20, 20), -- Jet Black
 	Color3.fromRGB(54, 38, 28), -- Dark Brown
@@ -1730,7 +1722,6 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local tieColor = TIE_PALETTES[rng:NextInteger(1, #TIE_PALETTES)]
 	local eyeColor = IRIS_PALETTES[rng:NextInteger(1, #IRIS_PALETTES)]
 	local hairColor = HAIR_COLORS[rng:NextInteger(1, #HAIR_COLORS)]
-	local hairAsset = HAIR_ASSETS[rng:NextInteger(1, #HAIR_ASSETS)]
 
 	local anomalyId = guestData.anomalyId
 	isCurrentAnomaly = anomalyId ~= nil
@@ -1741,11 +1732,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local transparency = 0.0
 
 	-- Apply Anomaly Property Changes
-	if anomalyId == "skin_tone_off" then
-		-- Desaturate 4%
-		local h, s, v = skinColor:ToHSV()
-		skinColor = Color3.fromHSV(h, math.clamp(s - 0.04, 0, 1), v)
-	elseif anomalyId == "colorless_skin" then
+	if anomalyId == "colorless_skin" then
 		skinColor = Color3.fromRGB(224, 226, 232)
 	elseif anomalyId == "no_reflection" then
 		transparency = 0.55 -- We will also disable shadows below
@@ -1769,7 +1756,9 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	desc.WidthScale = widthScale
 	desc.DepthScale = depthScale
 	desc.HeadScale = 1.0
-	desc.HairAccessory = if anomalyId ~= "shadow_entity" then hairAsset else ""
+	-- No catalog hair accessory. The handle mesh is wider than the head and hid
+	-- the entire sculpted face; buildVolumetricHairCrown does the hair instead.
+	desc.HairAccessory = ""
 	desc.Face = 0
 
 	local model: Model

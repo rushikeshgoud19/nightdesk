@@ -85,7 +85,7 @@ Anomalies.list = {
 	},
 	{
 		id = "colorless_skin",
-		tell = "Their skin tone is desaturated by exactly 4% compared to natural lighting.",
+		tell = "Their skin holds no colour at all -- flat grey, like the warmth was lifted out of it.",
 		horrorType = "visual_body",
 		tier = 1,
 	},
