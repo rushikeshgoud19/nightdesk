@@ -10,7 +10,11 @@
 -- 7. Balanced lighting: ceiling fixture with Future-technology Spotlight and ambient fill, green banker desk lamp, and hallway sconce lights.
 -- 8. Spawn point at (0, 3.5, 7.5) facing the desk counter.
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Materials = require(Shared:WaitForChild("Materials"))
 
 local function buildLobby(): Model
 	-- Strip what the Studio template left behind. Rojo only manages what the
@@ -40,128 +44,6 @@ local function buildLobby(): Model
 	local lobby = Instance.new("Model")
 	lobby.Name = "Lobby"
 
-	local MaterialService = game:GetService("MaterialService")
-
-	local function registerMaterial(
-		name: string,
-		base: Enum.Material,
-		maps: {
-			ColorMap: string,
-			NormalMap: string,
-			MetalnessMap: string,
-			RoughnessMap: string,
-		}
-	)
-		local variant = Instance.new("MaterialVariant")
-		variant.Name = name
-		variant.BaseMaterial = base
-		variant.ColorMap = maps.ColorMap
-		variant.NormalMap = maps.NormalMap
-		variant.MetalnessMap = maps.MetalnessMap
-		variant.RoughnessMap = maps.RoughnessMap
-		variant.Parent = MaterialService
-	end
-
-	local matData = {
-		{
-			"MotelSmoothPlastic",
-			Enum.Material.SmoothPlastic,
-			{
-				ColorMap = "rbxassetid://84847808898940",
-				NormalMap = "rbxassetid://127629375510502",
-				RoughnessMap = "rbxassetid://72990726694125",
-				MetalnessMap = "rbxassetid://119542628474764",
-			},
-		},
-		{
-			"MotelMetal",
-			Enum.Material.Metal,
-			{
-				ColorMap = "rbxassetid://98464466997973",
-				NormalMap = "rbxassetid://111988776284037",
-				RoughnessMap = "rbxassetid://93837891449698",
-				MetalnessMap = "rbxassetid://83600162523314",
-			},
-		},
-		{
-			"MotelWood",
-			Enum.Material.Wood,
-			{
-				ColorMap = "rbxassetid://96386482086063",
-				NormalMap = "rbxassetid://79383275971267",
-				RoughnessMap = "rbxassetid://107016336121246",
-				MetalnessMap = "rbxassetid://88481602168896",
-			},
-		},
-		{
-			"MotelFabric",
-			Enum.Material.Fabric,
-			{
-				ColorMap = "rbxassetid://83227731596606",
-				NormalMap = "rbxassetid://131848639768481",
-				RoughnessMap = "rbxassetid://125661757325907",
-				MetalnessMap = "rbxassetid://122891507024129",
-			},
-		},
-		{
-			"MotelPlaster",
-			Enum.Material.Plaster,
-			{
-				ColorMap = "rbxassetid://84651318728159",
-				NormalMap = "rbxassetid://96770765941017",
-				RoughnessMap = "rbxassetid://73347407064486",
-				MetalnessMap = "rbxassetid://71077153531981",
-			},
-		},
-		{
-			"MotelLeather",
-			Enum.Material.Leather,
-			{
-				ColorMap = "rbxassetid://114233731835499",
-				NormalMap = "rbxassetid://84266244644289",
-				RoughnessMap = "rbxassetid://100035393486562",
-				MetalnessMap = "rbxassetid://106676122828793",
-			},
-		},
-		{
-			"MotelWoodPlanks",
-			Enum.Material.WoodPlanks,
-			{
-				ColorMap = "rbxassetid://85187518430706",
-				NormalMap = "rbxassetid://89895230642680",
-				RoughnessMap = "rbxassetid://81752664145255",
-				MetalnessMap = "rbxassetid://105732520393883",
-			},
-		},
-		{
-			"MotelConcrete",
-			Enum.Material.Concrete,
-			{
-				ColorMap = "rbxassetid://131687710453378",
-				NormalMap = "rbxassetid://123706483732237",
-				RoughnessMap = "rbxassetid://87753147152899",
-				MetalnessMap = "rbxassetid://96731713862708",
-			},
-		},
-	}
-
-	for _, d in ipairs(matData) do
-		if not MaterialService:FindFirstChild(d[1] :: string) then
-			registerMaterial(d[1] :: string, d[2] :: Enum.Material, d[3] :: any)
-		end
-	end
-
-	local materialVariants = {
-		[Enum.Material.SmoothPlastic] = "MotelSmoothPlastic",
-		[Enum.Material.Metal] = "MotelMetal",
-		[Enum.Material.Wood] = "MotelWood",
-		[Enum.Material.Fabric] = "MotelFabric",
-		[Enum.Material.Plaster] = "MotelPlaster",
-		[Enum.Material.Leather] = "MotelLeather",
-		[Enum.Material.WoodPlanks] = "MotelWoodPlanks",
-		[Enum.Material.Concrete] = "MotelConcrete",
-	}
-
 	local function makePart(
 		name: string,
 		shape: Enum.PartType,
@@ -177,10 +59,7 @@ local function buildLobby(): Model
 		p.Size = size
 		p.CFrame = cf
 		p.Color = color
-		p.Material = material
-		if materialVariants[material] then
-			p.MaterialVariant = materialVariants[material]
-		end
+		Materials.applyMotel(p, material)
 		p.Anchored = true
 		p.CanCollide = true
 		p.TopSurface = Enum.SurfaceType.Smooth
@@ -206,10 +85,7 @@ local function buildLobby(): Model
 		p.Size = size
 		p.CFrame = cf
 		p.Color = color
-		p.Material = material
-		if materialVariants[material] then
-			p.MaterialVariant = materialVariants[material]
-		end
+		Materials.applyMotel(p, material)
 		p.Transparency = transparency
 		p.Anchored = true
 		p.CanCollide = canCollide

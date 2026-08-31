@@ -33,11 +33,13 @@ Thumbs.db
 !.vscode/settings.json
 
 # --- asset build output ---
-# .blend files are source and belong in git. Exported .fbx are intermediates on
+# .blend files are source and belong in git. Exported meshes are intermediates on
 # the way to a Roblox asset ID -- regenerate them with tools/blender_export.py.
-assets/*.fbx
-assets/*.obj
-assets/*.glb
+# Unanchored to a directory, so an export dropped at the repo root is caught too.
+*.fbx
+*.obj
+*.glb
+*.gltf
 
 # python bytecode from tools/
 __pycache__/

@@ -12,6 +12,7 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Materials = require(Shared:WaitForChild("Materials"))
 local Remotes = require(Shared:WaitForChild("Remotes"))
 
 local Atmosphere = require(script.Parent:WaitForChild("Atmosphere"))
@@ -72,6 +73,8 @@ type AnimState = {
 }
 
 local GuestRenderer = {}
+
+local S = Materials.guest
 
 -- Key lobby waypoints
 local SPAWN_POS = Vector3.new(0, 4.80, -14.00) -- Front entrance glass doors
@@ -167,7 +170,7 @@ local function makePart(
 	size: Vector3,
 	cf: CFrame,
 	color: Color3,
-	material: Enum.Material,
+	surface: Materials.Surface,
 	transparency: number,
 	parent: Instance
 ): Part
@@ -177,7 +180,7 @@ local function makePart(
 	p.Size = size
 	p.CFrame = cf
 	p.Color = color
-	p.Material = material
+	Materials.applySurface(p, surface)
 	p.Transparency = transparency
 	p.Anchored = true
 	p.CanCollide = false
@@ -195,7 +198,7 @@ local function spawnFootprint(pos: Vector3)
 	p.CFrame = CFrame.new(pos.X, 0.53, pos.Z)
 		* CFrame.Angles(0, math.rad(Random.new():NextNumber(-14, 14)), 0)
 	p.Color = Color3.fromRGB(12, 10, 14)
-	p.Material = Enum.Material.SmoothPlastic
+	Materials.applySurface(p, S.Gloss)
 	p.Transparency = 0.20
 	p.Anchored = true
 	p.CanCollide = false
@@ -461,7 +464,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new(-0.35 * scaleW, 0.05 * scaleH, 0.50 * scaleD)
 			* CFrame.Angles(0, math.rad(14), math.rad(-10)),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -473,7 +476,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new((0.35 + asymX) * scaleW, (0.05 + asymY) * scaleH, 0.50 * scaleD)
 			* CFrame.Angles(0, math.rad(-14), math.rad(10)),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -486,7 +489,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new(-0.30 * scaleW, -0.32 * scaleH, 0.44 * scaleD)
 			* CFrame.Angles(0, math.rad(22), math.rad(-18)),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -498,7 +501,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new((0.30 + asymX) * scaleW, (-0.32 + asymY) * scaleH, 0.44 * scaleD)
 			* CFrame.Angles(0, math.rad(-22), math.rad(18)),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -508,12 +511,12 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.28 * scaleW, 0.16 * scaleH, 0.12 * scaleD),
 		head.CFrame * CFrame.new(0, -0.42 * scaleH, 0.48 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
 
-	local noseMat = isMeltingWax and Enum.Material.Ice or Enum.Material.SmoothPlastic
+	local noseMat = isMeltingWax and S.Wax or S.Skin
 	makePart(
 		"NoseBridge",
 		Enum.PartType.Block,
@@ -563,7 +566,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new(-0.55 * scaleW, 0.08 * scaleH, -0.02 * scaleD)
 			* CFrame.Angles(0, math.rad(-10), 0),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -575,7 +578,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new((0.55 + asymX) * scaleW, (0.08 + asymY) * scaleH, -0.02 * scaleD)
 			* CFrame.Angles(0, math.rad(10), 0),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -585,7 +588,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.05 * scaleW, 0.16 * scaleH, 0.14 * scaleD),
 		head.CFrame * CFrame.new(-0.57 * scaleW, 0.16 * scaleH, -0.02 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -595,7 +598,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.05 * scaleW, 0.16 * scaleH, 0.14 * scaleD),
 		head.CFrame * CFrame.new(0.57 * scaleW, 0.16 * scaleH, -0.02 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -605,7 +608,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.06 * scaleW, 0.10 * scaleH, 0.10 * scaleD),
 		head.CFrame * CFrame.new(-0.56 * scaleW, -0.06 * scaleH, -0.02 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -615,7 +618,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.06 * scaleW, 0.10 * scaleH, 0.10 * scaleD),
 		head.CFrame * CFrame.new(0.56 * scaleW, -0.06 * scaleH, -0.02 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -628,7 +631,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new(-0.26 * scaleW, 0.28 * scaleH, 0.54 * scaleD)
 			* CFrame.Angles(0, 0, math.rad(5)),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -640,7 +643,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new(0.26 * scaleW, 0.28 * scaleH, 0.54 * scaleD)
 			* CFrame.Angles(0, 0, math.rad(-5)),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -656,7 +659,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.18 * scaleW, 0.11 * scaleH, 0.04 * scaleD),
 		head.CFrame * CFrame.new(-0.26 * scaleW, eyeY_L * scaleH, 0.53 * scaleD),
 		scleraColor,
-		Enum.Material.SmoothPlastic,
+		S.Gloss,
 		transparency,
 		model
 	)
@@ -666,7 +669,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.10 * scaleW, 0.10 * scaleH, 0.03 * scaleD),
 		head.CFrame * CFrame.new(-0.26 * scaleW, eyeY_L * scaleH, 0.55 * scaleD),
 		eyeColor,
-		Enum.Material.SmoothPlastic,
+		S.Gloss,
 		transparency,
 		model
 	)
@@ -676,7 +679,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(pupilSize * scaleW, pupilSize * scaleH, 0.03 * scaleD),
 		head.CFrame * CFrame.new(-0.26 * scaleW, eyeY_L * scaleH, 0.56 * scaleD),
 		Color3.fromRGB(15, 12, 14),
-		Enum.Material.SmoothPlastic,
+		S.Gloss,
 		transparency,
 		model
 	)
@@ -687,7 +690,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.18 * scaleW, 0.11 * scaleH, 0.04 * scaleD),
 		head.CFrame * CFrame.new((0.26 + asymX) * scaleW, (0.15 + asymY) * scaleH, 0.53 * scaleD),
 		scleraColor,
-		Enum.Material.SmoothPlastic,
+		S.Gloss,
 		transparency,
 		model
 	)
@@ -697,7 +700,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.10 * scaleW, 0.10 * scaleH, 0.03 * scaleD),
 		head.CFrame * CFrame.new((0.26 + asymX) * scaleW, (0.15 + asymY) * scaleH, 0.55 * scaleD),
 		eyeColor,
-		Enum.Material.SmoothPlastic,
+		S.Gloss,
 		transparency,
 		model
 	)
@@ -707,7 +710,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(pupilSize * scaleW, pupilSize * scaleH, 0.03 * scaleD),
 		head.CFrame * CFrame.new((0.26 + asymX) * scaleW, (0.15 + asymY) * scaleH, 0.56 * scaleD),
 		Color3.fromRGB(15, 12, 14),
-		Enum.Material.SmoothPlastic,
+		S.Gloss,
 		transparency,
 		model
 	)
@@ -718,7 +721,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.20 * scaleW, 0.03 * scaleH, 0.05 * scaleD),
 		head.CFrame * CFrame.new(-0.26 * scaleW, (eyeY_L + 0.05) * scaleH, 0.56 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -728,7 +731,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.20 * scaleW, 0.03 * scaleH, 0.05 * scaleD),
 		head.CFrame * CFrame.new(0.26 * scaleW, 0.20 * scaleH, 0.56 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -738,7 +741,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.20 * scaleW, 0.02 * scaleH, 0.05 * scaleD),
 		head.CFrame * CFrame.new(-0.26 * scaleW, (eyeY_L - 0.05) * scaleH, 0.56 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -748,7 +751,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.20 * scaleW, 0.02 * scaleH, 0.05 * scaleD),
 		head.CFrame * CFrame.new(0.26 * scaleW, 0.10 * scaleH, 0.56 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -762,7 +765,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.06 * scaleW, 0.08 * scaleH, 0.04 * scaleD),
 		head.CFrame * CFrame.new(0, -0.12 * scaleH, 0.55 * scaleD),
 		skinColor,
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -772,7 +775,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.26 * scaleW, 0.04 * scaleH, 0.05 * scaleD),
 		head.CFrame * CFrame.new(0, -0.18 * scaleH, 0.55 * scaleD),
 		Color3.fromRGB(140, 75, 75),
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -782,7 +785,7 @@ local function buildAnatomicalFacialContours(
 		Vector3.new(0.24 * scaleW, 0.05 * scaleH, 0.05 * scaleD),
 		head.CFrame * CFrame.new(0, -0.24 * scaleH, 0.55 * scaleD),
 		Color3.fromRGB(140, 75, 75),
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -797,7 +800,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new(-0.14 * scaleW, smileY * scaleH, 0.54 * scaleD)
 			* CFrame.Angles(0, 0, -smileRot),
 		Color3.fromRGB(120, 65, 65),
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -809,7 +812,7 @@ local function buildAnatomicalFacialContours(
 			* CFrame.new(0.14 * scaleW, smileY * scaleH, 0.54 * scaleD)
 			* CFrame.Angles(0, 0, smileRot),
 		Color3.fromRGB(120, 65, 65),
-		Enum.Material.SmoothPlastic,
+		S.Skin,
 		transparency,
 		model
 	)
@@ -834,7 +837,7 @@ local function buildVolumetricHairCrown(
 		Vector3.new(1.24 * scaleW, 0.38 * scaleH, 1.26 * scaleD),
 		head.CFrame * CFrame.new(0, 0.58 * scaleH, -0.05 * scaleD),
 		hairColor,
-		Enum.Material.SmoothPlastic,
+		S.Hair,
 		transparency,
 		model
 	)
@@ -844,7 +847,7 @@ local function buildVolumetricHairCrown(
 		Vector3.new(1.15 * scaleW, 0.24 * scaleH, 0.35 * scaleD),
 		head.CFrame * CFrame.new(0, 0.50 * scaleH, 0.38 * scaleD),
 		hairColor,
-		Enum.Material.SmoothPlastic,
+		S.Hair,
 		transparency,
 		model
 	)
@@ -854,7 +857,7 @@ local function buildVolumetricHairCrown(
 		Vector3.new(0.18 * scaleW, 0.68 * scaleH, 1.15 * scaleD),
 		head.CFrame * CFrame.new(-0.56 * scaleW, 0.18 * scaleH, -0.05 * scaleD),
 		hairColor,
-		Enum.Material.SmoothPlastic,
+		S.Hair,
 		transparency,
 		model
 	)
@@ -864,7 +867,7 @@ local function buildVolumetricHairCrown(
 		Vector3.new(0.18 * scaleW, 0.68 * scaleH, 1.15 * scaleD),
 		head.CFrame * CFrame.new(0.56 * scaleW, 0.18 * scaleH, -0.05 * scaleD),
 		hairColor,
-		Enum.Material.SmoothPlastic,
+		S.Hair,
 		transparency,
 		model
 	)
@@ -874,7 +877,7 @@ local function buildVolumetricHairCrown(
 		Vector3.new(1.20 * scaleW, 0.72 * scaleH, 0.22 * scaleD),
 		head.CFrame * CFrame.new(0, 0.12 * scaleH, -0.55 * scaleD),
 		hairColor,
-		Enum.Material.SmoothPlastic,
+		S.Hair,
 		transparency,
 		model
 	)
@@ -907,7 +910,7 @@ local function buildArticulatedHands(
 			Vector3.new(0.62 * scaleW, 0.38 * scaleH, 0.26 * scaleD),
 			leftHand.CFrame * CFrame.new(0, -0.10 * scaleH, 0),
 			handColor,
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			transparency,
 			model
 		)
@@ -919,7 +922,7 @@ local function buildArticulatedHands(
 				Vector3.new(0.78 * scaleW, 0.18 * scaleH, 0.78 * scaleD),
 				leftHand.CFrame * CFrame.new(0, 0.42 * scaleH, 0),
 				suitColor,
-				Enum.Material.Fabric,
+				S.Wool,
 				transparency,
 				model
 			)
@@ -929,7 +932,7 @@ local function buildArticulatedHands(
 				Vector3.new(0.72 * scaleW, 0.14 * scaleH, 0.72 * scaleD),
 				leftHand.CFrame * CFrame.new(0, 0.28 * scaleH, 0),
 				Color3.fromRGB(248, 248, 252),
-				Enum.Material.Fabric,
+				S.Wool,
 				transparency,
 				model
 			)
@@ -941,7 +944,7 @@ local function buildArticulatedHands(
 					* CFrame.new(-0.37 * scaleW, 0.28 * scaleH, 0)
 					* CFrame.Angles(0, 0, math.rad(90)),
 				cuffColorL,
-				Enum.Material.Metal,
+				S.Brass,
 				transparency,
 				model
 			)
@@ -954,7 +957,7 @@ local function buildArticulatedHands(
 			Vector3.new(0.10, 0.10, 0.10),
 			leftHand.CFrame * CFrame.new(0.22 * scaleW, -0.08 * scaleH, 0.08 * scaleD),
 			handColor,
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			transparency,
 			model
 		)
@@ -966,7 +969,7 @@ local function buildArticulatedHands(
 				* CFrame.new(0.25 * scaleW, -0.16 * scaleH, 0.10 * scaleD)
 				* CFrame.Angles(0, math.rad(-22), math.rad(-18)),
 			handColor,
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			transparency,
 			model
 		)
@@ -978,7 +981,7 @@ local function buildArticulatedHands(
 				* CFrame.new(0.30 * scaleW, -0.28 * scaleH, 0.12 * scaleD)
 				* CFrame.Angles(0, math.rad(-14), math.rad(-10)),
 			handColor,
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			transparency,
 			model
 		)
@@ -997,7 +1000,7 @@ local function buildArticulatedHands(
 				Vector3.new(0.09, 0.09, 0.09),
 				leftHand.CFrame * CFrame.new(f.x * scaleW, -0.26 * scaleH, 0),
 				handColor,
-				Enum.Material.SmoothPlastic,
+				S.Skin,
 				transparency,
 				model
 			)
@@ -1007,7 +1010,7 @@ local function buildArticulatedHands(
 				Vector3.new(0.08 * scaleW, f.len1 * scaleH, 0.08 * scaleD),
 				leftHand.CFrame * CFrame.new(f.x * scaleW, (-0.26 - f.len1 * 0.5) * scaleH, 0),
 				handColor,
-				Enum.Material.SmoothPlastic,
+				S.Skin,
 				transparency,
 				model
 			)
@@ -1018,7 +1021,7 @@ local function buildArticulatedHands(
 				leftHand.CFrame
 					* CFrame.new(f.x * scaleW, (-0.26 - f.len1 - f.len2 * 0.5) * scaleH, 0),
 				handColor,
-				Enum.Material.SmoothPlastic,
+				S.Skin,
 				transparency,
 				model
 			)
@@ -1033,7 +1036,7 @@ local function buildArticulatedHands(
 			Vector3.new(0.62 * scaleW, 0.38 * scaleH, 0.26 * scaleD),
 			rightHand.CFrame * CFrame.new(0, -0.10 * scaleH, 0),
 			handColor,
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			transparency,
 			model
 		)
@@ -1044,7 +1047,7 @@ local function buildArticulatedHands(
 				Vector3.new(0.78 * scaleW, 0.18 * scaleH, 0.78 * scaleD),
 				rightHand.CFrame * CFrame.new(0, 0.42 * scaleH, 0),
 				suitColor,
-				Enum.Material.Fabric,
+				S.Wool,
 				transparency,
 				model
 			)
@@ -1054,7 +1057,7 @@ local function buildArticulatedHands(
 				Vector3.new(0.72 * scaleW, 0.14 * scaleH, 0.72 * scaleD),
 				rightHand.CFrame * CFrame.new(0, 0.28 * scaleH, 0),
 				Color3.fromRGB(248, 248, 252),
-				Enum.Material.Fabric,
+				S.Wool,
 				transparency,
 				model
 			)
@@ -1066,7 +1069,7 @@ local function buildArticulatedHands(
 					* CFrame.new(0.37 * scaleW, 0.28 * scaleH, 0)
 					* CFrame.Angles(0, 0, math.rad(90)),
 				cuffColorR,
-				Enum.Material.Metal,
+				S.Brass,
 				transparency,
 				model
 			)
@@ -1079,7 +1082,7 @@ local function buildArticulatedHands(
 			Vector3.new(0.10, 0.10, 0.10),
 			rightHand.CFrame * CFrame.new(-0.22 * scaleW, -0.08 * scaleH, 0.08 * scaleD),
 			handColor,
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			transparency,
 			model
 		)
@@ -1091,7 +1094,7 @@ local function buildArticulatedHands(
 				* CFrame.new(-0.25 * scaleW, -0.16 * scaleH, 0.10 * scaleD)
 				* CFrame.Angles(0, math.rad(22), math.rad(18)),
 			handColor,
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			transparency,
 			model
 		)
@@ -1103,7 +1106,7 @@ local function buildArticulatedHands(
 				* CFrame.new(-0.30 * scaleW, -0.28 * scaleH, 0.12 * scaleD)
 				* CFrame.Angles(0, math.rad(14), math.rad(10)),
 			handColor,
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			transparency,
 			model
 		)
@@ -1122,7 +1125,7 @@ local function buildArticulatedHands(
 				Vector3.new(0.09, 0.09, 0.09),
 				rightHand.CFrame * CFrame.new(f.x * scaleW, -0.26 * scaleH, 0),
 				handColor,
-				Enum.Material.SmoothPlastic,
+				S.Skin,
 				transparency,
 				model
 			)
@@ -1132,7 +1135,7 @@ local function buildArticulatedHands(
 				Vector3.new(0.08 * scaleW, f.len1 * scaleH, 0.08 * scaleD),
 				rightHand.CFrame * CFrame.new(f.x * scaleW, (-0.26 - f.len1 * 0.5) * scaleH, 0),
 				handColor,
-				Enum.Material.SmoothPlastic,
+				S.Skin,
 				transparency,
 				model
 			)
@@ -1143,7 +1146,7 @@ local function buildArticulatedHands(
 				rightHand.CFrame
 					* CFrame.new(f.x * scaleW, (-0.26 - f.len1 - f.len2 * 0.5) * scaleH, 0),
 				handColor,
-				Enum.Material.SmoothPlastic,
+				S.Skin,
 				transparency,
 				model
 			)
@@ -1179,7 +1182,7 @@ local function buildTailoredSuitAndOvercoat(
 		Vector3.new(0.50 * scaleW, 0.95 * scaleH, 0.05 * scaleD),
 		upperTorso.CFrame * CFrame.new(0, 0.30 * scaleH, 0.52 * scaleD),
 		shirtColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1189,7 +1192,7 @@ local function buildTailoredSuitAndOvercoat(
 		Vector3.new(0.12 * scaleW, 0.90 * scaleH, 0.06 * scaleD),
 		upperTorso.CFrame * CFrame.new(0, 0.28 * scaleH, 0.53 * scaleD),
 		shirtColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1201,7 +1204,7 @@ local function buildTailoredSuitAndOvercoat(
 			* CFrame.new(-0.24 * scaleW, 0.68 * scaleH, 0.54 * scaleD)
 			* CFrame.Angles(0, 0, math.rad(-24)),
 		shirtColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1213,7 +1216,7 @@ local function buildTailoredSuitAndOvercoat(
 			* CFrame.new(0.24 * scaleW, 0.68 * scaleH, 0.54 * scaleD)
 			* CFrame.Angles(0, 0, math.rad(24)),
 		shirtColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1227,7 +1230,7 @@ local function buildTailoredSuitAndOvercoat(
 			* CFrame.new(-0.35 * scaleW, 0.22 * scaleH, 0.55 * scaleD)
 			* CFrame.Angles(0, 0, math.rad(-14)),
 		suitColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1239,7 +1242,7 @@ local function buildTailoredSuitAndOvercoat(
 			* CFrame.new(0.35 * scaleW, 0.22 * scaleH, 0.55 * scaleD)
 			* CFrame.Angles(0, 0, math.rad(14)),
 		suitColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1249,7 +1252,7 @@ local function buildTailoredSuitAndOvercoat(
 		Vector3.new(0.55 * scaleW, 1.35 * scaleH, 0.07 * scaleD),
 		upperTorso.CFrame * CFrame.new(-0.58 * scaleW, 0.05 * scaleH, 0.53 * scaleD),
 		suitColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1259,7 +1262,7 @@ local function buildTailoredSuitAndOvercoat(
 		Vector3.new(0.55 * scaleW, 1.35 * scaleH, 0.07 * scaleD),
 		upperTorso.CFrame * CFrame.new(0.58 * scaleW, 0.05 * scaleH, 0.53 * scaleD),
 		suitColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1273,7 +1276,7 @@ local function buildTailoredSuitAndOvercoat(
 			* CFrame.new(0, -0.12 * scaleH, 0.56 * scaleD)
 			* CFrame.Angles(0, 0, math.rad(90)),
 		Color3.fromRGB(30, 28, 26),
-		Enum.Material.SmoothPlastic,
+		S.Gloss,
 		transparency,
 		model
 	)
@@ -1285,7 +1288,7 @@ local function buildTailoredSuitAndOvercoat(
 			* CFrame.new(button2_offset * scaleW, -0.42 * scaleH, 0.56 * scaleD)
 			* CFrame.Angles(0, 0, math.rad(90)),
 		Color3.fromRGB(30, 28, 26),
-		Enum.Material.SmoothPlastic,
+		S.Gloss,
 		transparency,
 		model
 	)
@@ -1297,7 +1300,7 @@ local function buildTailoredSuitAndOvercoat(
 			* CFrame.new(0, -0.72 * scaleH, 0.56 * scaleD)
 			* CFrame.Angles(0, 0, math.rad(90)),
 		Color3.fromRGB(30, 28, 26),
-		Enum.Material.SmoothPlastic,
+		S.Gloss,
 		transparency,
 		model
 	)
@@ -1309,7 +1312,7 @@ local function buildTailoredSuitAndOvercoat(
 		Vector3.new(0.24 * scaleW, 0.06 * scaleH, 0.04 * scaleD),
 		upperTorso.CFrame * CFrame.new(0.54 * scaleW, 0.38 * scaleH, 0.55 * scaleD),
 		suitColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1319,7 +1322,7 @@ local function buildTailoredSuitAndOvercoat(
 		Vector3.new(0.18 * scaleW, 0.12 * scaleH, 0.04 * scaleD),
 		upperTorso.CFrame * CFrame.new(0.54 * scaleW, 0.44 * scaleH, 0.56 * scaleD),
 		tieColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1334,7 +1337,7 @@ local function buildTailoredSuitAndOvercoat(
 		Vector3.new(0.20 * scaleW, 0.18 * scaleH, 0.09 * scaleD),
 		upperTorso.CFrame * CFrame.new(0, 0.60 * scaleH, tieZOffset) * CFrame.Angles(0, tieRot, 0),
 		tieColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1344,7 +1347,7 @@ local function buildTailoredSuitAndOvercoat(
 		Vector3.new(0.18 * scaleW, 0.55 * scaleH, 0.06 * scaleD),
 		upperTorso.CFrame * CFrame.new(0, 0.28 * scaleH, tieZOffset) * CFrame.Angles(0, tieRot, 0),
 		tieColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1354,7 +1357,7 @@ local function buildTailoredSuitAndOvercoat(
 		Vector3.new(0.22 * scaleW, 0.55 * scaleH, 0.06 * scaleD),
 		upperTorso.CFrame * CFrame.new(0, -0.22 * scaleH, tieZOffset) * CFrame.Angles(0, tieRot, 0),
 		tieColor,
-		Enum.Material.Fabric,
+		S.Wool,
 		transparency,
 		model
 	)
@@ -1365,7 +1368,7 @@ local function buildTailoredSuitAndOvercoat(
 			Vector3.new(0.16 * scaleW, 0.04 * scaleH, 0.04 * scaleD),
 			upperTorso.CFrame * CFrame.new(0, 0.10 * scaleH, 0.58 * scaleD),
 			Color3.fromRGB(225, 190, 70),
-			Enum.Material.Metal,
+			S.Brass,
 			transparency,
 			model
 		)
@@ -1379,7 +1382,7 @@ local function buildTailoredSuitAndOvercoat(
 			Vector3.new(1.88 * scaleW, 0.16 * scaleH, 1.06 * scaleD),
 			lowerTorso.CFrame * CFrame.new(0, 0.38 * scaleH, 0),
 			Color3.fromRGB(28, 22, 18),
-			Enum.Material.Leather,
+			S.Leather,
 			transparency,
 			model
 		)
@@ -1389,7 +1392,7 @@ local function buildTailoredSuitAndOvercoat(
 			Vector3.new(0.34 * scaleW, 0.20 * scaleH, 0.06 * scaleD),
 			lowerTorso.CFrame * CFrame.new(0, 0.38 * scaleH, 0.55 * scaleD),
 			Color3.fromRGB(220, 185, 70),
-			Enum.Material.Metal,
+			S.Brass,
 			transparency,
 			model
 		)
@@ -1399,7 +1402,7 @@ local function buildTailoredSuitAndOvercoat(
 			Vector3.new(0.22 * scaleW, 0.12 * scaleH, 0.07 * scaleD),
 			lowerTorso.CFrame * CFrame.new(0, 0.38 * scaleH, 0.55 * scaleD),
 			Color3.fromRGB(28, 22, 18),
-			Enum.Material.Leather,
+			S.Leather,
 			transparency,
 			model
 		)
@@ -1409,7 +1412,7 @@ local function buildTailoredSuitAndOvercoat(
 			Vector3.new(0.04 * scaleW, 0.14 * scaleH, 0.08 * scaleD),
 			lowerTorso.CFrame * CFrame.new(0, 0.38 * scaleH, 0.56 * scaleD),
 			Color3.fromRGB(220, 185, 70),
-			Enum.Material.Metal,
+			S.Brass,
 			transparency,
 			model
 		)
@@ -1436,7 +1439,7 @@ local function buildExecutiveBriefcase(
 		Vector3.new(0.38 * scaleW, 1.20 * scaleH, 1.62 * scaleD),
 		rightHand.CFrame * CFrame.new(0, -0.48 * scaleH, 0),
 		Color3.fromRGB(42, 26, 18),
-		Enum.Material.Leather,
+		S.Leather,
 		transparency,
 		model
 	)
@@ -1447,7 +1450,7 @@ local function buildExecutiveBriefcase(
 		Vector3.new(0.40 * scaleW, 1.22 * scaleH, 0.06 * scaleD),
 		rightHand.CFrame * CFrame.new(0, -0.48 * scaleH, 0),
 		Color3.fromRGB(180, 150, 60),
-		Enum.Material.Metal,
+		S.Brass,
 		transparency,
 		model
 	)
@@ -1458,7 +1461,7 @@ local function buildExecutiveBriefcase(
 		Vector3.new(0.40 * scaleW, 0.12 * scaleH, 0.10 * scaleD),
 		rightHand.CFrame * CFrame.new(0, -0.16 * scaleH, -0.45 * scaleD),
 		Color3.fromRGB(220, 185, 75),
-		Enum.Material.Metal,
+		S.Brass,
 		transparency,
 		model
 	)
@@ -1468,7 +1471,7 @@ local function buildExecutiveBriefcase(
 		Vector3.new(0.40 * scaleW, 0.12 * scaleH, 0.10 * scaleD),
 		rightHand.CFrame * CFrame.new(0, -0.16 * scaleH, 0.45 * scaleD),
 		Color3.fromRGB(220, 185, 75),
-		Enum.Material.Metal,
+		S.Brass,
 		transparency,
 		model
 	)
@@ -1479,7 +1482,7 @@ local function buildExecutiveBriefcase(
 		Vector3.new(0.12 * scaleW, 0.48 * scaleH, 0.48 * scaleD),
 		rightHand.CFrame * CFrame.new(0, 0.12 * scaleH, 0) * CFrame.Angles(0, 0, math.rad(90)),
 		Color3.fromRGB(28, 18, 12),
-		Enum.Material.Leather,
+		S.Leather,
 		transparency,
 		model
 	)
@@ -1489,7 +1492,7 @@ local function buildExecutiveBriefcase(
 		Vector3.new(0.14 * scaleW, 0.08 * scaleH, 0.42 * scaleD),
 		rightHand.CFrame * CFrame.new(0, 0.22 * scaleH, 0),
 		Color3.fromRGB(220, 185, 75),
-		Enum.Material.Metal,
+		S.Brass,
 		transparency,
 		model
 	)
@@ -1520,7 +1523,7 @@ local function buildTailoredLegsAndShoes(
 			Vector3.new(0.96 * scaleW, 0.16 * scaleH, 0.96 * scaleD),
 			leftLowerLeg.CFrame * CFrame.new(0, -0.65 * scaleH, 0),
 			pantsColor,
-			Enum.Material.Fabric,
+			S.Wool,
 			transparency,
 			model
 		)
@@ -1530,7 +1533,7 @@ local function buildTailoredLegsAndShoes(
 			Vector3.new(0.88 * scaleW, 0.36 * scaleH, 1.25 * scaleD),
 			leftLowerLeg.CFrame * CFrame.new(0, -0.92 * scaleH, 0.14 * scaleD),
 			shoeColor,
-			Enum.Material.Leather,
+			S.Leather,
 			transparency,
 			model
 		)
@@ -1540,7 +1543,7 @@ local function buildTailoredLegsAndShoes(
 			Vector3.new(0.92 * scaleW, 0.08 * scaleH, 1.30 * scaleD),
 			leftLowerLeg.CFrame * CFrame.new(0, -1.12 * scaleH, 0.14 * scaleD),
 			Color3.fromRGB(10, 10, 10),
-			Enum.Material.SmoothPlastic,
+			S.Gloss,
 			transparency,
 			model
 		)
@@ -1550,7 +1553,7 @@ local function buildTailoredLegsAndShoes(
 			Vector3.new(0.92 * scaleW, 0.12 * scaleH, 0.44 * scaleD),
 			leftLowerLeg.CFrame * CFrame.new(0, -1.06 * scaleH, -0.32 * scaleD),
 			Color3.fromRGB(28, 20, 16),
-			Enum.Material.Leather,
+			S.Leather,
 			transparency,
 			model
 		)
@@ -1564,7 +1567,7 @@ local function buildTailoredLegsAndShoes(
 			Vector3.new(0.96 * scaleW, 0.16 * scaleH, 0.96 * scaleD),
 			rightLowerLeg.CFrame * CFrame.new(0, -0.65 * scaleH, 0),
 			pantsColor,
-			Enum.Material.Fabric,
+			S.Wool,
 			transparency,
 			model
 		)
@@ -1574,7 +1577,7 @@ local function buildTailoredLegsAndShoes(
 			Vector3.new(0.88 * scaleW, 0.36 * scaleH, 1.25 * scaleD),
 			rightLowerLeg.CFrame * CFrame.new(0, -0.92 * scaleH, 0.14 * scaleD),
 			shoeColor,
-			Enum.Material.Leather,
+			S.Leather,
 			transparency,
 			model
 		)
@@ -1584,7 +1587,7 @@ local function buildTailoredLegsAndShoes(
 			Vector3.new(0.92 * scaleW, 0.08 * scaleH, 1.30 * scaleD),
 			rightLowerLeg.CFrame * CFrame.new(0, -1.12 * scaleH, 0.14 * scaleD),
 			Color3.fromRGB(10, 10, 10),
-			Enum.Material.SmoothPlastic,
+			S.Gloss,
 			transparency,
 			model
 		)
@@ -1594,7 +1597,7 @@ local function buildTailoredLegsAndShoes(
 			Vector3.new(0.92 * scaleW, 0.12 * scaleH, 0.44 * scaleD),
 			rightLowerLeg.CFrame * CFrame.new(0, -1.06 * scaleH, -0.32 * scaleD),
 			Color3.fromRGB(28, 20, 16),
-			Enum.Material.Leather,
+			S.Leather,
 			transparency,
 			model
 		)
@@ -1624,7 +1627,7 @@ local function buildHorrorArchetypes(
 				Vector3.new(0.24 * scaleW, 0.16 * scaleH, 0.24 * scaleD),
 				head.CFrame * CFrame.new(0.38 * scaleW, (-0.40 - i * 0.14) * scaleH, 0),
 				Color3.fromRGB(236, 230, 218),
-				Enum.Material.SmoothPlastic,
+				S.Gloss,
 				0,
 				model
 			)
@@ -1637,7 +1640,7 @@ local function buildHorrorArchetypes(
 				* CFrame.new(0.38 * scaleW, -0.68 * scaleH, 0)
 				* CFrame.Angles(0, 0, math.rad(90)),
 			Color3.fromRGB(180, 160, 140),
-			Enum.Material.SmoothPlastic,
+			S.Gloss,
 			0,
 			model
 		)
@@ -1653,7 +1656,7 @@ local function buildHorrorArchetypes(
 						(i % 2 == 0) and 0.08 or -0.08
 					),
 				Color3.fromRGB(85, 10, 15),
-				Enum.Material.SmoothPlastic,
+				S.Skin,
 				0,
 				model
 			)
@@ -1664,7 +1667,7 @@ local function buildHorrorArchetypes(
 			Vector3.new(0.32 * scaleW, 0.25 * scaleH, 0.32 * scaleD),
 			head.CFrame * CFrame.new(0.36 * scaleW, -0.48 * scaleH, 0),
 			Color3.fromRGB(65, 8, 12),
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			0,
 			model
 		)
@@ -1676,7 +1679,7 @@ local function buildHorrorArchetypes(
 			Vector3.new(0.26 * scaleW, 0.15 * scaleH, 0.06 * scaleD),
 			head.CFrame * CFrame.new(-0.28 * scaleW, 0.15 * scaleH, 0.56 * scaleD),
 			Color3.fromRGB(0, 255, 235),
-			Enum.Material.Neon,
+			S.Glow,
 			0,
 			model
 		)
@@ -1686,7 +1689,7 @@ local function buildHorrorArchetypes(
 			Vector3.new(0.26 * scaleW, 0.15 * scaleH, 0.06 * scaleD),
 			head.CFrame * CFrame.new(0.28 * scaleW, 0.15 * scaleH, 0.56 * scaleD),
 			Color3.fromRGB(0, 255, 235),
-			Enum.Material.Neon,
+			S.Glow,
 			0,
 			model
 		)
@@ -1787,7 +1790,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 			Vector3.new(2, 2, 1),
 			CFrame.new(SPAWN_POS),
 			Color3.new(),
-			Enum.Material.SmoothPlastic,
+			S.Gloss,
 			1,
 			model
 		)
@@ -1805,7 +1808,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 			Vector3.new(2, 2, 1),
 			CFrame.new(SPAWN_POS),
 			Color3.new(),
-			Enum.Material.SmoothPlastic,
+			S.Gloss,
 			1,
 			model
 		)
@@ -1841,16 +1844,16 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 			end
 			if anomalyId == "shadow_entity" then
 				p.Color = Color3.fromRGB(0, 0, 0)
-				p.Material = Enum.Material.SmoothPlastic
+				Materials.applySurface(p, S.Gloss)
 			elseif p.Name:find("Torso") or p.Name:find("Arm") then
 				p.Color = suitColor
-				p.Material = Enum.Material.Fabric
-			elseif p.Name:find("Leg") then
+				Materials.applySurface(p, S.Wool)
+			elseif p.Name:find("Leg") or p.Name == "LeftFoot" or p.Name == "RightFoot" then
 				p.Color = pantsColor
-				p.Material = Enum.Material.Fabric
+				Materials.applySurface(p, S.Wool)
 			elseif p.Name == "Head" then
 				p.Color = skinColor
-				p.Material = Enum.Material.SmoothPlastic
+				Materials.applySurface(p, S.Skin)
 			end
 		end
 	end
@@ -1952,7 +1955,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 			Vector3.new(2.5 * widthScale, 0.05 * heightScale, 1.5 * depthScale),
 			upperTorso.CFrame,
 			Color3.fromRGB(200, 200, 200),
-			Enum.Material.Neon,
+			S.Glow,
 			1.0,
 			model
 		)
@@ -1965,7 +1968,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 			Vector3.new(0.14 * widthScale, 0.35 * heightScale, 0.14 * depthScale),
 			upperTorso.CFrame * CFrame.new(0.48 * widthScale, 0.70 * heightScale, 0.25 * depthScale),
 			Color3.fromRGB(150, 20, 25),
-			Enum.Material.SmoothPlastic,
+			S.Skin,
 			0,
 			model
 		)
@@ -1977,7 +1980,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 			Vector3.new(0.1, 0.1, 0.1),
 			head.CFrame * CFrame.new(0, -0.22 * heightScale, 0.65 * depthScale),
 			Color3.fromRGB(240, 245, 255),
-			Enum.Material.Air,
+			S.Vapor,
 			1,
 			model
 		)
@@ -2006,7 +2009,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 			Vector3.new(0.32 * widthScale, 0.32 * heightScale, 0.05 * depthScale),
 			head.CFrame * CFrame.new(0, 0.35 * heightScale, 0.55 * depthScale),
 			Color3.fromRGB(255, 30, 45),
-			Enum.Material.Neon,
+			S.Glow,
 			1.0,
 			model
 		)
@@ -2024,7 +2027,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 			Vector3.new(0.65 * widthScale, 0.65 * heightScale, 0.65 * depthScale),
 			rightHand.CFrame,
 			Color3.fromRGB(240, 25, 60),
-			Enum.Material.Neon,
+			S.Glow,
 			1.0,
 			model
 		)

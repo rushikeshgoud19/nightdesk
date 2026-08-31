@@ -284,6 +284,11 @@ conventional choice.
 - **Unanchored parts** — physics cost forever. `Anchored = true` by default.
 - **RemoteFunction to a client** — can hang the server thread indefinitely.
 - **Free models with scripts** — malware vector. Read before inserting.
+- **Creating a `MaterialVariant` from a game script** — `BaseMaterial` is Plugin
+  security and raises "lacking capability Plugin". Variants belong in the place
+  (project file, or a plugin at authoring time), never in runtime code. The throw
+  propagates: one variant took down a whole lobby builder and everything the
+  bootstrap called after it.
 - **Wildcards in agy path permissions** — crashes with "globs not supported".
   Directory rules are already recursive.
 - **`roblox.yml` and `sourcemap.json`** are generated per clone and gitignored.

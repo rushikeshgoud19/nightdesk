@@ -43,6 +43,142 @@
         }
       }
     },
+    // Every MaterialVariant in the game is declared HERE, not created at runtime.
+    // MaterialVariant.BaseMaterial carries Plugin security, so a game Script that
+    // writes it throws "lacking capability Plugin". That is what took the entire
+    // lobby build down for a session -- buildLobby() raised on its first variant,
+    // init.server.luau calls it unprotected, and nothing after line 12 ran. No
+    // build, lint or format step noticed. Rojo writes the place file directly and
+    // is not subject to the check. Add a material by adding it here;
+    // src/shared/Materials.luau only names them.
+    //
+    // StudsPerTile is the size of one texture repeat in studs. Guest surfaces are
+    // small -- a cheekbone is about 0.3 studs -- so their tiles are sub-stud or
+    // the detail stretches into invisible blur.
+    "MaterialService": {
+      "$className": "MaterialService",
+      "MotelSmoothPlastic": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "SmoothPlastic",
+          "StudsPerTile": 4,
+          "ColorMap": "rbxassetid://84847808898940",
+          "NormalMap": "rbxassetid://127629375510502",
+          "RoughnessMap": "rbxassetid://72990726694125",
+          "MetalnessMap": "rbxassetid://119542628474764"
+        }
+      },
+      "MotelMetal": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Metal",
+          "StudsPerTile": 3,
+          "ColorMap": "rbxassetid://98464466997973",
+          "NormalMap": "rbxassetid://111988776284037",
+          "RoughnessMap": "rbxassetid://93837891449698",
+          "MetalnessMap": "rbxassetid://83600162523314"
+        }
+      },
+      "MotelWood": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Wood",
+          "StudsPerTile": 4,
+          "ColorMap": "rbxassetid://96386482086063",
+          "NormalMap": "rbxassetid://79383275971267",
+          "RoughnessMap": "rbxassetid://107016336121246",
+          "MetalnessMap": "rbxassetid://88481602168896"
+        }
+      },
+      "MotelFabric": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Fabric",
+          "StudsPerTile": 2,
+          "ColorMap": "rbxassetid://83227731596606",
+          "NormalMap": "rbxassetid://131848639768481",
+          "RoughnessMap": "rbxassetid://125661757325907",
+          "MetalnessMap": "rbxassetid://122891507024129"
+        }
+      },
+      "MotelPlaster": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Plaster",
+          "StudsPerTile": 6,
+          "ColorMap": "rbxassetid://84651318728159",
+          "NormalMap": "rbxassetid://96770765941017",
+          "RoughnessMap": "rbxassetid://73347407064486",
+          "MetalnessMap": "rbxassetid://71077153531981"
+        }
+      },
+      "MotelLeather": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Leather",
+          "StudsPerTile": 2,
+          "ColorMap": "rbxassetid://114233731835499",
+          "NormalMap": "rbxassetid://84266244644289",
+          "RoughnessMap": "rbxassetid://100035393486562",
+          "MetalnessMap": "rbxassetid://106676122828793"
+        }
+      },
+      "MotelWoodPlanks": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "WoodPlanks",
+          "StudsPerTile": 5,
+          "ColorMap": "rbxassetid://85187518430706",
+          "NormalMap": "rbxassetid://89895230642680",
+          "RoughnessMap": "rbxassetid://81752664145255",
+          "MetalnessMap": "rbxassetid://105732520393883"
+        }
+      },
+      "MotelConcrete": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Concrete",
+          "StudsPerTile": 6,
+          "ColorMap": "rbxassetid://131687710453378",
+          "NormalMap": "rbxassetid://123706483732237",
+          "RoughnessMap": "rbxassetid://87753147152899",
+          "MetalnessMap": "rbxassetid://96731713862708"
+        }
+      },
+      "GuestSkin": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "SmoothPlastic",
+          "StudsPerTile": 0.5,
+          "ColorMap": "rbxassetid://97295374627629",
+          "NormalMap": "rbxassetid://107498800381317",
+          "RoughnessMap": "rbxassetid://125175590849695",
+          "MetalnessMap": "rbxassetid://96277239383984"
+        }
+      },
+      "GuestHair": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "SmoothPlastic",
+          "StudsPerTile": 0.6,
+          "ColorMap": "rbxassetid://90404303434662",
+          "NormalMap": "rbxassetid://104159192870966",
+          "RoughnessMap": "rbxassetid://107792511953909",
+          "MetalnessMap": "rbxassetid://118720678239663"
+        }
+      },
+      "GuestWool": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Fabric",
+          "StudsPerTile": 0.8,
+          "ColorMap": "rbxassetid://139386158308488",
+          "NormalMap": "rbxassetid://120934904965337",
+          "RoughnessMap": "rbxassetid://95168413091361",
+          "MetalnessMap": "rbxassetid://128669591648974"
+        }
+      }
+    },
     // Color3 here is FLOATS 0-1, never 0-255. Anything above 1.0 clamps to white:
     // [35, 35, 45] silently became pure white ambient, flooding the scene flat and
     // removing every shadow. Multiply by 255 to read as RGB -- 0.12 is about 31.

@@ -8,6 +8,7 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Materials = require(Shared:WaitForChild("Materials"))
 local Remotes = require(Shared:WaitForChild("Remotes"))
 
 local Atmosphere = require(script.Parent:WaitForChild("Atmosphere"))
@@ -94,7 +95,7 @@ local function makePart(
 	p.Size = size
 	p.CFrame = cf
 	p.Color = color
-	p.Material = material
+	Materials.applyMotel(p, material)
 	p.Anchored = true
 	p.CanCollide = false
 	p.TopSurface = Enum.SurfaceType.Smooth
@@ -170,7 +171,7 @@ function DeskProps.init()
 		Vector3.new(0.7, 0.2, 0.9),
 		CFrame.new(2.8, 4.96, 4.6),
 		Color3.fromRGB(35, 125, 60),
-		Enum.Material.Plastic,
+		Enum.Material.SmoothPlastic,
 		admitModel
 	)
 	admitModel.PrimaryPart = aHandle
@@ -201,7 +202,7 @@ function DeskProps.init()
 		Vector3.new(0.7, 0.2, 0.9),
 		CFrame.new(4.0, 4.96, 4.6),
 		Color3.fromRGB(145, 40, 40),
-		Enum.Material.Plastic,
+		Enum.Material.SmoothPlastic,
 		refuseModel
 	)
 	refuseModel.PrimaryPart = rHandle

@@ -119,3 +119,15 @@ rojo build -o nightdesk.rbxl    # standalone place file
 - Roblox `task.wait()` returns actual elapsed time, not requested time. Never accumulate as exact.
 - `Players.PlayerRemoving` does not fire reliably on server shutdown. BindToClose is required for persistence.
 - Lobby architecture is constructed server-authoritatively on boot via `src/server/BuildLobby.luau`.
+- **MaterialVariants cannot be created at runtime.** `MaterialVariant.BaseMaterial`
+  carries Plugin security, so a game `Script` that writes it raises "lacking
+  capability Plugin". They are declared in `default.project.json` under
+  `MaterialService` and reach the place through Rojo. `src/shared/Materials.luau`
+  only names them. `BasePart.MaterialVariant` is a plain string and *is* writable
+  at runtime -- it is only the variant object that is restricted.
+- **`rojo build` and `selene` cannot see a runtime failure.** Both the white-ambient
+  lighting bug and the material bug above built clean, linted clean and warned
+  about nothing; the lighting one was only visible on screen and the material one
+  only in the Output window. After a change to lighting, materials, or anything
+  else the project file owns, read the value back out of the built place and
+  press Play to confirm `[nightdesk] server initialized` still prints.
