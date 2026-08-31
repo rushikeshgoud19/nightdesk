@@ -26,7 +26,11 @@ import urllib.request
 from pathlib import Path
 
 API_URL = "https://api.mistral.ai/v1/chat/completions"
-DEFAULT_MODEL = "mistral-large-latest"
+MODELS_URL = "https://api.mistral.ai/v1/models"
+# The strongest model this account's tier can actually call. mistral-large-latest
+# is listed by /v1/models but returns 403 tier_not_allowed, so the listing is not
+# a permission check -- `models` below probes for real.
+DEFAULT_MODEL = "mistral-medium-latest"
 REPO_ROOT = Path(__file__).resolve().parent.parent
 KEY_NAME = "MISTRAL_API_KEY"
 
@@ -73,7 +77,12 @@ def call(messages: list, model: str, tools: list | None = None, temperature: flo
             return json.loads(r.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", "replace")[:600]
-        sys.exit(f"Mistral returned HTTP {e.code}\n{detail}")
+        hint = ""
+        if e.code == 403 and "tier" in detail:
+            hint = "\n\nThat model is not on this account's tier. Run:  python tools/mistral.py models"
+        elif e.code == 401:
+            hint = "\n\nThe key was rejected. Check " + KEY_NAME + " in .env."
+        sys.exit(f"Mistral returned HTTP {e.code}\n{detail}{hint}")
     except urllib.error.URLError as e:
         sys.exit(f"Could not reach Mistral: {e.reason}")
 
@@ -197,6 +206,75 @@ def cmd_selftest(args: argparse.Namespace) -> int:
     return 0
 
 
+# --------------------------------------------------------------------------- #
+# models -- what this key can actually call, which is not what /v1/models says
+# --------------------------------------------------------------------------- #
+
+
+def cmd_models(args: argparse.Namespace) -> int:
+    req = urllib.request.Request(
+        MODELS_URL,
+        headers={"Authorization": "Bearer " + load_key(), "Accept": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            listed = json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        sys.exit(f"HTTP {e.code} listing models\n{e.read().decode('utf-8', 'replace')[:300]}")
+
+    chat_models = sorted(
+        m["id"]
+        for m in listed.get("data", [])
+        if (m.get("capabilities") or {}).get("completion_chat")
+        and (m.get("capabilities") or {}).get("function_calling")
+    )
+    if not args.probe:
+        print(f"{len(chat_models)} chat models with function_calling are LISTED for this key:\n")
+        for m in chat_models:
+            print("  " + m)
+        print("\nListing is not a permission check. Add --probe to call each one for real.")
+        return 0
+
+    print("Calling each model with one tool definition. This costs a few tokens each.\n")
+    usable = []
+    for m in chat_models:
+        body = {
+            "model": m,
+            "messages": [{"role": "user", "content": "Is room 104 occupied? Use the tool."}],
+            "tools": [SELFTEST_TOOL],
+            "tool_choice": "auto",
+            "temperature": 0,
+        }
+        req = urllib.request.Request(
+            API_URL,
+            data=json.dumps(body).encode("utf-8"),
+            headers={
+                "Authorization": "Bearer " + load_key(),
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=90) as r:
+                out = json.loads(r.read().decode("utf-8"))
+            got_tool = bool(out["choices"][0]["message"].get("tool_calls"))
+            status = "OK" if got_tool else "no tool call"
+            if got_tool:
+                usable.append(m)
+            print(f"  {m:<28} {status}")
+        except urllib.error.HTTPError as e:
+            try:
+                msg = json.loads(e.read().decode("utf-8")).get("message", "")[:60]
+            except Exception:
+                msg = ""
+            print(f"  {m:<28} HTTP {e.code}  {msg}")
+
+    print(f"\n{len(usable)}/{len(chat_models)} usable for tool calling.")
+    if usable:
+        print("Default in this script is " + DEFAULT_MODEL + ".")
+    return 0
+
+
 def main() -> int:
     p = argparse.ArgumentParser(prog="mistral", description="Call Mistral, and test its tool calling.")
     p.add_argument("--model", default=DEFAULT_MODEL, help="default " + DEFAULT_MODEL)
@@ -210,6 +288,10 @@ def main() -> int:
 
     s = sub.add_parser("selftest", help="prove tool calling works end to end")
     s.set_defaults(func=cmd_selftest)
+
+    m = sub.add_parser("models", help="what this key can call (listing lies; --probe checks)")
+    m.add_argument("--probe", action="store_true", help="actually call each model")
+    m.set_defaults(func=cmd_models)
 
     args = p.parse_args()
     return args.func(args)
