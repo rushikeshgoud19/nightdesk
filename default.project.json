@@ -47,14 +47,14 @@
       "$className": "Lighting",
       "$properties": {
         "Technology": "Future",
-        "Ambient": [0.03, 0.03, 0.04],
-        "OutdoorAmbient": [0.02, 0.02, 0.03],
+        "Ambient": [35, 35, 45],
+        "OutdoorAmbient": [20, 20, 30],
         "Brightness": 0.4,
         "ClockTime": 2.0,
         "GlobalShadows": true,
-        "ExposureCompensation": -0.1,
+        "ExposureCompensation": 0,
         "FogEnd": 120,
-        "FogColor": [0.03, 0.03, 0.05]
+        "FogColor": [8, 8, 12]
       }
     },
     "SoundService": {

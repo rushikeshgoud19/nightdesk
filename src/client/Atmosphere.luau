@@ -63,9 +63,9 @@ function Atmosphere.init()
 	if not bloom then
 		local b = Instance.new("BloomEffect")
 		b.Name = "NightDesk_Bloom"
-		b.Intensity = 0.25
-		b.Size = 14
-		b.Threshold = 0.95
+		b.Intensity = 0.1
+		b.Size = 10
+		b.Threshold = 2.0
 		b.Parent = Lighting
 		bloom = b
 	end
