@@ -44,13 +44,13 @@ local MOTEL: { [Enum.Material]: string } = {
 -- colour shift that small has nothing to read against on a flat plastic surface
 -- -- it needs pores and a broken specular to sit on.
 Materials.guest = table.freeze({
-	Skin = surface(Enum.Material.SmoothPlastic, "GuestSkin"),
-	Hair = surface(Enum.Material.SmoothPlastic, "GuestHair"),
-	Wool = surface(Enum.Material.Fabric, "GuestWool"),
-	Suit = surface(Enum.Material.Fabric, "GuestSuit"),
-	Shirt = surface(Enum.Material.Fabric, "GuestShirt"),
-	Shoe = surface(Enum.Material.Leather, "GuestShoe"),
-	WetSuit = surface(Enum.Material.Fabric, "GuestWetSuit"),
+	Skin = surface(Enum.Material.SmoothPlastic),
+	Hair = surface(Enum.Material.SmoothPlastic),
+	Wool = surface(Enum.Material.Fabric),
+	Suit = surface(Enum.Material.Fabric),
+	Shirt = surface(Enum.Material.Fabric),
+	Shoe = surface(Enum.Material.Leather),
+	WetSuit = surface(Enum.Material.Plastic),
 	Leather = surface(Enum.Material.Leather, "MotelLeather"),
 	Brass = surface(Enum.Material.Metal, "MotelMetal"),
 	-- Wet, hard and clean: eyeballs, teeth, bone, suit buttons, shoe soles.

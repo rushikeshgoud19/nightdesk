@@ -44,3 +44,5 @@ Thumbs.db
 # python bytecode from tools/
 __pycache__/
 *.pyc
+patcher.py
+fix_warnings.py
