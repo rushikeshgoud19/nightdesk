@@ -416,7 +416,10 @@ function DeskUI.onGuest(guest)
 		})
 		:Play()
 
-	queueLabel.Text = `{guest.guestsLeft} remaining · [G] Ask · [T] Phone · [Q] UV`
+	-- The night runs on a clock now, not a guest counter, so `guestsLeft` stopped
+	-- being sent and this rendered a literal "nil remaining" on the HUD all shift.
+	-- How much night is left is the clock's job; this line is for the tools.
+	queueLabel.Text = "[G] Ask · [T] Phone · [Q] UV · [F] Ledger"
 	statusLabel.Text =
 		"Guest at the desk. Inspect documents, ask questions [G], or test UV seal [Q]."
 	statusLabel.TextColor3 = Theme.inkSoft

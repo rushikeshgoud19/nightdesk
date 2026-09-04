@@ -423,11 +423,11 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local pantsColor = PANTS_PALETTES[rng:NextInteger(1, #PANTS_PALETTES)]
 	local tieColor = TIE_PALETTES[rng:NextInteger(1, #TIE_PALETTES)]
 	local hairColor = HAIR_COLORS[rng:NextInteger(1, #HAIR_COLORS)]
-	
+
 	local HAIR_MESHES = {
 		"rbxassetid://113756968918441",
 		"rbxassetid://100645125889787",
-		"rbxassetid://104867370093409"
+		"rbxassetid://104867370093409",
 	}
 	local hairMeshId = HAIR_MESHES[rng:NextInteger(1, #HAIR_MESHES)]
 
@@ -435,7 +435,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	isCurrentAnomaly = anomalyId ~= nil
 
 	local faceTexture = "rbxassetid://108872266733797" -- base
-		local isMimic = false
+	local isMimic = false
 	local isMandela = false
 	local isBrokenNeck = false
 	local isDrowned = false
@@ -473,10 +473,19 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local model = Instance.new("Model")
 	model.Name = `Guest_{guestData.name}`
 
-	local hrp = makePart("HumanoidRootPart", Enum.PartType.Block, Vector3.new(2, 2, 1), CFrame.new(SPAWN_POS), Color3.new(), S.Gloss, 1, model)
+	local hrp = makePart(
+		"HumanoidRootPart",
+		Enum.PartType.Block,
+		Vector3.new(2, 2, 1),
+		CFrame.new(SPAWN_POS),
+		Color3.new(),
+		S.Gloss,
+		1,
+		model
+	)
 	model.PrimaryPart = hrp
 	model:PivotTo(CFrame.lookAt(SPAWN_POS, DESK_POS))
-	
+
 	local baseCF = hrp.CFrame
 	local suitMat = if isDrowned then S.WetSuit else S.Suit
 
@@ -490,30 +499,165 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 		suitMat = S.Gloss
 	end
 
-	makePart("UpperTorso", Enum.PartType.Block, Vector3.new(2, 2, 1), baseCF * CFrame.new(0, 0, 0), suitColor, suitMat, 0, model)
-	makePart("Shirt", Enum.PartType.Block, Vector3.new(0.8, 1.8, 1.05), baseCF * CFrame.new(0, 0, 0), shirtColor, S.Shirt, 0, model)
-	makePart("Tie", Enum.PartType.Block, Vector3.new(0.2, 1.4, 1.1), baseCF * CFrame.new(0, -0.1, 0), tieColor, S.Wool, 0, model)
-	makePart("Belt", Enum.PartType.Block, Vector3.new(2.05, 0.2, 1.05), baseCF * CFrame.new(0, -0.9, 0), Color3.fromRGB(20, 20, 20), S.Leather, 0, model)
-	makePart("Buckle", Enum.PartType.Block, Vector3.new(0.3, 0.3, 1.1), baseCF * CFrame.new(0, -0.9, 0), Color3.fromRGB(200, 200, 200), S.Brass, 0, model)
+	makePart(
+		"UpperTorso",
+		Enum.PartType.Block,
+		Vector3.new(2, 2, 1),
+		baseCF * CFrame.new(0, 0, 0),
+		suitColor,
+		suitMat,
+		0,
+		model
+	)
+	makePart(
+		"Shirt",
+		Enum.PartType.Block,
+		Vector3.new(0.8, 1.8, 1.05),
+		baseCF * CFrame.new(0, 0, 0),
+		shirtColor,
+		S.Shirt,
+		0,
+		model
+	)
+	makePart(
+		"Tie",
+		Enum.PartType.Block,
+		Vector3.new(0.2, 1.4, 1.1),
+		baseCF * CFrame.new(0, -0.1, 0),
+		tieColor,
+		S.Wool,
+		0,
+		model
+	)
+	makePart(
+		"Belt",
+		Enum.PartType.Block,
+		Vector3.new(2.05, 0.2, 1.05),
+		baseCF * CFrame.new(0, -0.9, 0),
+		Color3.fromRGB(20, 20, 20),
+		S.Leather,
+		0,
+		model
+	)
+	makePart(
+		"Buckle",
+		Enum.PartType.Block,
+		Vector3.new(0.3, 0.3, 1.1),
+		baseCF * CFrame.new(0, -0.9, 0),
+		Color3.fromRGB(200, 200, 200),
+		S.Brass,
+		0,
+		model
+	)
 
-	makePart("LeftUpperLeg", Enum.PartType.Block, Vector3.new(0.9, 2, 1), baseCF * CFrame.new(-0.5, -2, 0), pantsColor, suitMat, 0, model)
-	makePart("RightUpperLeg", Enum.PartType.Block, Vector3.new(0.9, 2, 1), baseCF * CFrame.new(0.5, -2, 0), pantsColor, suitMat, 0, model)
+	makePart(
+		"LeftUpperLeg",
+		Enum.PartType.Block,
+		Vector3.new(0.9, 2, 1),
+		baseCF * CFrame.new(-0.5, -2, 0),
+		pantsColor,
+		suitMat,
+		0,
+		model
+	)
+	makePart(
+		"RightUpperLeg",
+		Enum.PartType.Block,
+		Vector3.new(0.9, 2, 1),
+		baseCF * CFrame.new(0.5, -2, 0),
+		pantsColor,
+		suitMat,
+		0,
+		model
+	)
 
-	makePart("LeftShoe", Enum.PartType.Block, Vector3.new(0.95, 0.4, 1.2), baseCF * CFrame.new(-0.5, -3.2, -0.1), Color3.fromRGB(15, 15, 15), S.Shoe, 0, model)
-	makePart("RightShoe", Enum.PartType.Block, Vector3.new(0.95, 0.4, 1.2), baseCF * CFrame.new(0.5, -3.2, -0.1), Color3.fromRGB(15, 15, 15), S.Shoe, 0, model)
+	makePart(
+		"LeftShoe",
+		Enum.PartType.Block,
+		Vector3.new(0.95, 0.4, 1.2),
+		baseCF * CFrame.new(-0.5, -3.2, -0.1),
+		Color3.fromRGB(15, 15, 15),
+		S.Shoe,
+		0,
+		model
+	)
+	makePart(
+		"RightShoe",
+		Enum.PartType.Block,
+		Vector3.new(0.95, 0.4, 1.2),
+		baseCF * CFrame.new(0.5, -3.2, -0.1),
+		Color3.fromRGB(15, 15, 15),
+		S.Shoe,
+		0,
+		model
+	)
 
-	makePart("LeftUpperArm", Enum.PartType.Block, Vector3.new(1, 2, 1), baseCF * CFrame.new(-1.5, 0, 0), suitColor, suitMat, 0, model)
-	makePart("RightUpperArm", Enum.PartType.Block, Vector3.new(1, 2, 1), baseCF * CFrame.new(1.5, 0, 0), suitColor, suitMat, 0, model)
+	makePart(
+		"LeftUpperArm",
+		Enum.PartType.Block,
+		Vector3.new(1, 2, 1),
+		baseCF * CFrame.new(-1.5, 0, 0),
+		suitColor,
+		suitMat,
+		0,
+		model
+	)
+	makePart(
+		"RightUpperArm",
+		Enum.PartType.Block,
+		Vector3.new(1, 2, 1),
+		baseCF * CFrame.new(1.5, 0, 0),
+		suitColor,
+		suitMat,
+		0,
+		model
+	)
 
-	local handL = makePart("LeftHand", Enum.PartType.Block, Vector3.new(0.8, 0.4, 0.8), baseCF * CFrame.new(-1.5, -1.2, 0), skinColor, S.Skin, 0, model)
-	local handR = makePart("RightHand", Enum.PartType.Block, Vector3.new(0.8, 0.4, 0.8), baseCF * CFrame.new(1.5, -1.2, 0), skinColor, S.Skin, 0, model)
+	local handL = makePart(
+		"LeftHand",
+		Enum.PartType.Block,
+		Vector3.new(0.8, 0.4, 0.8),
+		baseCF * CFrame.new(-1.5, -1.2, 0),
+		skinColor,
+		S.Skin,
+		0,
+		model
+	)
+	local handR = makePart(
+		"RightHand",
+		Enum.PartType.Block,
+		Vector3.new(0.8, 0.4, 0.8),
+		baseCF * CFrame.new(1.5, -1.2, 0),
+		skinColor,
+		S.Skin,
+		0,
+		model
+	)
 
 	local headScaleY = if isMandela then 2.0 else 1.2
 	local headOffset = if isMandela then -0.4 else 0
-	local head = makePart("Head", Enum.PartType.Block, Vector3.new(1.2, headScaleY, 1.2), baseCF * CFrame.new(0, 1.6 + headOffset, 0), skinColor, S.Skin, 0, model)
+	local head = makePart(
+		"Head",
+		Enum.PartType.Block,
+		Vector3.new(1.2, headScaleY, 1.2),
+		baseCF * CFrame.new(0, 1.6 + headOffset, 0),
+		skinColor,
+		S.Skin,
+		0,
+		model
+	)
 
 	if isMandela then
-		makePart("HeadVoid", Enum.PartType.Block, Vector3.new(1.25, 0.8, 1.25), baseCF * CFrame.new(0, 1.0, 0), Color3.new(0, 0, 0), S.Gloss, 0, model)
+		makePart(
+			"HeadVoid",
+			Enum.PartType.Block,
+			Vector3.new(1.25, 0.8, 1.25),
+			baseCF * CFrame.new(0, 1.0, 0),
+			Color3.new(0, 0, 0),
+			S.Gloss,
+			0,
+			model
+		)
 	end
 
 	if isVoid then
@@ -525,23 +669,23 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 		Materials.applySurface(handR, S.Gloss)
 		faceTexture = "rbxassetid://108872266733797" -- cyan faces will be handled by Color3 tint
 	end
-    
-    if isBrokenNeck then
-        head.CFrame = head.CFrame * CFrame.Angles(0, 0, math.rad(85))
-    end
+
+	if isBrokenNeck then
+		head.CFrame = head.CFrame * CFrame.Angles(0, 0, math.rad(85))
+	end
 
 	local faceDecal = Instance.new("Decal")
 	faceDecal.Name = "face"
 	faceDecal.Face = Enum.NormalId.Front
 	faceDecal.Texture = faceTexture
 	faceDecal.Parent = head
-    if isVoid then
-        faceDecal.Color3 = Color3.fromRGB(0, 255, 255)
-    end
-	
+	if isVoid then
+		faceDecal.Color3 = Color3.fromRGB(0, 255, 255)
+	end
+
 	table.clear(activeEyelids)
 	table.clear(activeUvParts)
-	
+
 	if isBlinkEnabled then
 		faceDecal:SetAttribute("BaseTexture", faceTexture)
 		faceDecal:SetAttribute("BlinkTexture", "rbxassetid://106023531620267")
@@ -561,13 +705,13 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local hair = Instance.new("Part")
 	hair.Name = "Hair"
 	hair.Size = Vector3.new(1.4, 0.8, 1.4)
-	hair.CFrame = head.CFrame * CFrame.new(0, (headScaleY/2) + 0.1, 0)
+	hair.CFrame = head.CFrame * CFrame.new(0, (headScaleY / 2) + 0.1, 0)
 	hair.Color = hairColor
 	Materials.applySurface(hair, S.Hair)
 	hair.Anchored = true
 	hair.CanCollide = false
 	hair.Transparency = 1 -- Hide the block itself, show the mesh
-	
+
 	local mesh = Instance.new("SpecialMesh")
 	mesh.MeshType = Enum.MeshType.FileMesh
 	mesh.MeshId = hairMeshId
@@ -575,7 +719,7 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	mesh.TextureId = ""
 	mesh.VertexColor = Vector3.new(hairColor.R, hairColor.G, hairColor.B)
 	mesh.Parent = hair
-	
+
 	hair.Parent = model
 
 	table.clear(currentPartInfos)
@@ -593,15 +737,15 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	if isDrowned then
 		spawnFootprint(SPAWN_POS)
 		spawnFootprint(SPAWN_POS + Vector3.new(0, 0, -2))
-        local emitter = Instance.new("ParticleEmitter")
-        emitter.Texture = "rbxassetid://243660364" 
-        emitter.Color = ColorSequence.new(Color3.fromRGB(20, 20, 20))
-        emitter.Size = NumberSequence.new(0.05)
-        emitter.Rate = 10
-        emitter.Speed = NumberRange.new(0)
-        emitter.Acceleration = Vector3.new(0, -5, 0)
-        emitter.Lifetime = NumberRange.new(1, 2)
-        emitter.Parent = hrp
+		local emitter = Instance.new("ParticleEmitter")
+		emitter.Texture = "rbxassetid://243660364"
+		emitter.Color = ColorSequence.new(Color3.fromRGB(20, 20, 20))
+		emitter.Size = NumberSequence.new(0.05)
+		emitter.Rate = 10
+		emitter.Speed = NumberRange.new(0)
+		emitter.Acceleration = Vector3.new(0, -5, 0)
+		emitter.Lifetime = NumberRange.new(1, 2)
+		emitter.Parent = hrp
 	end
 
 	return model, hrp, 1.0, 1.0

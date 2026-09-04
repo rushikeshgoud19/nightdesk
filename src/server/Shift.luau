@@ -234,7 +234,11 @@ local function sendNext(player: Player)
 		sanity = p.sanity,
 		takings = p.takings,
 		nightNumber = p.nightsWorked + 1,
-		visualSeed = if p.rng then p.rng:NextInteger(1, 9999999) else 1,
+		-- Falling back to a constant here gave every guest in the shift the same
+		-- seed, so every guest rendered as the same person. If the shift RNG is
+		-- missing the night is already non-reproducible; identical faces on top
+		-- of that is just a harder bug to see.
+		visualSeed = if p.rng then p.rng:NextInteger(1, 9999999) else math.random(1, 9999999),
 	})
 end
 

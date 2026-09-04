@@ -46,3 +46,7 @@ __pycache__/
 *.pyc
 patcher.py
 fix_warnings.py
+old_guest.luau
+temp.luau
+fix_decal.py
+fix_meshpart.py
