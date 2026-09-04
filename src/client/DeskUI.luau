@@ -24,6 +24,8 @@ local timeTick = Remotes.get("TimeTick")
 local DeskUI = {}
 
 local currentNightNumber = 1
+local currentGuestAtDesk = false
+local wasWaiting = false
 
 local hudFrame: Frame
 local nightBadge: Frame
@@ -380,11 +382,33 @@ function DeskUI.build(gui: ScreenGui)
 		local displayHour = if hour == 0 then 12 else hour
 		nightLabel.Text =
 			string.format("NIGHT %d · %02d:%02d AM", currentNightNumber, displayHour, min)
+
+		-- Somebody is at the door. Say so, and say it louder as their patience
+		-- runs out -- they leave on their own and it costs $10.
+		if not currentGuestAtDesk then
+			if data.waiting then
+				local left = data.waitLeft or 0
+				statusLabel.Text = if left < 8
+					then "Someone is still waiting at the door. Ring the bell [E] before they leave."
+					else "Someone has come in out of the rain. Ring the bell [E] to call them up."
+				statusLabel.TextColor3 = if left < 8
+					then Color3.fromRGB(245, 130, 60)
+					else Color3.fromRGB(235, 215, 165)
+			elseif wasWaiting then
+				-- They gave up and walked back out into the rain, and that costs
+				-- $10. Without this branch the "someone is waiting" line stayed on
+				-- screen after they had gone, which is worse than saying nothing.
+				statusLabel.Text = "They gave up waiting and walked back out. -$10."
+				statusLabel.TextColor3 = Color3.fromRGB(245, 130, 60)
+			end
+			wasWaiting = data.waiting == true
+		end
 	end)
 end
 
 function DeskUI.onGuest(guest)
 	ShopUI.close()
+	currentGuestAtDesk = true
 	if guest.nightNumber then
 		currentNightNumber = guest.nightNumber
 	end
@@ -459,6 +483,7 @@ function DeskUI.onSanity(payload)
 end
 
 function DeskUI.onResult(result)
+	currentGuestAtDesk = false
 	setPrompt(false)
 	phoneBannerFrame.Visible = false
 
@@ -485,6 +510,7 @@ function DeskUI.onResult(result)
 end
 
 function DeskUI.onShiftEnded(result)
+	currentGuestAtDesk = false
 	setPrompt(false)
 	phoneBannerFrame.Visible = false
 	GuestRenderer.cleanup()

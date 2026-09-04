@@ -365,8 +365,20 @@ function Shift.start(player: Player)
 				p.takings = math.max(0, p.takings - 10)
 			end
 
+			-- A guest arrives, waits, and after 20 in-game minutes walks out and
+			-- costs $10. None of that was ever sent to the client, so the player
+			-- was fined for missing something they had no way to perceive -- the
+			-- exact complaint the first playtest made. The client needs to know
+			-- somebody is at the door and roughly how long they will stand there.
+			local waitLeft: number? = nil
+			if p.waitingGuest and p.waitingSince then
+				waitLeft = math.max(0, 20 - (p.shiftTime - p.waitingSince))
+			end
+
 			timeTick:FireClient(player, {
 				time = p.shiftTime,
+				waiting = p.waitingGuest ~= nil,
+				waitLeft = waitLeft,
 			})
 		end
 	end)

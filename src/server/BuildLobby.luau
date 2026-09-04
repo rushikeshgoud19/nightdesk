@@ -164,7 +164,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(0.4, 9.2, 0.4),
 			cf * CFrame.new(-2.0, 0, 0),
-			Color3.fromRGB(108, 91, 77),
+			Color3.fromRGB(79, 69, 61),
 			Enum.Material.Wood,
 			doorModel
 		)
@@ -173,7 +173,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(0.4, 9.2, 0.4),
 			cf * CFrame.new(2.0, 0, 0),
-			Color3.fromRGB(108, 91, 77),
+			Color3.fromRGB(79, 69, 61),
 			Enum.Material.Wood,
 			doorModel
 		)
@@ -182,7 +182,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(4.4, 0.4, 0.4),
 			cf * CFrame.new(0, 4.4, 0),
-			Color3.fromRGB(108, 91, 77),
+			Color3.fromRGB(79, 69, 61),
 			Enum.Material.Wood,
 			doorModel
 		)
@@ -193,7 +193,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(3.6, 8.8, 0.25),
 			cf,
-			Color3.fromRGB(120, 100, 85),
+			Color3.fromRGB(90, 78, 69),
 			Enum.Material.WoodPlanks,
 			doorModel
 		)
@@ -204,7 +204,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(2.8, 3.2, 0.30),
 			cf * CFrame.new(0, 1.8, 0),
-			Color3.fromRGB(106, 88, 73),
+			Color3.fromRGB(76, 66, 58),
 			Enum.Material.Wood,
 			doorModel
 		)
@@ -213,7 +213,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(2.8, 3.2, 0.30),
 			cf * CFrame.new(0, -1.8, 0),
-			Color3.fromRGB(106, 88, 73),
+			Color3.fromRGB(76, 66, 58),
 			Enum.Material.Wood,
 			doorModel
 		)
@@ -276,7 +276,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 1, 32),
 		CFrame.new(0, 0, -1),
-		Color3.fromRGB(106, 100, 94),
+		Color3.fromRGB(80, 77, 74),
 		Enum.Material.WoodPlanks
 	)
 	makePart(
@@ -284,7 +284,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(6, 0.05, 18),
 		CFrame.new(0, 0.52, -4.5),
-		Color3.fromRGB(164, 88, 88),
+		Color3.fromRGB(118, 72, 72),
 		Enum.Material.Fabric
 	)
 
@@ -294,7 +294,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 1, 32),
 		CFrame.new(0, 14.5, -1),
-		Color3.fromRGB(91, 91, 94),
+		Color3.fromRGB(68, 68, 70),
 		Enum.Material.Plaster
 	)
 
@@ -304,7 +304,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 14, 1),
 		CFrame.new(0, 7.5, 14.5),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.WoodPlanks
 	)
 	-- Back Wall baseboards & crown moulding
@@ -313,7 +313,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 0.8, 0.2),
 		CFrame.new(0, 0.9, 13.9),
-		Color3.fromRGB(100, 85, 73),
+		Color3.fromRGB(71, 63, 57),
 		Enum.Material.Wood
 	)
 	makePart(
@@ -321,7 +321,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 0.6, 0.3),
 		CFrame.new(0, 13.7, 13.85),
-		Color3.fromRGB(100, 85, 73),
+		Color3.fromRGB(71, 63, 57),
 		Enum.Material.Wood
 	)
 
@@ -331,7 +331,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1, 14, 14),
 		CFrame.new(-18, 7.5, -8),
-		Color3.fromRGB(111, 108, 106),
+		Color3.fromRGB(86, 85, 83),
 		Enum.Material.Plaster
 	)
 	makePart(
@@ -339,7 +339,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1, 14, 10),
 		CFrame.new(-18, 7.5, 9),
-		Color3.fromRGB(111, 108, 106),
+		Color3.fromRGB(86, 85, 83),
 		Enum.Material.Plaster
 	)
 	makePart(
@@ -347,7 +347,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1, 4, 8),
 		CFrame.new(-18, 12.5, 1),
-		Color3.fromRGB(111, 108, 106),
+		Color3.fromRGB(86, 85, 83),
 		Enum.Material.Plaster
 	)
 
@@ -357,7 +357,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1.3, 10.5, 0.6),
 		CFrame.new(-18, 5.75, -2.7),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood
 	)
 	makePart(
@@ -365,7 +365,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1.3, 10.5, 0.6),
 		CFrame.new(-18, 5.75, 4.7),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood
 	)
 	makePart(
@@ -373,7 +373,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1.4, 0.8, 8.0),
 		CFrame.new(-18, 10.8, 1.0),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood
 	)
 
@@ -383,7 +383,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1, 14, 32),
 		CFrame.new(18, 7.5, -1),
-		Color3.fromRGB(111, 108, 106),
+		Color3.fromRGB(86, 85, 83),
 		Enum.Material.Plaster
 	)
 	makePart(
@@ -391,7 +391,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.2, 4.2, 32),
 		CFrame.new(17.4, 2.6, -1),
-		Color3.fromRGB(116, 97, 81),
+		Color3.fromRGB(86, 75, 66),
 		Enum.Material.Wood
 	)
 	makePart(
@@ -399,7 +399,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.3, 0.8, 32),
 		CFrame.new(17.35, 0.9, -1),
-		Color3.fromRGB(100, 85, 73),
+		Color3.fromRGB(71, 63, 57),
 		Enum.Material.Wood
 	)
 
@@ -409,7 +409,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.2, 4.5, 7.5),
 		CFrame.new(17.4, 3.4, -4.0),
-		Color3.fromRGB(120, 103, 85),
+		Color3.fromRGB(90, 80, 70),
 		Enum.Material.Wood
 	)
 	local artCanvas = makePart(
@@ -417,7 +417,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.05, 3.9, 6.9),
 		CFrame.new(17.28, 3.4, -4.0),
-		Color3.fromRGB(100, 113, 120),
+		Color3.fromRGB(81, 89, 93),
 		Enum.Material.SmoothPlastic
 	)
 	local artGui = Instance.new("SurfaceGui")
@@ -457,7 +457,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(14, 14, 1),
 		CFrame.new(-11, 7.5, -16.5),
-		Color3.fromRGB(111, 108, 106),
+		Color3.fromRGB(86, 85, 83),
 		Enum.Material.Plaster
 	)
 	makePart(
@@ -465,7 +465,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(14, 14, 1),
 		CFrame.new(11, 7.5, -16.5),
-		Color3.fromRGB(111, 108, 106),
+		Color3.fromRGB(86, 85, 83),
 		Enum.Material.Plaster
 	)
 	makePart(
@@ -473,7 +473,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(8, 4, 1),
 		CFrame.new(0, 12.5, -16.5),
-		Color3.fromRGB(111, 108, 106),
+		Color3.fromRGB(86, 85, 83),
 		Enum.Material.Plaster
 	)
 
@@ -560,7 +560,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 1, 12),
 		CFrame.new(-36, 0, 3),
-		Color3.fromRGB(103, 97, 91),
+		Color3.fromRGB(77, 74, 71),
 		Enum.Material.WoodPlanks
 	)
 	makePart(
@@ -568,7 +568,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(34, 0.05, 5),
 		CFrame.new(-35, 0.52, 3),
-		Color3.fromRGB(158, 85, 85),
+		Color3.fromRGB(112, 68, 68),
 		Enum.Material.Fabric
 	)
 	makePart(
@@ -576,7 +576,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 1, 12),
 		CFrame.new(-36, 14.5, 3),
-		Color3.fromRGB(91, 91, 94),
+		Color3.fromRGB(68, 68, 70),
 		Enum.Material.Plaster
 	)
 	makePart(
@@ -584,7 +584,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 14, 1),
 		CFrame.new(-36, 7.5, 9),
-		Color3.fromRGB(113, 111, 108),
+		Color3.fromRGB(89, 87, 86),
 		Enum.Material.Plaster
 	)
 	makePart(
@@ -592,7 +592,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 14, 1),
 		CFrame.new(-36, 7.5, -3),
-		Color3.fromRGB(113, 111, 108),
+		Color3.fromRGB(89, 87, 86),
 		Enum.Material.Plaster
 	)
 	makePart(
@@ -600,7 +600,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1, 14, 12),
 		CFrame.new(-54, 7.5, 3),
-		Color3.fromRGB(113, 111, 108),
+		Color3.fromRGB(89, 87, 86),
 		Enum.Material.Plaster
 	)
 
@@ -610,7 +610,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 3.8, 0.2),
 		CFrame.new(-36, 2.4, 8.4),
-		Color3.fromRGB(116, 97, 81),
+		Color3.fromRGB(86, 75, 66),
 		Enum.Material.Wood
 	)
 	makePart(
@@ -618,7 +618,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(36, 3.8, 0.2),
 		CFrame.new(-36, 2.4, -2.4),
-		Color3.fromRGB(116, 97, 81),
+		Color3.fromRGB(86, 75, 66),
 		Enum.Material.Wood
 	)
 
@@ -637,7 +637,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(1.0, 0.75, 4.8),
 			CFrame.new(xStep, yStep, 3),
-			Color3.fromRGB(116, 97, 81),
+			Color3.fromRGB(86, 75, 66),
 			Enum.Material.Wood
 		)
 		-- Carpet step tread
@@ -646,7 +646,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(0.9, 0.05, 3.6),
 			CFrame.new(xStep, yStep + 0.38, 3),
-			Color3.fromRGB(158, 85, 85),
+			Color3.fromRGB(112, 68, 68),
 			Enum.Material.Fabric,
 			stepPart
 		)
@@ -676,7 +676,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(6.0, 0.8, 12.0),
 		CFrame.new(-51.0, 8.0, 3.0),
-		Color3.fromRGB(106, 100, 94),
+		Color3.fromRGB(80, 77, 74),
 		Enum.Material.WoodPlanks
 	)
 	makePart(
@@ -720,7 +720,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.2, 1.4, 5.5),
 		CFrame.new(-17.8, 10.8, 1),
-		Color3.fromRGB(94, 120, 108),
+		Color3.fromRGB(79, 94, 87),
 		Enum.Material.Metal
 	)
 	local hGui = Instance.new("SurfaceGui")
@@ -742,7 +742,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(2.4, 1.0, 0.25),
 		CFrame.new(-53.8, 13.2, 3.0) * CFrame.Angles(0, math.rad(90), 0),
-		Color3.fromRGB(71, 71, 77),
+		Color3.fromRGB(49, 49, 53),
 		Enum.Material.Metal
 	)
 	local exitGui = Instance.new("SurfaceGui")
@@ -771,7 +771,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(2.4, 0.7, 0.7),
 		CFrame.new(-38.0, 5.0, 8.4) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(229, 97, 90),
+		Color3.fromRGB(172, 87, 82),
 		Enum.Material.Metal,
 		fireExt
 	)
@@ -780,7 +780,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.3, 0.5, 0.5),
 		CFrame.new(-38.0, 6.4, 8.4),
-		Color3.fromRGB(90, 90, 90),
+		Color3.fromRGB(66, 66, 66),
 		Enum.Material.Metal,
 		fireExt
 	)
@@ -794,7 +794,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(18, 4.0, 2.8),
 		CFrame.new(0, 2.5, 4.5),
-		Color3.fromRGB(111, 91, 73),
+		Color3.fromRGB(80, 69, 59),
 		Enum.Material.WoodPlanks
 	)
 	makePart(
@@ -802,7 +802,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(19.2, 0.4, 3.4),
 		CFrame.new(0, 4.7, 4.5),
-		Color3.fromRGB(135, 113, 91),
+		Color3.fromRGB(104, 91, 78),
 		Enum.Material.Wood
 	)
 	-- Polished Brass Trim along Front Edge
@@ -829,7 +829,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.8, 9.2, 0.8),
 		CFrame.new(-9.2, 9.1, 4.5),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood
 	)
 	makePart(
@@ -837,7 +837,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.8, 9.2, 0.8),
 		CFrame.new(9.2, 9.1, 4.5),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood
 	)
 	-- Pillar Brass Collars
@@ -879,7 +879,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(19.2, 1.2, 0.8),
 		CFrame.new(0, 13.2, 4.5),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood
 	)
 	local dGui = Instance.new("SurfaceGui")
@@ -901,7 +901,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.2, 2.2, 3.2),
 		CFrame.new(-8.8, 5.8, 4.5),
-		Color3.fromRGB(111, 91, 73),
+		Color3.fromRGB(80, 69, 59),
 		Enum.Material.Wood
 	)
 	makePart(
@@ -909,7 +909,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.2, 2.2, 3.2),
 		CFrame.new(8.8, 5.8, 4.5),
-		Color3.fromRGB(111, 91, 73),
+		Color3.fromRGB(80, 69, 59),
 		Enum.Material.Wood
 	)
 
@@ -922,7 +922,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(6.0, 3.2, 2.8),
 		CFrame.new(-4.5, 2.1, 11.5),
-		Color3.fromRGB(116, 94, 77),
+		Color3.fromRGB(85, 72, 63),
 		Enum.Material.Wood
 	)
 	makePart(
@@ -930,7 +930,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(6.4, 0.3, 3.2),
 		CFrame.new(-4.5, 3.8, 11.5),
-		Color3.fromRGB(131, 108, 88),
+		Color3.fromRGB(100, 86, 75),
 		Enum.Material.Wood
 	)
 	-- Office Desk Blotter / Paperwork
@@ -939,7 +939,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(2.8, 0.04, 2.0),
 		CFrame.new(-4.5, 3.98, 11.5),
-		Color3.fromRGB(94, 103, 97),
+		Color3.fromRGB(73, 78, 75),
 		Enum.Material.Leather
 	)
 	makePart(
@@ -967,7 +967,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1.8, 0.4, 1.8),
 		CFrame.new(-4.5, 2.2, 9.5),
-		Color3.fromRGB(97, 90, 88),
+		Color3.fromRGB(71, 67, 66),
 		Enum.Material.Leather,
 		chairModel
 	)
@@ -976,7 +976,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1.8, 2.2, 0.3),
 		CFrame.new(-4.5, 3.4, 10.3),
-		Color3.fromRGB(97, 90, 88),
+		Color3.fromRGB(71, 67, 66),
 		Enum.Material.Leather,
 		chairModel
 	)
@@ -985,7 +985,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(1.6, 0.15, 0.15),
 		CFrame.new(-4.5, 1.2, 9.5) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(151, 156, 160),
+		Color3.fromRGB(132, 135, 137),
 		Enum.Material.Metal,
 		chairModel
 	)
@@ -994,7 +994,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1.6, 0.1, 1.6),
 		CFrame.new(-4.5, 0.55, 9.5),
-		Color3.fromRGB(133, 138, 143),
+		Color3.fromRGB(112, 115, 118),
 		Enum.Material.Metal,
 		chairModel
 	)
@@ -1008,7 +1008,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(2.2, 6.0, 2.8),
 		CFrame.new(6.5, 3.5, 12.0),
-		Color3.fromRGB(113, 120, 116),
+		Color3.fromRGB(92, 96, 93),
 		Enum.Material.Metal,
 		fileCabinet
 	)
@@ -1034,7 +1034,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(2.2, 6.8, 2.4),
 		CFrame.new(6.5, 3.9, 7.8),
-		Color3.fromRGB(94, 97, 100),
+		Color3.fromRGB(72, 74, 75),
 		Enum.Material.Metal,
 		cctvRack
 	)
@@ -1044,7 +1044,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.2, 1.6, 1.8),
 		CFrame.new(5.35, 5.8, 7.8),
-		Color3.fromRGB(71, 90, 77),
+		Color3.fromRGB(55, 64, 58),
 		Enum.Material.Neon,
 		cctvRack
 	)
@@ -1066,7 +1066,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.2, 1.6, 1.8),
 		CFrame.new(5.35, 3.8, 7.8),
-		Color3.fromRGB(71, 90, 77),
+		Color3.fromRGB(55, 64, 58),
 		Enum.Material.Neon,
 		cctvRack
 	)
@@ -1093,7 +1093,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(2.2, 2.6, 2.0),
 		CFrame.new(6.5, 1.8, 13.8),
-		Color3.fromRGB(97, 100, 106),
+		Color3.fromRGB(75, 76, 80),
 		Enum.Material.Metal,
 		safeModel
 	)
@@ -1148,7 +1148,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.2, 1.8, 1.8),
 		CFrame.new(0, 12.2, 14.1) * CFrame.Angles(math.rad(90), 0, 0),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood,
 		clockModel
 	)
@@ -1183,7 +1183,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(4.2, 9.2, 0.4),
 		CFrame.new(-8.5, 5.1, 14.0),
-		Color3.fromRGB(108, 91, 77),
+		Color3.fromRGB(79, 69, 61),
 		Enum.Material.Wood,
 		staffDoor
 	)
@@ -1192,7 +1192,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(3.6, 8.6, 0.2),
 		CFrame.new(-8.5, 5.1, 14.0),
-		Color3.fromRGB(120, 100, 85),
+		Color3.fromRGB(90, 78, 69),
 		Enum.Material.WoodPlanks,
 		staffDoor
 	)
@@ -1238,7 +1238,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(8.0, 3.8, 0.3),
 		CFrame.new(0, 8.6, 14.1),
-		Color3.fromRGB(116, 94, 77),
+		Color3.fromRGB(85, 72, 63),
 		Enum.Material.Wood
 	)
 	-- Outer Key Rack Trim Box
@@ -1247,7 +1247,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(8.4, 0.3, 0.6),
 		CFrame.new(0, 10.5, 14.0),
-		Color3.fromRGB(103, 85, 69),
+		Color3.fromRGB(73, 63, 54),
 		Enum.Material.Wood,
 		keyRack
 	)
@@ -1256,7 +1256,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(8.4, 0.3, 0.6),
 		CFrame.new(0, 6.7, 14.0),
-		Color3.fromRGB(103, 85, 69),
+		Color3.fromRGB(73, 63, 54),
 		Enum.Material.Wood,
 		keyRack
 	)
@@ -1283,7 +1283,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(0.40, 0.65, 0.04),
 			CFrame.new(xOff, 7.8, 13.8),
-			Color3.fromRGB(215, 117, 104),
+			Color3.fromRGB(168, 103, 96),
 			Enum.Material.SmoothPlastic,
 			keyRack
 		)
@@ -1315,7 +1315,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.06, 1.20, 1.20),
 		CFrame.new(1.3, 4.93, 4.5) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(117, 117, 122),
+		Color3.fromRGB(93, 93, 97),
 		Enum.Material.Metal,
 		bellModel
 	)
@@ -1324,7 +1324,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.04, 1.00, 1.00),
 		CFrame.new(1.3, 4.98, 4.5) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(117, 117, 122),
+		Color3.fromRGB(93, 93, 97),
 		Enum.Material.Metal,
 		bellModel
 	)
@@ -1375,7 +1375,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.9, 0.4, 0.9),
 		CFrame.new(-4.6, 5.10, 5.0),
-		Color3.fromRGB(90, 90, 94),
+		Color3.fromRGB(66, 66, 69),
 		Enum.Material.SmoothPlastic,
 		phoneModel
 	)
@@ -1393,7 +1393,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.3, 0.25, 1.2),
 		CFrame.new(-4.6, 5.42, 5.0),
-		Color3.fromRGB(90, 90, 94),
+		Color3.fromRGB(66, 66, 69),
 		Enum.Material.SmoothPlastic,
 		phoneModel
 	)
@@ -1405,7 +1405,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.15, 1.0, 1.0),
 		CFrame.new(-6.5, 4.98, 4.8) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(128, 138, 128),
+		Color3.fromRGB(108, 114, 108),
 		Enum.Material.Metal
 	)
 	makePart(
@@ -1413,7 +1413,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(1.4, 0.12, 0.12),
 		CFrame.new(-6.5, 5.7, 4.8) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(147, 151, 143),
+		Color3.fromRGB(127, 129, 124),
 		Enum.Material.Metal
 	)
 	local lampShade = makePart(
@@ -1421,7 +1421,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1.2, 0.6, 0.8),
 		CFrame.new(-6.2, 6.4, 4.6) * CFrame.Angles(math.rad(25), 0, 0),
-		Color3.fromRGB(104, 156, 128),
+		Color3.fromRGB(98, 129, 112),
 		Enum.Material.SmoothPlastic
 	)
 	local deskLight = Instance.new("SpotLight")
@@ -1445,7 +1445,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(8.0, 1.3, 3.4),
 		CFrame.new(13.5, 1.15, -4),
-		Color3.fromRGB(141, 88, 88),
+		Color3.fromRGB(101, 70, 70),
 		Enum.Material.Fabric,
 		sofaModel
 	)
@@ -1454,7 +1454,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(8.0, 2.8, 0.9),
 		CFrame.new(13.5, 3.0, -2.4),
-		Color3.fromRGB(141, 88, 88),
+		Color3.fromRGB(101, 70, 70),
 		Enum.Material.Fabric,
 		sofaModel
 	)
@@ -1463,7 +1463,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.9, 2.2, 3.4),
 		CFrame.new(9.1, 1.7, -4),
-		Color3.fromRGB(141, 88, 88),
+		Color3.fromRGB(101, 70, 70),
 		Enum.Material.Fabric,
 		sofaModel
 	)
@@ -1472,7 +1472,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.9, 2.2, 3.4),
 		CFrame.new(17.9, 1.7, -4),
-		Color3.fromRGB(141, 88, 88),
+		Color3.fromRGB(101, 70, 70),
 		Enum.Material.Fabric,
 		sofaModel
 	)
@@ -1482,7 +1482,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(2.4, 0.5, 2.6),
 		CFrame.new(11.0, 1.9, -4.1),
-		Color3.fromRGB(147, 91, 91),
+		Color3.fromRGB(106, 73, 73),
 		Enum.Material.Fabric,
 		sofaModel
 	)
@@ -1491,7 +1491,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(2.4, 0.5, 2.6),
 		CFrame.new(13.5, 1.9, -4.1),
-		Color3.fromRGB(147, 91, 91),
+		Color3.fromRGB(106, 73, 73),
 		Enum.Material.Fabric,
 		sofaModel
 	)
@@ -1500,7 +1500,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(2.4, 0.5, 2.6),
 		CFrame.new(16.0, 1.9, -4.1),
-		Color3.fromRGB(147, 91, 91),
+		Color3.fromRGB(106, 73, 73),
 		Enum.Material.Fabric,
 		sofaModel
 	)
@@ -1528,7 +1528,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.6, 0.2, 0.2),
 		CFrame.new(9.6, 0.3, -2.6) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood,
 		sofaModel
 	)
@@ -1537,7 +1537,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.6, 0.2, 0.2),
 		CFrame.new(17.4, 0.3, -2.6) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood,
 		sofaModel
 	)
@@ -1546,7 +1546,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.6, 0.2, 0.2),
 		CFrame.new(9.6, 0.3, -5.4) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood,
 		sofaModel
 	)
@@ -1555,7 +1555,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.6, 0.2, 0.2),
 		CFrame.new(17.4, 0.3, -5.4) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood,
 		sofaModel
 	)
@@ -1567,7 +1567,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(10.5, 0.05, 11.0),
 		CFrame.new(13.5, 0.52, -6.5),
-		Color3.fromRGB(125, 111, 106),
+		Color3.fromRGB(97, 88, 85),
 		Enum.Material.Fabric
 	)
 
@@ -1577,7 +1577,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(4.6, 1.1, 2.4),
 		CFrame.new(13.5, 1.05, -7.8),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood
 	)
 	-- Tabletop Daily Newspaper
@@ -1629,7 +1629,7 @@ local function buildLobby(): Model
 		Enum.PartType.Ball,
 		Vector3.new(2.4, 1.8, 2.4),
 		CFrame.new(16.5, 2.5, -12.5),
-		Color3.fromRGB(111, 150, 117),
+		Color3.fromRGB(100, 124, 103),
 		Enum.Material.Grass,
 		plantModel
 	)
@@ -1638,7 +1638,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.6, 0.12, 0.12),
 		CFrame.new(16.0, 0.3, -12.5) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood,
 		plantModel
 	)
@@ -1647,7 +1647,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.6, 0.12, 0.12),
 		CFrame.new(17.0, 0.3, -12.5) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(120, 103, 88),
+		Color3.fromRGB(91, 80, 72),
 		Enum.Material.Wood,
 		plantModel
 	)
@@ -1659,7 +1659,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(3.5, 7.5, 2.8),
 		CFrame.new(15.5, 4.25, 5.5),
-		Color3.fromRGB(97, 117, 138),
+		Color3.fromRGB(81, 92, 105),
 		Enum.Material.Metal
 	)
 	local vGlass = makeCustomPart(
@@ -1737,7 +1737,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(64, 1, 36),
 		CFrame.new(0, 0, -34.5),
-		Color3.fromRGB(77, 81, 85),
+		Color3.fromRGB(56, 58, 60),
 		Enum.Material.Slate
 	)
 
@@ -1747,7 +1747,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(44, 0.4, 3.0),
 		CFrame.new(0, 0.3, -18.0),
-		Color3.fromRGB(147, 150, 153),
+		Color3.fromRGB(126, 128, 130),
 		Enum.Material.Concrete
 	)
 
@@ -1799,7 +1799,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(16, 0.5, 7.5),
 		CFrame.new(0, 11.5, -20.2),
-		Color3.fromRGB(94, 100, 106),
+		Color3.fromRGB(73, 76, 79),
 		Enum.Material.Metal
 	)
 	-- Awning Support Struts
@@ -1808,7 +1808,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(11.0, 0.4, 0.4),
 		CFrame.new(-7.2, 5.5, -23.5) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(117, 120, 125),
+		Color3.fromRGB(95, 97, 99),
 		Enum.Material.Metal
 	)
 	makePart(
@@ -1816,7 +1816,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(11.0, 0.4, 0.4),
 		CFrame.new(7.2, 5.5, -23.5) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(117, 120, 125),
+		Color3.fromRGB(95, 97, 99),
 		Enum.Material.Metal
 	)
 
@@ -1826,7 +1826,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(9.2, 4.0, 0.5),
 		CFrame.new(0, 15.0, -22.5),
-		Color3.fromRGB(77, 77, 85),
+		Color3.fromRGB(55, 55, 59),
 		Enum.Material.Metal
 	)
 	local neonGlow = makePart(
@@ -1834,7 +1834,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(8.6, 3.4, 0.2),
 		CFrame.new(0, 15.0, -22.2),
-		Color3.fromRGB(255, 117, 97),
+		Color3.fromRGB(201, 107, 96),
 		Enum.Material.Neon
 	)
 	local nLight = Instance.new("PointLight")
@@ -1864,7 +1864,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(4.0, 0.3, 0.3),
 		CFrame.new(-3.6, 12.5, -22.5) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(117, 120, 125),
+		Color3.fromRGB(95, 97, 99),
 		Enum.Material.Metal
 	)
 	makePart(
@@ -1872,7 +1872,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(4.0, 0.3, 0.3),
 		CFrame.new(3.6, 12.5, -22.5) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(117, 120, 125),
+		Color3.fromRGB(95, 97, 99),
 		Enum.Material.Metal
 	)
 
@@ -1936,7 +1936,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(1.2, 1.6, 1.2),
 		CFrame.new(3.5, 5.4, 7.8),
-		Color3.fromRGB(104, 111, 117),
+		Color3.fromRGB(83, 87, 90),
 		Enum.Material.Metal,
 		coffeeModel
 	)
@@ -1954,7 +1954,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.6, 0.5, 0.5),
 		CFrame.new(3.5, 5.0, 7.4) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(133, 97, 71),
+		Color3.fromRGB(97, 76, 62),
 		Enum.Material.Glass,
 		coffeeModel
 	)
@@ -1979,7 +1979,7 @@ local function buildLobby(): Model
 		Enum.PartType.Block,
 		Vector3.new(0.4, 2.2, 1.6),
 		CFrame.new(-17.8, 3.5, -2.0),
-		Color3.fromRGB(117, 122, 128),
+		Color3.fromRGB(95, 99, 102),
 		Enum.Material.Metal,
 		breakerModel
 	)
@@ -1988,7 +1988,7 @@ local function buildLobby(): Model
 		Enum.PartType.Cylinder,
 		Vector3.new(0.4, 0.15, 0.15),
 		CFrame.new(-17.5, 3.5, -2.0) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(229, 117, 104),
+		Color3.fromRGB(179, 104, 97),
 		Enum.Material.Metal,
 		breakerModel
 	)
@@ -2075,7 +2075,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(0.35, 6.4, 0.35),
 			cf * CFrame.new(-1.6, 0, 0),
-			Color3.fromRGB(108, 91, 77),
+			Color3.fromRGB(79, 69, 61),
 			Enum.Material.Wood,
 			doorModel
 		)
@@ -2084,7 +2084,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(0.35, 6.4, 0.35),
 			cf * CFrame.new(1.6, 0, 0),
-			Color3.fromRGB(108, 91, 77),
+			Color3.fromRGB(79, 69, 61),
 			Enum.Material.Wood,
 			doorModel
 		)
@@ -2093,7 +2093,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(3.55, 0.35, 0.35),
 			cf * CFrame.new(0, 3.0, 0),
-			Color3.fromRGB(108, 91, 77),
+			Color3.fromRGB(79, 69, 61),
 			Enum.Material.Wood,
 			doorModel
 		)
@@ -2152,7 +2152,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(5, 0.8, 17),
 			CFrame.new(x, BALCONY_Y, -6.5),
-			Color3.fromRGB(106, 100, 94),
+			Color3.fromRGB(80, 77, 74),
 			Enum.Material.WoodPlanks
 		)
 		makePart(
@@ -2160,7 +2160,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(5, 0.25, 17),
 			CFrame.new(x, BALCONY_Y - 0.5, -6.5),
-			Color3.fromRGB(100, 85, 73),
+			Color3.fromRGB(71, 63, 57),
 			Enum.Material.Plaster
 		)
 
@@ -2229,7 +2229,7 @@ local function buildLobby(): Model
 			Enum.PartType.Block,
 			Vector3.new(4.2, 0.7, 1.5),
 			CFrame.new(-15.5, 1.0 + i * 0.72, -15.6 + i * 1.45),
-			Color3.fromRGB(100, 85, 73),
+			Color3.fromRGB(71, 63, 57),
 			Enum.Material.Wood
 		)
 	end
