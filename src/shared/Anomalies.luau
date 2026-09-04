@@ -364,10 +364,6 @@ local CITIES = {
 	"Sacramento, CA",
 	"Eugene, OR",
 }
-
--- Balanced anomaly spawn chance (45%)
-local ANOMALY_CHANCE = 0.45
-
 -- Anomalies that currently produce nothing a player could observe.
 --
 -- An anomaly is observable if EITHER the roll below corrupts a field the ledger
@@ -420,16 +416,38 @@ function Anomalies.rollable(): { Anomaly }
 	return pool
 end
 
-function Anomalies.roll(rng: Random): Guest
+function Anomalies.roll(
+	rng: Random,
+	anomalyChance: number,
+	tierWeights: { [number]: number }
+): Guest
 	local name = `{FIRST[rng:NextInteger(1, #FIRST)]} {LAST[rng:NextInteger(1, #LAST)]}`
 	local reservation = string.format("%04d", rng:NextInteger(1000, 9999))
 	local roomNum = rng:NextInteger(101, 108)
 	local city = CITIES[rng:NextInteger(1, #CITIES)]
 
 	local anomaly: Anomaly? = nil
-	if rng:NextNumber() < ANOMALY_CHANCE then
+	if rng:NextNumber() < anomalyChance then
 		local pool = Anomalies.rollable()
-		anomaly = pool[rng:NextInteger(1, #pool)]
+		local totalWeight = 0
+		local anomalyWeights = {}
+		for _, a in pool do
+			local w = tierWeights[a.tier] or 0
+			totalWeight += w
+			table.insert(anomalyWeights, { anomaly = a, weight = w })
+		end
+
+		if totalWeight > 0 then
+			local r = rng:NextNumber() * totalWeight
+			local currentWeight = 0
+			for _, aw in anomalyWeights do
+				currentWeight += aw.weight
+				if r <= currentWeight then
+					anomaly = aw.anomaly
+					break
+				end
+			end
+		end
 	end
 
 	local zipCode = string.format("%05d", rng:NextInteger(10000, 99999))

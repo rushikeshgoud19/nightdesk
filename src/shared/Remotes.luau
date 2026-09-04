@@ -10,6 +10,7 @@ local NAMES = {
 	"Judge",
 	"ShiftUpdate",
 	"SanityUpdate",
+	"TimeTick",
 	"Loadout",
 	"ShiftEnded",
 	"RequestPurchase",

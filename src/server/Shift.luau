@@ -37,7 +37,52 @@ local resetBreaker = Remotes.get("ResetBreaker")
 local breakerTripped = Remotes.get("BreakerTripped")
 local breakerRestored = Remotes.get("BreakerRestored")
 
-local rng = Random.new()
+local timeTick = Remotes.get("TimeTick")
+
+local PHASES = {
+	{
+		startMin = 0,
+		name = "12:00 AM - Calm",
+		chance = 0.05,
+		tiers = { [1] = 100, [2] = 0, [3] = 0 },
+	},
+	{
+		startMin = 60,
+		name = "01:00 AM - Unease",
+		chance = 0.20,
+		tiers = { [1] = 80, [2] = 20, [3] = 0 },
+	},
+	{
+		startMin = 120,
+		name = "02:00 AM - Activity",
+		chance = 0.35,
+		tiers = { [1] = 60, [2] = 35, [3] = 5 },
+	},
+	{
+		startMin = 210,
+		name = "03:30 AM - Suspicion",
+		chance = 0.55,
+		tiers = { [1] = 40, [2] = 50, [3] = 10 },
+	},
+	{
+		startMin = 300,
+		name = "05:00 AM - Climax",
+		chance = 0.85,
+		tiers = { [1] = 10, [2] = 50, [3] = 40 },
+	},
+}
+
+local function getPhase(time: number)
+	local phase = PHASES[1]
+	for i = 2, #PHASES do
+		if time >= PHASES[i].startMin then
+			phase = PHASES[i]
+		else
+			break
+		end
+	end
+	return phase
+end
 
 local GAP_AFTER_JUDGEMENT = 1.8
 
@@ -93,68 +138,78 @@ end
 
 Shift.pushLoadout = pushLoadout
 
-local function sendNext(player: Player)
+local function endShift(player: Player, survived: boolean)
 	local p = State.get(player)
-	if not p then
+	if not p or not p.shiftActive then
 		return
 	end
 
-	-- Already someone at the desk. A second arrival would replace the guest the
-	-- player is currently looking at.
+	p.current = nil
+	p.shiftActive = false
+	p.waitingGuest = nil
+	p.lastShiftSurvived = survived
+	local bonus = 0
+
+	if survived then
+		if p.sanity > 50 then
+			bonus = 50
+			p.takings += bonus
+		end
+		-- Night 5 Campaign Grand Survivor Bonus
+		if p.nightsWorked == 4 then
+			bonus += 500
+			p.takings += 500
+		end
+	else
+		p.takings = p.shiftStartTakings
+	end
+
+	p.nightsWorked += 1
+	shiftEnded:FireClient(player, {
+		nightsWorked = p.nightsWorked,
+		takings = p.takings,
+		mistakes = p.mistakes,
+		sanity = p.sanity,
+		survived = survived,
+		bonus = bonus,
+		seed = p.shiftSeed,
+	})
+	if onShiftEnd then
+		onShiftEnd(player)
+	end
+end
+
+local function sendNext(player: Player)
+	local p = State.get(player)
+	if not p or not p.shiftActive then
+		return
+	end
 	if p.current then
 		return
 	end
 
-	if p.guestsLeft <= 0 or p.sanity <= 0 then
-		p.current = nil
-		p.shiftActive = false
-		p.guestsLeft = 0
-		local survived = p.sanity > 0
-		p.lastShiftSurvived = survived
-		local bonus = 0
-
-		if survived then
-			if p.sanity > 50 then
-				bonus = 50
-				p.takings += bonus
-			end
-			-- Night 5 Campaign Grand Survivor Bonus
-			if p.nightsWorked == 4 then
-				bonus += 500
-				p.takings += 500
-			end
-		else
-			p.takings = p.shiftStartTakings
-		end
-
-		p.nightsWorked += 1
-		shiftEnded:FireClient(player, {
-			nightsWorked = p.nightsWorked,
-			takings = p.takings,
-			mistakes = p.mistakes,
-			sanity = p.sanity,
-			survived = survived,
-			bonus = bonus,
-		})
-		if onShiftEnd then
-			onShiftEnd(player)
-		end
+	if p.sanity <= 0 then
+		endShift(player, false)
 		return
 	end
 
-	p.guestsLeft -= 1
+	if not p.waitingGuest then
+		return
+	end
 
 	-- Occasional blackout fuse blowout on Night 3+
-	if p.nightsWorked >= 2 and rng:NextNumber() < 0.25 and not p.breakerTripped then
+	if p.nightsWorked >= 2 and p.rng and p.rng:NextNumber() < 0.25 and not p.breakerTripped then
 		p.breakerTripped = true
 		breakerTripped:FireClient(player)
 	end
 
-	local guest = Anomalies.roll(rng)
+	local guest = p.waitingGuest
+	p.waitingGuest = nil
+	p.waitingSince = nil
 	p.current = guest
 
 	local stats = Upgrades.stats(p.owned)
-	local textVisible = guest.anomaly ~= nil and rng:NextNumber() < stats.tellChance
+	local textVisible = guest.anomaly ~= nil and p.rng and p.rng:NextNumber() < stats.tellChance
 	p.tellVisible = textVisible
 
 	guestArrived:FireClient(player, {
@@ -171,16 +226,15 @@ local function sendNext(player: Player)
 		watermarkText = guest.watermarkText,
 		photoMaskTransparency = guest.photoMaskTransparency,
 		licenseExpiry = guest.licenseExpiry,
-
 		tell = if textVisible and guest.anomaly then guest.anomaly.tell else nil,
 		anomalyId = if guest.anomaly then guest.anomaly.id else nil,
 		horrorType = if guest.anomaly then guest.anomaly.horrorType else nil,
 		uvSymbol = guest.uvSymbol,
 		isRoomOccupied = guest.isRoomOccupied,
-		guestsLeft = p.guestsLeft,
 		sanity = p.sanity,
 		takings = p.takings,
 		nightNumber = p.nightsWorked + 1,
+		visualSeed = if p.rng then p.rng:NextInteger(1, 9999999) else 1,
 	})
 end
 
@@ -244,25 +298,74 @@ function Shift.start(player: Player)
 		return
 	end
 	local stats = Upgrades.stats(p.owned)
-	-- Dynamic guest count scaling with night progression
 	local nightBonus = math.clamp(p.nightsWorked, 0, 4)
-	p.guestsLeft = stats.guestsPerShift + nightBonus
+	local totalGuests = stats.guestsPerShift + nightBonus
+
+	p.shiftSeed = math.random(10000, 99999)
+	p.rng = Random.new(p.shiftSeed)
+
 	p.sanity = 100
 	p.shiftStartTakings = p.takings
 	p.shiftActive = true
-
-	-- Per-shift state, reset per shift. These used to persist for the whole
-	-- session: night 2 opened with night 1's mistake count, the espresso machine
-	-- was once per login rather than once per night, and a blackout left
-	-- unresolved at the end of a shift was still tripped at the start of the next.
 	p.mistakes = 0
 	p.hasBrewedCoffee = false
 	p.breakerTripped = false
 	p.current = nil
+	p.shiftTime = 0
+	p.waitingGuest = nil
+	p.waitingSince = nil
+	p.spawnedGuests = 0
+	p.nextArrivalMin = 360 / (totalGuests + 1)
 
 	pushLoadout(player)
-	claimArrival(player)
-	sendNext(player)
+
+	task.spawn(function()
+		while p.shiftActive do
+			task.wait(1)
+			if not p.shiftActive then
+				break
+			end
+
+			p.shiftTime += 0.5
+
+			if p.shiftTime >= 360 then
+				endShift(player, true)
+				break
+			end
+
+			if p.sanity <= 0 then
+				endShift(player, false)
+				break
+			end
+
+			if
+				p.spawnedGuests < totalGuests
+				and p.shiftTime >= p.nextArrivalMin
+				and not p.waitingGuest
+				and not p.current
+			then
+				local phase = getPhase(p.shiftTime)
+				local chance = phase.chance + (p.nightsWorked * 0.05)
+				if p.rng then
+					p.waitingGuest = Anomalies.roll(p.rng, chance, phase.tiers)
+				end
+				p.waitingSince = p.shiftTime
+				p.spawnedGuests += 1
+				p.nextArrivalMin = (360 / (totalGuests + 1)) * (p.spawnedGuests + 1)
+			end
+
+			if p.waitingGuest and p.waitingSince and (p.shiftTime - p.waitingSince) > 20 then
+				p.waitingGuest = nil
+				p.waitingSince = nil
+				-- "revenue that walked out" -> deduction
+				p.takings = math.max(0, p.takings - 10)
+			end
+
+			timeTick:FireClient(player, {
+				time = p.shiftTime,
+			})
+		end
+	end)
 end
 
 local lastBellRing: { [Player]: number } = {}
@@ -288,7 +391,7 @@ function Shift.bind()
 		bellRang:FireAllClients(player)
 
 		local p = State.get(player)
-		if p and p.shiftActive and not p.current and p.guestsLeft > 0 then
+		if p and p.shiftActive and not p.current and p.waitingGuest then
 			claimArrival(player)
 			sendNext(player)
 		end
@@ -417,7 +520,7 @@ function Shift.bind()
 					"Long haul drive from Spokane. Need a bed until sunrise.",
 					"Business delivery in Portland tomorrow morning.",
 				}
-				answer = NORMAL_PURPOSES[rng:NextInteger(1, #NORMAL_PURPOSES)]
+				answer = NORMAL_PURPOSES[p.rng:NextInteger(1, #NORMAL_PURPOSES)]
 			else
 				isCreepy = true
 				if aId == "frozen_smile" then
@@ -435,7 +538,7 @@ function Shift.bind()
 		elseif questionId == "plate" then
 			if not isAnomaly then
 				answer =
-					`Oregon plates: {rng:NextInteger(100, 999)}-XNV on the sedan parked outside.`
+					`Oregon plates: {p.rng:NextInteger(100, 999)}-XNV on the sedan parked outside.`
 			else
 				isCreepy = true
 				answer = "I did not require a vehicle to arrive here."

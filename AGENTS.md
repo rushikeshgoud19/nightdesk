@@ -40,21 +40,59 @@ src/
 
 ---
 
-## 2. Cinematic Horror Mobs & Custom Humanoid Mesh Architecture
+## 2. Guest Visual Doctrine -- Blocky Silhouette, Cinematic Surface
 
-Guests are **high-fidelity sculpted anatomical human mob models** (NOT blocky default avatars):
-* **Facial Geometry**: Chiseled zygomatic cheekbones, defined mandible jawline, sculpted nose bridge/nostrils, and anatomical ear helixes.
-* **Eyes & Lids**: Multi-layer eye meshes with depth-layered iris discs (hazel, blue, amber, green) and asynchronous eyelid blinking cycles.
-* **Executive Tailored Attire**: 3D V-neck collared shirts, tailored notch lapels, silk neckties with 3D Windsor knots, gold tie bars, triple horn buttons, leather belt with brass buckle, and polished oxford dress shoes.
-* **Articulated Hands & Briefcase**: 5-finger articulation with proximal/distal phalanges and knuckles holding an executive leather briefcase.
-* **The 6 Core Cinematic Horror Mob Archetypes**:
-  1. *The Flayed Mimic*: Desaturated skin, smooth fingerprint spirals, and glowing UV crimson suture neck stitches.
-  2. *The Mandela Alternate*: Subcutaneous jaw dislocation stretching ~25cm downward into an ear-to-ear void with 16 razor teeth.
-  3. *The Broken Cervical*: 85° lateral head snap with exposed cervical vertebrae bones and violent micro-spasms.
-  4. *The Cavernous Hollow*: Pitch-black orbital eye void sockets with glowing red embers and streaming dark tears.
-  5. *The Drowned Drifter*: Waterlogged swollen grey-cyan flesh, seaweed strands, dripping water particles, and wet floor puddles.
-  6. *The Void Silhouette*: 100% light-absorbing pitch-black 3D silhouette with piercing electric cyan eyes and void smoke aura.
+Reference: `reference/guest-kit.png`. Look at it before touching a guest.
 
+Guests are **classic Roblox avatar proportions rendered at high fidelity**. The
+silhouette is blocky and native to the platform. Everything that sells them is
+*surface*, not anatomy.
+
+> **This supersedes the previous doctrine, as of 4 September 2026.** The project
+> used to specify sculpted anatomical humans -- zygomatic cheekbones, mandible
+> jawlines, layered iris discs, proximal and distal phalanges -- and
+> `GuestRenderer.luau` implemented roughly 2,500 lines of it. That direction is
+> withdrawn. It fought the engine, it read as uncanny rather than frightening,
+> and it turned every visual anomaly into a geometry problem.
+
+### What a guest is made of
+
+| layer | rule |
+|---|---|
+| Rig | Blocky. Rectangular torso, block limbs, rounded-cube head. No sculpted anatomy, no fingers. |
+| Face | A **texture on the head**, not geometry. Simple black eyes, drawn mouth. |
+| Hair | A sculpted mesh accessory, and the highest-detail thing on the model. |
+| Clothing | PBR surface. Visible fabric weave on the suit, leather sheen on shoes, metal on the buckle. |
+| Palette | Muted. Black suit, cream shirt, warm skin, dark hair. |
+
+### Why this is an upgrade, not a compromise
+
+- **It is what a high-quality Roblox game looks like.** Blocky was never the
+  flaw; *untextured* was. The playtest complaint was "neon blocks" -- the fix is
+  the texture, not the anatomy.
+- **Every tier-1 anomaly becomes a texture swap** instead of a 0.03-stud
+  geometry nudge. Pixel-exact, trivially authorable, and actually visible at
+  conversation distance.
+- **A guest assembled from a seeded choice of parts is deterministic by
+  construction**, which is exactly what Section 2 co-op needs. The old renderer
+  drew from unseeded `math.random` in fifteen places.
+
+### How anomalies are expressed
+
+| tier | mechanism |
+|---|---|
+| 1 — subtle | Face texture variants and colour tints |
+| 2 — noticeable | Swapped accessories and materials, changes between observations |
+| 3 — overt | Geometry distortion of the blocky parts themselves |
+
+### The 6 core archetypes, in this visual language
+
+1. *The Flayed Mimic* — desaturated skin tint, UV-only crimson suture texture across the neck seam.
+2. *The Mandela Alternate* — the head block's lower half dropped and stretched into a dark void with teeth.
+3. *The Broken Cervical* — head block rotated 85° laterally on the neck joint, with micro-spasm jitter.
+4. *The Cavernous Hollow* — face texture with black orbital voids, ember glow, dark streaks running down.
+5. *The Drowned Drifter* — darkened wet material variant on every clothing part, drip particles, floor puddle.
+6. *The Void Silhouette* — every part black and light-absorbing, cyan eyes on the face texture only.
 ---
 
 ## 3. Core Systems & Control Scheme

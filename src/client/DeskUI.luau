@@ -19,8 +19,11 @@ local judge = Remotes.get("Judge")
 local phoneResponse = Remotes.get("PhoneResponse")
 local interrogate = Remotes.get("Interrogate")
 local interrogationResponse = Remotes.get("InterrogationResponse")
+local timeTick = Remotes.get("TimeTick")
 
 local DeskUI = {}
+
+local currentNightNumber = 1
 
 local hudFrame: Frame
 local nightBadge: Frame
@@ -369,12 +372,21 @@ function DeskUI.build(gui: ScreenGui)
 			end
 		end)
 	end)
+
+	timeTick.OnClientEvent:Connect(function(data)
+		local mins = data.time or 0
+		local hour = math.floor(mins / 60)
+		local min = math.floor(mins % 60)
+		local displayHour = if hour == 0 then 12 else hour
+		nightLabel.Text =
+			string.format("NIGHT %d · %02d:%02d AM", currentNightNumber, displayHour, min)
+	end)
 end
 
 function DeskUI.onGuest(guest)
 	ShopUI.close()
 	if guest.nightNumber then
-		nightLabel.Text = `NIGHT {guest.nightNumber} · 02:00 AM`
+		currentNightNumber = guest.nightNumber
 	end
 	guestBriefLabel.Text =
 		`GUEST: {guest.name}  ·  Res #{guest.reservation}  ·  Room {guest.roomNumber or 101}`
@@ -476,14 +488,15 @@ function DeskUI.onShiftEnded(result)
 	DeskProps.clearLedger()
 
 	if result and result.survived ~= nil then
+		local seedText = if result.seed then ` · Seed: {result.seed}` else ""
 		if result.survived then
 			statusLabel.TextColor3 = Color3.fromRGB(120, 230, 150)
 			statusLabel.Text =
-				`Shift Completed! You survived Night {result.nightsWorked} with {result.sanity}% sanity. Safe: ${result.takings}`
+				`Shift Completed! You survived Night {result.nightsWorked} with {result.sanity}% sanity. Safe: ${result.takings}{seedText}`
 		else
 			statusLabel.TextColor3 = Color3.fromRGB(245, 80, 70)
 			statusLabel.Text =
-				`Sanity broke on Night {result.nightsWorked}. Shift ended immediately.`
+				`Sanity broke on Night {result.nightsWorked}. Shift ended immediately.{seedText}`
 		end
 	else
 		statusLabel.Text = "The night shift is over."

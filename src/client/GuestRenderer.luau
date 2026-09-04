@@ -34,6 +34,7 @@ export type GuestData = {
 	takings: number?,
 	guestsLeft: number?,
 	nightNumber: number?,
+	visualSeed: number?,
 }
 
 type LimbGroup =
@@ -432,7 +433,8 @@ local function buildAnatomicalFacialContours(
 	scaleD: number,
 	transparency: number,
 	anomalyId: string?,
-	model: Model
+	model: Model,
+	rng: Random
 )
 	if anomalyId == "shadow_entity" then
 		return
@@ -451,8 +453,8 @@ local function buildAnatomicalFacialContours(
 	-- for 1 guest in 25 -- rendering a genuine face identical to the anomaly and
 	-- costing the player 20 sanity for reading it correctly.
 	local function asymOffset(): number
-		local magnitude = math.random(1, 2)
-		local sign = if math.random(0, 1) == 0 then -1 else 1
+		local magnitude = rng:NextInteger(1, 2)
+		local sign = if rng:NextInteger(0, 1) == 0 then -1 else 1
 		return magnitude * sign * 0.008
 	end
 
@@ -1726,7 +1728,7 @@ end
 -- =============================================================================
 
 local function createGuestModel(guestData: GuestData): (Model, BasePart, number, number)
-	local rng = Random.new()
+	local rng = Random.new(guestData.visualSeed or 1)
 	local skinColor = SKIN_TONES[rng:NextInteger(1, #SKIN_TONES)]
 	local suitColor = SUIT_PALETTES[rng:NextInteger(1, #SUIT_PALETTES)]
 	local shirtColor = SHIRT_PALETTES[rng:NextInteger(1, #SHIRT_PALETTES)]
@@ -1876,7 +1878,8 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 		depthScale,
 		transparency,
 		anomalyId,
-		model
+		model,
+		rng
 	)
 	buildVolumetricHairCrown(
 		head,

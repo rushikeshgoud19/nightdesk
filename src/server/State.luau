@@ -24,7 +24,13 @@ export type Profile = {
 	guestsLeft: number,
 	shiftActive: boolean,
 	hasBrewedCoffee: boolean,
-	breakerTripped: boolean,
+	shiftTime: number,
+	rng: Random?,
+	shiftSeed: number?,
+	waitingGuest: Anomalies.Guest?,
+	waitingSince: number?,
+	nextArrivalMin: number,
+	spawnedGuests: number,
 }
 
 local profileTemplate = {
@@ -83,7 +89,13 @@ function State.load(player: Player): Profile
 				guestsLeft = 0,
 				shiftActive = false,
 				hasBrewedCoffee = false,
-				breakerTripped = false,
+				shiftTime = 0,
+				rng = nil,
+				shiftSeed = nil,
+				waitingGuest = nil,
+				waitingSince = nil,
+				nextArrivalMin = 0,
+				spawnedGuests = 0,
 			}
 
 			setmetatable(proxy, {
