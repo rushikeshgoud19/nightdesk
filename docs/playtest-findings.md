@@ -185,3 +185,21 @@ afterwards.
 **An upgrade bought now survives logout.** The retention spine — the entire
 reason this game has a shop rather than just an anomaly loop — is real for the
 first time.
+
+### Correction, 4 September 2026
+
+That verification was **place-specific, and it did not carry**. The place that
+opens in Studio as "Anamoli" is `80829108524155`, not `106512529474987`, and it
+was running with Studio Access to API Services **off**:
+
+```
+DataStoreService: StudioAccessToApisNotAllowed
+[profilestore]: Roblox API services unavailable - data will not be saved
+```
+
+Which is the same failure mode as before, for the same reason: ProfileStore
+falls back to an in-memory mock and every test passes for the wrong reason.
+
+Enabled on the Anamoli place on 4 September. **Persistence has not been
+re-verified end to end against that place** -- the round trip above was run
+somewhere else. Re-run it before trusting a saved upgrade again.

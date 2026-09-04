@@ -26,7 +26,7 @@ Verified against the code on 4 September 2026, not reported:
 | Investigation tools | All five have something to find |
 | Sanity | A number with client effects. Does not yet distort perception |
 | Economy + shop | Works, persists. 11 items, all of them now real |
-| Persistence | ProfileStore round trip proven — but against place `106512529474987`, and Studio opens `80829108524155`. **Unresolved** |
+| Persistence | API access enabled on `80829108524155` on 4 Sep, but the round trip has **never been run against that place**. Re-verified in Section 3 |
 | Room art | Materials + lighting pass landed |
 | Guest art | **Direction changed 4 Sep.** Blocky kit, not sculpted anatomy. Not built yet |
 | CCTV | Camera positions and a CRT overlay. **Nothing to see on them** |
@@ -82,6 +82,14 @@ takings.
 **Early because it is architecture, not content.** Every section after it lands
 co-op-native instead of needing its own port. Doing this last would mean porting
 six systems instead of one.
+
+Settled 4 September, and not to be reopened: **the server is the session**
+(MaxPlayers 4, no lobbies), **sanity is shared**, and **wallets and upgrades are
+individual**. Upgrades split into personal tools and motel-wide fixtures, where
+the session takes the best owned by anyone present — so a well-equipped player
+visibly helps the crew, and your own progress is always your own, which is what
+the retention spine depends on. `tellChance` stays personal: two players
+disagreeing about what they can even see is the §13 conversation, not a bug.
 
 ### Section 4 — Evidence Chains — §6, §7
 

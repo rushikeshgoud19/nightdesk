@@ -47,6 +47,10 @@ Materials.guest = table.freeze({
 	Skin = surface(Enum.Material.SmoothPlastic, "GuestSkin"),
 	Hair = surface(Enum.Material.SmoothPlastic, "GuestHair"),
 	Wool = surface(Enum.Material.Fabric, "GuestWool"),
+	Suit = surface(Enum.Material.Fabric, "GuestSuit"),
+	Shirt = surface(Enum.Material.Fabric, "GuestShirt"),
+	Shoe = surface(Enum.Material.Leather, "GuestShoe"),
+	WetSuit = surface(Enum.Material.Fabric, "GuestWetSuit"),
 	Leather = surface(Enum.Material.Leather, "MotelLeather"),
 	Brass = surface(Enum.Material.Metal, "MotelMetal"),
 	-- Wet, hard and clean: eyeballs, teeth, bone, suit buttons, shoe soles.

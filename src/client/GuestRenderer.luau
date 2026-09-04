@@ -5,7 +5,6 @@
 -- executive briefcases, natural breathing physics, eye blinking, gaze micro-saccades,
 -- and the 6 Core Cinematic Horror Mob Archetypes.
 
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -124,14 +123,6 @@ local SKIN_TONES = {
 	Color3.fromRGB(180, 130, 92), -- Olive Bronze
 	Color3.fromRGB(130, 85, 55), -- Rich Chestnut
 	Color3.fromRGB(80, 50, 35), -- Deep Espresso
-}
-
-local IRIS_PALETTES = {
-	Color3.fromRGB(58, 40, 30), -- Dark Brown
-	Color3.fromRGB(48, 72, 105), -- Slate Blue
-	Color3.fromRGB(115, 82, 42), -- Hazel Amber
-	Color3.fromRGB(42, 78, 52), -- Forest Green
-	Color3.fromRGB(90, 95, 102), -- Steel Gray
 }
 
 local HAIR_COLORS = {
@@ -421,1309 +412,6 @@ local function applyPose(hrp: BasePart, state: AnimState, scaleW: number, scaleH
 end
 
 -- =============================================================================
--- PROCEDURAL SCULPTING ARCHITECTURE
--- =============================================================================
-
-local function buildAnatomicalFacialContours(
-	head: BasePart,
-	skinColor: Color3,
-	eyeColor: Color3,
-	scaleW: number,
-	scaleH: number,
-	scaleD: number,
-	transparency: number,
-	anomalyId: string?,
-	model: Model,
-	rng: Random
-)
-	if anomalyId == "shadow_entity" then
-		return
-	end
-	if anomalyId == "dark_sclera" then
-		eyeColor = Color3.fromRGB(30, 30, 30)
-	end
-
-	local isDilatedPupils = anomalyId == "dilated_pupils"
-	local isAsymmetricFace = anomalyId == "asymmetric_face"
-	local isSubtleSmile = anomalyId == "subtle_smile"
-	local isMeltingWax = anomalyId == "melting_wax"
-	-- Real faces are never perfectly symmetric, and `perfect_symmetry` is an
-	-- anomaly whose whole tell is that this one is. So a genuine guest's offset
-	-- must never land on zero: `math.random(-2, 2)` did, on both axes at once,
-	-- for 1 guest in 25 -- rendering a genuine face identical to the anomaly and
-	-- costing the player 20 sanity for reading it correctly.
-	local function asymOffset(): number
-		local magnitude = rng:NextInteger(1, 2)
-		local sign = if rng:NextInteger(0, 1) == 0 then -1 else 1
-		return magnitude * sign * 0.008
-	end
-
-	local isPerfectSymmetry = anomalyId == "perfect_symmetry"
-	local asymX = if isPerfectSymmetry then 0 else asymOffset()
-	local asymY = if isPerfectSymmetry then 0 else asymOffset()
-
-	makePart(
-		"Cheekbone_L",
-		Enum.PartType.Block,
-		Vector3.new(0.20 * scaleW, 0.14 * scaleH, 0.08 * scaleD),
-		head.CFrame
-			* CFrame.new(-0.35 * scaleW, 0.05 * scaleH, 0.50 * scaleD)
-			* CFrame.Angles(0, math.rad(14), math.rad(-10)),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"Cheekbone_R",
-		Enum.PartType.Block,
-		Vector3.new(0.20 * scaleW, 0.14 * scaleH, 0.08 * scaleD),
-		head.CFrame
-			* CFrame.new((0.35 + asymX) * scaleW, (0.05 + asymY) * scaleH, 0.50 * scaleD)
-			* CFrame.Angles(0, math.rad(-14), math.rad(10)),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-
-	makePart(
-		"Jaw_L",
-		Enum.PartType.Block,
-		Vector3.new(0.18 * scaleW, 0.26 * scaleH, 0.10 * scaleD),
-		head.CFrame
-			* CFrame.new(-0.30 * scaleW, -0.32 * scaleH, 0.44 * scaleD)
-			* CFrame.Angles(0, math.rad(22), math.rad(-18)),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"Jaw_R",
-		Enum.PartType.Block,
-		Vector3.new(0.18 * scaleW, 0.26 * scaleH, 0.10 * scaleD),
-		head.CFrame
-			* CFrame.new((0.30 + asymX) * scaleW, (-0.32 + asymY) * scaleH, 0.44 * scaleD)
-			* CFrame.Angles(0, math.rad(-22), math.rad(18)),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"ChinPlate",
-		Enum.PartType.Block,
-		Vector3.new(0.28 * scaleW, 0.16 * scaleH, 0.12 * scaleD),
-		head.CFrame * CFrame.new(0, -0.42 * scaleH, 0.48 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-
-	local noseMat = isMeltingWax and S.Wax or S.Skin
-	makePart(
-		"NoseBridge",
-		Enum.PartType.Block,
-		Vector3.new(0.08 * scaleW, 0.26 * scaleH, 0.10 * scaleD),
-		head.CFrame * CFrame.new(0, 0.12 * scaleH, 0.55 * scaleD),
-		skinColor,
-		noseMat,
-		transparency,
-		model
-	)
-	makePart(
-		"NoseTip",
-		Enum.PartType.Block,
-		Vector3.new(0.13 * scaleW, 0.10 * scaleH, 0.12 * scaleD),
-		head.CFrame * CFrame.new(0, -0.02 * scaleH, 0.60 * scaleD),
-		skinColor,
-		noseMat,
-		transparency,
-		model
-	)
-	makePart(
-		"Nostril_L",
-		Enum.PartType.Block,
-		Vector3.new(0.05 * scaleW, 0.05 * scaleH, 0.06 * scaleD),
-		head.CFrame * CFrame.new(-0.08 * scaleW, -0.05 * scaleH, 0.57 * scaleD),
-		skinColor,
-		noseMat,
-		transparency,
-		model
-	)
-	makePart(
-		"Nostril_R",
-		Enum.PartType.Block,
-		Vector3.new(0.05 * scaleW, 0.05 * scaleH, 0.06 * scaleD),
-		head.CFrame * CFrame.new(0.08 * scaleW, -0.05 * scaleH, 0.57 * scaleD),
-		skinColor,
-		noseMat,
-		transparency,
-		model
-	)
-
-	makePart(
-		"Ear_L",
-		Enum.PartType.Block,
-		Vector3.new(0.08 * scaleW, 0.32 * scaleH, 0.18 * scaleD),
-		head.CFrame
-			* CFrame.new(-0.55 * scaleW, 0.08 * scaleH, -0.02 * scaleD)
-			* CFrame.Angles(0, math.rad(-10), 0),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"Ear_R",
-		Enum.PartType.Block,
-		Vector3.new(0.08 * scaleW, 0.32 * scaleH, 0.18 * scaleD),
-		head.CFrame
-			* CFrame.new((0.55 + asymX) * scaleW, (0.08 + asymY) * scaleH, -0.02 * scaleD)
-			* CFrame.Angles(0, math.rad(10), 0),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"EarHelix_L",
-		Enum.PartType.Block,
-		Vector3.new(0.05 * scaleW, 0.16 * scaleH, 0.14 * scaleD),
-		head.CFrame * CFrame.new(-0.57 * scaleW, 0.16 * scaleH, -0.02 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"EarHelix_R",
-		Enum.PartType.Block,
-		Vector3.new(0.05 * scaleW, 0.16 * scaleH, 0.14 * scaleD),
-		head.CFrame * CFrame.new(0.57 * scaleW, 0.16 * scaleH, -0.02 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"EarLobe_L",
-		Enum.PartType.Block,
-		Vector3.new(0.06 * scaleW, 0.10 * scaleH, 0.10 * scaleD),
-		head.CFrame * CFrame.new(-0.56 * scaleW, -0.06 * scaleH, -0.02 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"EarLobe_R",
-		Enum.PartType.Block,
-		Vector3.new(0.06 * scaleW, 0.10 * scaleH, 0.10 * scaleD),
-		head.CFrame * CFrame.new(0.56 * scaleW, -0.06 * scaleH, -0.02 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-
-	makePart(
-		"BrowRidge_L",
-		Enum.PartType.Block,
-		Vector3.new(0.22 * scaleW, 0.05 * scaleH, 0.06 * scaleD),
-		head.CFrame
-			* CFrame.new(-0.26 * scaleW, 0.28 * scaleH, 0.54 * scaleD)
-			* CFrame.Angles(0, 0, math.rad(5)),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"BrowRidge_R",
-		Enum.PartType.Block,
-		Vector3.new(0.22 * scaleW, 0.05 * scaleH, 0.06 * scaleD),
-		head.CFrame
-			* CFrame.new(0.26 * scaleW, 0.28 * scaleH, 0.54 * scaleD)
-			* CFrame.Angles(0, 0, math.rad(-5)),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-
-	local eyeY_L = isAsymmetricFace and 0.12 or 0.15
-	local scleraColor = anomalyId == "dark_sclera" and Color3.fromRGB(150, 150, 150)
-		or Color3.fromRGB(246, 246, 250)
-	local pupilSize = isDilatedPupils and 0.08 or 0.05
-
-	makePart(
-		"Sclera_L",
-		Enum.PartType.Block,
-		Vector3.new(0.18 * scaleW, 0.11 * scaleH, 0.04 * scaleD),
-		head.CFrame * CFrame.new(-0.26 * scaleW, eyeY_L * scaleH, 0.53 * scaleD),
-		scleraColor,
-		S.Gloss,
-		transparency,
-		model
-	)
-	makePart(
-		"Iris_L",
-		Enum.PartType.Block,
-		Vector3.new(0.10 * scaleW, 0.10 * scaleH, 0.03 * scaleD),
-		head.CFrame * CFrame.new(-0.26 * scaleW, eyeY_L * scaleH, 0.55 * scaleD),
-		eyeColor,
-		S.Gloss,
-		transparency,
-		model
-	)
-	makePart(
-		"Pupil_L",
-		Enum.PartType.Block,
-		Vector3.new(pupilSize * scaleW, pupilSize * scaleH, 0.03 * scaleD),
-		head.CFrame * CFrame.new(-0.26 * scaleW, eyeY_L * scaleH, 0.56 * scaleD),
-		Color3.fromRGB(15, 12, 14),
-		S.Gloss,
-		transparency,
-		model
-	)
-
-	makePart(
-		"Sclera_R",
-		Enum.PartType.Block,
-		Vector3.new(0.18 * scaleW, 0.11 * scaleH, 0.04 * scaleD),
-		head.CFrame * CFrame.new((0.26 + asymX) * scaleW, (0.15 + asymY) * scaleH, 0.53 * scaleD),
-		scleraColor,
-		S.Gloss,
-		transparency,
-		model
-	)
-	makePart(
-		"Iris_R",
-		Enum.PartType.Block,
-		Vector3.new(0.10 * scaleW, 0.10 * scaleH, 0.03 * scaleD),
-		head.CFrame * CFrame.new((0.26 + asymX) * scaleW, (0.15 + asymY) * scaleH, 0.55 * scaleD),
-		eyeColor,
-		S.Gloss,
-		transparency,
-		model
-	)
-	makePart(
-		"Pupil_R",
-		Enum.PartType.Block,
-		Vector3.new(pupilSize * scaleW, pupilSize * scaleH, 0.03 * scaleD),
-		head.CFrame * CFrame.new((0.26 + asymX) * scaleW, (0.15 + asymY) * scaleH, 0.56 * scaleD),
-		Color3.fromRGB(15, 12, 14),
-		S.Gloss,
-		transparency,
-		model
-	)
-
-	local lidUpperL = makePart(
-		"EyelidUpper_L",
-		Enum.PartType.Block,
-		Vector3.new(0.20 * scaleW, 0.03 * scaleH, 0.05 * scaleD),
-		head.CFrame * CFrame.new(-0.26 * scaleW, (eyeY_L + 0.05) * scaleH, 0.56 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	local lidUpperR = makePart(
-		"EyelidUpper_R",
-		Enum.PartType.Block,
-		Vector3.new(0.20 * scaleW, 0.03 * scaleH, 0.05 * scaleD),
-		head.CFrame * CFrame.new(0.26 * scaleW, 0.20 * scaleH, 0.56 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"EyelidLower_L",
-		Enum.PartType.Block,
-		Vector3.new(0.20 * scaleW, 0.02 * scaleH, 0.05 * scaleD),
-		head.CFrame * CFrame.new(-0.26 * scaleW, (eyeY_L - 0.05) * scaleH, 0.56 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"EyelidLower_R",
-		Enum.PartType.Block,
-		Vector3.new(0.20 * scaleW, 0.02 * scaleH, 0.05 * scaleD),
-		head.CFrame * CFrame.new(0.26 * scaleW, 0.10 * scaleH, 0.56 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-
-	table.insert(activeEyelids, lidUpperL)
-	table.insert(activeEyelids, lidUpperR)
-
-	makePart(
-		"Philtrum",
-		Enum.PartType.Block,
-		Vector3.new(0.06 * scaleW, 0.08 * scaleH, 0.04 * scaleD),
-		head.CFrame * CFrame.new(0, -0.12 * scaleH, 0.55 * scaleD),
-		skinColor,
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"LipUpper",
-		Enum.PartType.Block,
-		Vector3.new(0.26 * scaleW, 0.04 * scaleH, 0.05 * scaleD),
-		head.CFrame * CFrame.new(0, -0.18 * scaleH, 0.55 * scaleD),
-		Color3.fromRGB(140, 75, 75),
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"LipLower",
-		Enum.PartType.Block,
-		Vector3.new(0.24 * scaleW, 0.05 * scaleH, 0.05 * scaleD),
-		head.CFrame * CFrame.new(0, -0.24 * scaleH, 0.55 * scaleD),
-		Color3.fromRGB(140, 75, 75),
-		S.Skin,
-		transparency,
-		model
-	)
-
-	local smileRot = isSubtleSmile and math.rad(10) or 0
-	local smileY = isSubtleSmile and -0.18 or -0.20
-	makePart(
-		"MouthCorner_L",
-		Enum.PartType.Block,
-		Vector3.new(0.04 * scaleW, 0.04 * scaleH, 0.04 * scaleD),
-		head.CFrame
-			* CFrame.new(-0.14 * scaleW, smileY * scaleH, 0.54 * scaleD)
-			* CFrame.Angles(0, 0, -smileRot),
-		Color3.fromRGB(120, 65, 65),
-		S.Skin,
-		transparency,
-		model
-	)
-	makePart(
-		"MouthCorner_R",
-		Enum.PartType.Block,
-		Vector3.new(0.04 * scaleW, 0.04 * scaleH, 0.04 * scaleD),
-		head.CFrame
-			* CFrame.new(0.14 * scaleW, smileY * scaleH, 0.54 * scaleD)
-			* CFrame.Angles(0, 0, smileRot),
-		Color3.fromRGB(120, 65, 65),
-		S.Skin,
-		transparency,
-		model
-	)
-end
-local function buildVolumetricHairCrown(
-	head: BasePart,
-	hairColor: Color3,
-	scaleW: number,
-	scaleH: number,
-	scaleD: number,
-	transparency: number,
-	isShadow: boolean,
-	model: Model
-)
-	if isShadow then
-		return
-	end
-
-	makePart(
-		"HairTopVolume",
-		Enum.PartType.Block,
-		Vector3.new(1.24 * scaleW, 0.38 * scaleH, 1.26 * scaleD),
-		head.CFrame * CFrame.new(0, 0.58 * scaleH, -0.05 * scaleD),
-		hairColor,
-		S.Hair,
-		transparency,
-		model
-	)
-	makePart(
-		"HairCrownFront",
-		Enum.PartType.Block,
-		Vector3.new(1.15 * scaleW, 0.24 * scaleH, 0.35 * scaleD),
-		head.CFrame * CFrame.new(0, 0.50 * scaleH, 0.38 * scaleD),
-		hairColor,
-		S.Hair,
-		transparency,
-		model
-	)
-	makePart(
-		"HairSideburn_L",
-		Enum.PartType.Block,
-		Vector3.new(0.18 * scaleW, 0.68 * scaleH, 1.15 * scaleD),
-		head.CFrame * CFrame.new(-0.56 * scaleW, 0.18 * scaleH, -0.05 * scaleD),
-		hairColor,
-		S.Hair,
-		transparency,
-		model
-	)
-	makePart(
-		"HairSideburn_R",
-		Enum.PartType.Block,
-		Vector3.new(0.18 * scaleW, 0.68 * scaleH, 1.15 * scaleD),
-		head.CFrame * CFrame.new(0.56 * scaleW, 0.18 * scaleH, -0.05 * scaleD),
-		hairColor,
-		S.Hair,
-		transparency,
-		model
-	)
-	makePart(
-		"HairBackTaper",
-		Enum.PartType.Block,
-		Vector3.new(1.20 * scaleW, 0.72 * scaleH, 0.22 * scaleD),
-		head.CFrame * CFrame.new(0, 0.12 * scaleH, -0.55 * scaleD),
-		hairColor,
-		S.Hair,
-		transparency,
-		model
-	)
-end
-
-local function buildArticulatedHands(
-	leftHand: BasePart?,
-	rightHand: BasePart?,
-	skinColor: Color3,
-	suitColor: Color3,
-	scaleW: number,
-	scaleH: number,
-	scaleD: number,
-	transparency: number,
-	anomalyId: string?,
-	isShadow: boolean,
-	model: Model
-)
-	local cuffColorL = Color3.fromRGB(220, 185, 75)
-	local cuffColorR = (anomalyId == "wrong_cufflink") and Color3.fromRGB(192, 192, 192)
-		or Color3.fromRGB(220, 185, 75)
-
-	local handColor = if isShadow then Color3.fromRGB(0, 0, 0) else skinColor
-
-	-- 1. Left Hand & 5 Articulated Fingers
-	if leftHand then
-		makePart(
-			"Palm_L",
-			Enum.PartType.Block,
-			Vector3.new(0.62 * scaleW, 0.38 * scaleH, 0.26 * scaleD),
-			leftHand.CFrame * CFrame.new(0, -0.10 * scaleH, 0),
-			handColor,
-			S.Skin,
-			transparency,
-			model
-		)
-		-- Shirt Cuff & French Cuff Button
-		if not isShadow then
-			makePart(
-				"LeftSleeveHem",
-				Enum.PartType.Block,
-				Vector3.new(0.78 * scaleW, 0.18 * scaleH, 0.78 * scaleD),
-				leftHand.CFrame * CFrame.new(0, 0.42 * scaleH, 0),
-				suitColor,
-				S.Wool,
-				transparency,
-				model
-			)
-			makePart(
-				"ShirtCuff_L",
-				Enum.PartType.Block,
-				Vector3.new(0.72 * scaleW, 0.14 * scaleH, 0.72 * scaleD),
-				leftHand.CFrame * CFrame.new(0, 0.28 * scaleH, 0),
-				Color3.fromRGB(248, 248, 252),
-				S.Wool,
-				transparency,
-				model
-			)
-			makePart(
-				"CuffButton_L",
-				Enum.PartType.Cylinder,
-				Vector3.new(0.03, 0.06, 0.06),
-				leftHand.CFrame
-					* CFrame.new(-0.37 * scaleW, 0.28 * scaleH, 0)
-					* CFrame.Angles(0, 0, math.rad(90)),
-				cuffColorL,
-				S.Brass,
-				transparency,
-				model
-			)
-		end
-
-		-- Thumb
-		makePart(
-			"ThumbKnuckle_L",
-			Enum.PartType.Ball,
-			Vector3.new(0.10, 0.10, 0.10),
-			leftHand.CFrame * CFrame.new(0.22 * scaleW, -0.08 * scaleH, 0.08 * scaleD),
-			handColor,
-			S.Skin,
-			transparency,
-			model
-		)
-		makePart(
-			"ThumbProximal_L",
-			Enum.PartType.Block,
-			Vector3.new(0.09 * scaleW, 0.18 * scaleH, 0.09 * scaleD),
-			leftHand.CFrame
-				* CFrame.new(0.25 * scaleW, -0.16 * scaleH, 0.10 * scaleD)
-				* CFrame.Angles(0, math.rad(-22), math.rad(-18)),
-			handColor,
-			S.Skin,
-			transparency,
-			model
-		)
-		makePart(
-			"ThumbDistal_L",
-			Enum.PartType.Block,
-			Vector3.new(0.08 * scaleW, 0.14 * scaleH, 0.08 * scaleD),
-			leftHand.CFrame
-				* CFrame.new(0.30 * scaleW, -0.28 * scaleH, 0.12 * scaleD)
-				* CFrame.Angles(0, math.rad(-14), math.rad(-10)),
-			handColor,
-			S.Skin,
-			transparency,
-			model
-		)
-
-		-- 4 Articulated Fingers (Index, Middle, Ring, Pinky)
-		local fingerOffsetsL = {
-			{ name = "Index", x = 0.15, len1 = 0.22, len2 = 0.16 },
-			{ name = "Middle", x = 0.04, len1 = 0.25, len2 = 0.18 },
-			{ name = "Ring", x = -0.07, len1 = 0.22, len2 = 0.16 },
-			{ name = "Pinky", x = -0.18, len1 = 0.18, len2 = 0.13 },
-		}
-		for _, f in ipairs(fingerOffsetsL) do
-			makePart(
-				`{f.name}Knuckle_L`,
-				Enum.PartType.Ball,
-				Vector3.new(0.09, 0.09, 0.09),
-				leftHand.CFrame * CFrame.new(f.x * scaleW, -0.26 * scaleH, 0),
-				handColor,
-				S.Skin,
-				transparency,
-				model
-			)
-			makePart(
-				`{f.name}Proximal_L`,
-				Enum.PartType.Block,
-				Vector3.new(0.08 * scaleW, f.len1 * scaleH, 0.08 * scaleD),
-				leftHand.CFrame * CFrame.new(f.x * scaleW, (-0.26 - f.len1 * 0.5) * scaleH, 0),
-				handColor,
-				S.Skin,
-				transparency,
-				model
-			)
-			makePart(
-				`{f.name}Distal_L`,
-				Enum.PartType.Block,
-				Vector3.new(0.07 * scaleW, f.len2 * scaleH, 0.07 * scaleD),
-				leftHand.CFrame
-					* CFrame.new(f.x * scaleW, (-0.26 - f.len1 - f.len2 * 0.5) * scaleH, 0),
-				handColor,
-				S.Skin,
-				transparency,
-				model
-			)
-		end
-	end
-
-	-- 2. Right Hand & 5 Articulated Fingers
-	if rightHand then
-		makePart(
-			"Palm_R",
-			Enum.PartType.Block,
-			Vector3.new(0.62 * scaleW, 0.38 * scaleH, 0.26 * scaleD),
-			rightHand.CFrame * CFrame.new(0, -0.10 * scaleH, 0),
-			handColor,
-			S.Skin,
-			transparency,
-			model
-		)
-		if not isShadow then
-			makePart(
-				"RightSleeveHem",
-				Enum.PartType.Block,
-				Vector3.new(0.78 * scaleW, 0.18 * scaleH, 0.78 * scaleD),
-				rightHand.CFrame * CFrame.new(0, 0.42 * scaleH, 0),
-				suitColor,
-				S.Wool,
-				transparency,
-				model
-			)
-			makePart(
-				"ShirtCuff_R",
-				Enum.PartType.Block,
-				Vector3.new(0.72 * scaleW, 0.14 * scaleH, 0.72 * scaleD),
-				rightHand.CFrame * CFrame.new(0, 0.28 * scaleH, 0),
-				Color3.fromRGB(248, 248, 252),
-				S.Wool,
-				transparency,
-				model
-			)
-			makePart(
-				"CuffButton_R",
-				Enum.PartType.Cylinder,
-				Vector3.new(0.03, 0.06, 0.06),
-				rightHand.CFrame
-					* CFrame.new(0.37 * scaleW, 0.28 * scaleH, 0)
-					* CFrame.Angles(0, 0, math.rad(90)),
-				cuffColorR,
-				S.Brass,
-				transparency,
-				model
-			)
-		end
-
-		-- Thumb
-		makePart(
-			"ThumbKnuckle_R",
-			Enum.PartType.Ball,
-			Vector3.new(0.10, 0.10, 0.10),
-			rightHand.CFrame * CFrame.new(-0.22 * scaleW, -0.08 * scaleH, 0.08 * scaleD),
-			handColor,
-			S.Skin,
-			transparency,
-			model
-		)
-		makePart(
-			"ThumbProximal_R",
-			Enum.PartType.Block,
-			Vector3.new(0.09 * scaleW, 0.18 * scaleH, 0.09 * scaleD),
-			rightHand.CFrame
-				* CFrame.new(-0.25 * scaleW, -0.16 * scaleH, 0.10 * scaleD)
-				* CFrame.Angles(0, math.rad(22), math.rad(18)),
-			handColor,
-			S.Skin,
-			transparency,
-			model
-		)
-		makePart(
-			"ThumbDistal_R",
-			Enum.PartType.Block,
-			Vector3.new(0.08 * scaleW, 0.14 * scaleH, 0.08 * scaleD),
-			rightHand.CFrame
-				* CFrame.new(-0.30 * scaleW, -0.28 * scaleH, 0.12 * scaleD)
-				* CFrame.Angles(0, math.rad(14), math.rad(10)),
-			handColor,
-			S.Skin,
-			transparency,
-			model
-		)
-
-		-- 4 Articulated Fingers (Index, Middle, Ring, Pinky)
-		local fingerOffsetsR = {
-			{ name = "Index", x = -0.15, len1 = 0.22, len2 = 0.16 },
-			{ name = "Middle", x = -0.04, len1 = 0.25, len2 = 0.18 },
-			{ name = "Ring", x = 0.07, len1 = 0.22, len2 = 0.16 },
-			{ name = "Pinky", x = 0.18, len1 = 0.18, len2 = 0.13 },
-		}
-		for _, f in ipairs(fingerOffsetsR) do
-			makePart(
-				`{f.name}Knuckle_R`,
-				Enum.PartType.Ball,
-				Vector3.new(0.09, 0.09, 0.09),
-				rightHand.CFrame * CFrame.new(f.x * scaleW, -0.26 * scaleH, 0),
-				handColor,
-				S.Skin,
-				transparency,
-				model
-			)
-			makePart(
-				`{f.name}Proximal_R`,
-				Enum.PartType.Block,
-				Vector3.new(0.08 * scaleW, f.len1 * scaleH, 0.08 * scaleD),
-				rightHand.CFrame * CFrame.new(f.x * scaleW, (-0.26 - f.len1 * 0.5) * scaleH, 0),
-				handColor,
-				S.Skin,
-				transparency,
-				model
-			)
-			makePart(
-				`{f.name}Distal_R`,
-				Enum.PartType.Block,
-				Vector3.new(0.07 * scaleW, f.len2 * scaleH, 0.07 * scaleD),
-				rightHand.CFrame
-					* CFrame.new(f.x * scaleW, (-0.26 - f.len1 - f.len2 * 0.5) * scaleH, 0),
-				handColor,
-				S.Skin,
-				transparency,
-				model
-			)
-		end
-	end
-end
-
-local function buildTailoredSuitAndOvercoat(
-	upperTorso: BasePart,
-	lowerTorso: BasePart?,
-	suitColor: Color3,
-	shirtColor: Color3,
-	tieColor: Color3,
-	scaleW: number,
-	scaleH: number,
-	scaleD: number,
-	transparency: number,
-	anomalyId: string?,
-	isShadow: boolean,
-	model: Model
-)
-	local isBackwardTie = anomalyId == "backward_tie"
-	local button2_offset = anomalyId == "button_wrong" and 0.08 or 0
-
-	if isShadow then
-		return
-	end
-
-	-- 1. V-Neck 3D Collared Shirt with Stiff Wings & Center Placket
-	makePart(
-		"ShirtChest",
-		Enum.PartType.Block,
-		Vector3.new(0.50 * scaleW, 0.95 * scaleH, 0.05 * scaleD),
-		upperTorso.CFrame * CFrame.new(0, 0.30 * scaleH, 0.52 * scaleD),
-		shirtColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	makePart(
-		"ShirtPlacket",
-		Enum.PartType.Block,
-		Vector3.new(0.12 * scaleW, 0.90 * scaleH, 0.06 * scaleD),
-		upperTorso.CFrame * CFrame.new(0, 0.28 * scaleH, 0.53 * scaleD),
-		shirtColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	makePart(
-		"ShirtCollarWing_L",
-		Enum.PartType.Block,
-		Vector3.new(0.20 * scaleW, 0.36 * scaleH, 0.06 * scaleD),
-		upperTorso.CFrame
-			* CFrame.new(-0.24 * scaleW, 0.68 * scaleH, 0.54 * scaleD)
-			* CFrame.Angles(0, 0, math.rad(-24)),
-		shirtColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	makePart(
-		"ShirtCollarWing_R",
-		Enum.PartType.Block,
-		Vector3.new(0.20 * scaleW, 0.36 * scaleH, 0.06 * scaleD),
-		upperTorso.CFrame
-			* CFrame.new(0.24 * scaleW, 0.68 * scaleH, 0.54 * scaleD)
-			* CFrame.Angles(0, 0, math.rad(24)),
-		shirtColor,
-		S.Wool,
-		transparency,
-		model
-	)
-
-	-- 2. Tailored Overcoat / Suit Jacket Chest Panels & Notch Lapels
-	makePart(
-		"JacketLapel_L",
-		Enum.PartType.Block,
-		Vector3.new(0.26 * scaleW, 1.10 * scaleH, 0.08 * scaleD),
-		upperTorso.CFrame
-			* CFrame.new(-0.35 * scaleW, 0.22 * scaleH, 0.55 * scaleD)
-			* CFrame.Angles(0, 0, math.rad(-14)),
-		suitColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	makePart(
-		"JacketLapel_R",
-		Enum.PartType.Block,
-		Vector3.new(0.26 * scaleW, 1.10 * scaleH, 0.08 * scaleD),
-		upperTorso.CFrame
-			* CFrame.new(0.35 * scaleW, 0.22 * scaleH, 0.55 * scaleD)
-			* CFrame.Angles(0, 0, math.rad(14)),
-		suitColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	makePart(
-		"JacketChest_L",
-		Enum.PartType.Block,
-		Vector3.new(0.55 * scaleW, 1.35 * scaleH, 0.07 * scaleD),
-		upperTorso.CFrame * CFrame.new(-0.58 * scaleW, 0.05 * scaleH, 0.53 * scaleD),
-		suitColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	makePart(
-		"JacketChest_R",
-		Enum.PartType.Block,
-		Vector3.new(0.55 * scaleW, 1.35 * scaleH, 0.07 * scaleD),
-		upperTorso.CFrame * CFrame.new(0.58 * scaleW, 0.05 * scaleH, 0.53 * scaleD),
-		suitColor,
-		S.Wool,
-		transparency,
-		model
-	)
-
-	-- 3. Polished Horn Suit Buttons
-	makePart(
-		"SuitButton_1",
-		Enum.PartType.Cylinder,
-		Vector3.new(0.04, 0.08, 0.08),
-		upperTorso.CFrame
-			* CFrame.new(0, -0.12 * scaleH, 0.56 * scaleD)
-			* CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(30, 28, 26),
-		S.Gloss,
-		transparency,
-		model
-	)
-	makePart(
-		"SuitButton_2",
-		Enum.PartType.Cylinder,
-		Vector3.new(0.04, 0.08, 0.08),
-		upperTorso.CFrame
-			* CFrame.new(button2_offset * scaleW, -0.42 * scaleH, 0.56 * scaleD)
-			* CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(30, 28, 26),
-		S.Gloss,
-		transparency,
-		model
-	)
-	makePart(
-		"SuitButton_3",
-		Enum.PartType.Cylinder,
-		Vector3.new(0.04, 0.08, 0.08),
-		upperTorso.CFrame
-			* CFrame.new(0, -0.72 * scaleH, 0.56 * scaleD)
-			* CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(30, 28, 26),
-		S.Gloss,
-		transparency,
-		model
-	)
-
-	-- 4. Left Breast Pocket with Silk Pocket Square
-	makePart(
-		"BreastPocket",
-		Enum.PartType.Block,
-		Vector3.new(0.24 * scaleW, 0.06 * scaleH, 0.04 * scaleD),
-		upperTorso.CFrame * CFrame.new(0.54 * scaleW, 0.38 * scaleH, 0.55 * scaleD),
-		suitColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	makePart(
-		"PocketSquare_Fold",
-		Enum.PartType.Block,
-		Vector3.new(0.18 * scaleW, 0.12 * scaleH, 0.04 * scaleD),
-		upperTorso.CFrame * CFrame.new(0.54 * scaleW, 0.44 * scaleH, 0.56 * scaleD),
-		tieColor,
-		S.Wool,
-		transparency,
-		model
-	)
-
-	-- 5. Tapered Silk Necktie with 3D Windsor Knot and Gold Tie Bar
-	local tieZOffset = if isBackwardTie then -0.55 * scaleD else 0.56 * scaleD
-	local tieRot = if isBackwardTie then math.rad(180) else 0
-
-	makePart(
-		"TieKnot_3D",
-		Enum.PartType.Block,
-		Vector3.new(0.20 * scaleW, 0.18 * scaleH, 0.09 * scaleD),
-		upperTorso.CFrame * CFrame.new(0, 0.60 * scaleH, tieZOffset) * CFrame.Angles(0, tieRot, 0),
-		tieColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	makePart(
-		"TieBladeUpper",
-		Enum.PartType.Block,
-		Vector3.new(0.18 * scaleW, 0.55 * scaleH, 0.06 * scaleD),
-		upperTorso.CFrame * CFrame.new(0, 0.28 * scaleH, tieZOffset) * CFrame.Angles(0, tieRot, 0),
-		tieColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	makePart(
-		"TieBladeLower",
-		Enum.PartType.Block,
-		Vector3.new(0.22 * scaleW, 0.55 * scaleH, 0.06 * scaleD),
-		upperTorso.CFrame * CFrame.new(0, -0.22 * scaleH, tieZOffset) * CFrame.Angles(0, tieRot, 0),
-		tieColor,
-		S.Wool,
-		transparency,
-		model
-	)
-	if not isBackwardTie then
-		makePart(
-			"TieBarGold",
-			Enum.PartType.Block,
-			Vector3.new(0.16 * scaleW, 0.04 * scaleH, 0.04 * scaleD),
-			upperTorso.CFrame * CFrame.new(0, 0.10 * scaleH, 0.58 * scaleD),
-			Color3.fromRGB(225, 190, 70),
-			S.Brass,
-			transparency,
-			model
-		)
-	end
-
-	-- 6. Leather Belt with Brass Buckle & Prong on LowerTorso
-	if lowerTorso then
-		makePart(
-			"LeatherBeltStrap",
-			Enum.PartType.Block,
-			Vector3.new(1.88 * scaleW, 0.16 * scaleH, 1.06 * scaleD),
-			lowerTorso.CFrame * CFrame.new(0, 0.38 * scaleH, 0),
-			Color3.fromRGB(28, 22, 18),
-			S.Leather,
-			transparency,
-			model
-		)
-		makePart(
-			"BeltBuckleOuter",
-			Enum.PartType.Block,
-			Vector3.new(0.34 * scaleW, 0.20 * scaleH, 0.06 * scaleD),
-			lowerTorso.CFrame * CFrame.new(0, 0.38 * scaleH, 0.55 * scaleD),
-			Color3.fromRGB(220, 185, 70),
-			S.Brass,
-			transparency,
-			model
-		)
-		makePart(
-			"BeltBuckleInner",
-			Enum.PartType.Block,
-			Vector3.new(0.22 * scaleW, 0.12 * scaleH, 0.07 * scaleD),
-			lowerTorso.CFrame * CFrame.new(0, 0.38 * scaleH, 0.55 * scaleD),
-			Color3.fromRGB(28, 22, 18),
-			S.Leather,
-			transparency,
-			model
-		)
-		makePart(
-			"BeltProng",
-			Enum.PartType.Block,
-			Vector3.new(0.04 * scaleW, 0.14 * scaleH, 0.08 * scaleD),
-			lowerTorso.CFrame * CFrame.new(0, 0.38 * scaleH, 0.56 * scaleD),
-			Color3.fromRGB(220, 185, 70),
-			S.Brass,
-			transparency,
-			model
-		)
-	end
-end
-
-local function buildExecutiveBriefcase(
-	rightHand: BasePart,
-	scaleW: number,
-	scaleH: number,
-	scaleD: number,
-	transparency: number,
-	isShadow: boolean,
-	model: Model
-)
-	if isShadow then
-		return
-	end
-
-	-- Hard-shell Executive Leather Briefcase Body
-	makePart(
-		"BriefcaseBody",
-		Enum.PartType.Block,
-		Vector3.new(0.38 * scaleW, 1.20 * scaleH, 1.62 * scaleD),
-		rightHand.CFrame * CFrame.new(0, -0.48 * scaleH, 0),
-		Color3.fromRGB(42, 26, 18),
-		S.Leather,
-		transparency,
-		model
-	)
-	-- Metal Trim Perimeter
-	makePart(
-		"BriefcaseRim",
-		Enum.PartType.Block,
-		Vector3.new(0.40 * scaleW, 1.22 * scaleH, 0.06 * scaleD),
-		rightHand.CFrame * CFrame.new(0, -0.48 * scaleH, 0),
-		Color3.fromRGB(180, 150, 60),
-		S.Brass,
-		transparency,
-		model
-	)
-	-- Brass Latches
-	makePart(
-		"BriefcaseLatch_L",
-		Enum.PartType.Block,
-		Vector3.new(0.40 * scaleW, 0.12 * scaleH, 0.10 * scaleD),
-		rightHand.CFrame * CFrame.new(0, -0.16 * scaleH, -0.45 * scaleD),
-		Color3.fromRGB(220, 185, 75),
-		S.Brass,
-		transparency,
-		model
-	)
-	makePart(
-		"BriefcaseLatch_R",
-		Enum.PartType.Block,
-		Vector3.new(0.40 * scaleW, 0.12 * scaleH, 0.10 * scaleD),
-		rightHand.CFrame * CFrame.new(0, -0.16 * scaleH, 0.45 * scaleD),
-		Color3.fromRGB(220, 185, 75),
-		S.Brass,
-		transparency,
-		model
-	)
-	-- Curved Handle
-	makePart(
-		"BriefcaseHandleArch",
-		Enum.PartType.Cylinder,
-		Vector3.new(0.12 * scaleW, 0.48 * scaleH, 0.48 * scaleD),
-		rightHand.CFrame * CFrame.new(0, 0.12 * scaleH, 0) * CFrame.Angles(0, 0, math.rad(90)),
-		Color3.fromRGB(28, 18, 12),
-		S.Leather,
-		transparency,
-		model
-	)
-	makePart(
-		"BriefcaseHandleGrip",
-		Enum.PartType.Block,
-		Vector3.new(0.14 * scaleW, 0.08 * scaleH, 0.42 * scaleD),
-		rightHand.CFrame * CFrame.new(0, 0.22 * scaleH, 0),
-		Color3.fromRGB(220, 185, 75),
-		S.Brass,
-		transparency,
-		model
-	)
-end
-
-local function buildTailoredLegsAndShoes(
-	leftLowerLeg: BasePart?,
-	rightLowerLeg: BasePart?,
-	pantsColor: Color3,
-	scaleW: number,
-	scaleH: number,
-	scaleD: number,
-	transparency: number,
-	isShadow: boolean,
-	model: Model
-)
-	if isShadow then
-		return
-	end
-
-	local shoeColor = Color3.fromRGB(20, 16, 14)
-
-	-- Left Trouser Cuff & Oxford Shoe
-	if leftLowerLeg then
-		makePart(
-			"PantCuff_L",
-			Enum.PartType.Block,
-			Vector3.new(0.96 * scaleW, 0.16 * scaleH, 0.96 * scaleD),
-			leftLowerLeg.CFrame * CFrame.new(0, -0.65 * scaleH, 0),
-			pantsColor,
-			S.Wool,
-			transparency,
-			model
-		)
-		makePart(
-			"Shoe_L",
-			Enum.PartType.Block,
-			Vector3.new(0.88 * scaleW, 0.36 * scaleH, 1.25 * scaleD),
-			leftLowerLeg.CFrame * CFrame.new(0, -0.92 * scaleH, 0.14 * scaleD),
-			shoeColor,
-			S.Leather,
-			transparency,
-			model
-		)
-		makePart(
-			"ShoeSole_L",
-			Enum.PartType.Block,
-			Vector3.new(0.92 * scaleW, 0.08 * scaleH, 1.30 * scaleD),
-			leftLowerLeg.CFrame * CFrame.new(0, -1.12 * scaleH, 0.14 * scaleD),
-			Color3.fromRGB(10, 10, 10),
-			S.Gloss,
-			transparency,
-			model
-		)
-		makePart(
-			"ShoeHeel_L",
-			Enum.PartType.Block,
-			Vector3.new(0.92 * scaleW, 0.12 * scaleH, 0.44 * scaleD),
-			leftLowerLeg.CFrame * CFrame.new(0, -1.06 * scaleH, -0.32 * scaleD),
-			Color3.fromRGB(28, 20, 16),
-			S.Leather,
-			transparency,
-			model
-		)
-	end
-
-	-- Right Trouser Cuff & Oxford Shoe
-	if rightLowerLeg then
-		makePart(
-			"PantCuff_R",
-			Enum.PartType.Block,
-			Vector3.new(0.96 * scaleW, 0.16 * scaleH, 0.96 * scaleD),
-			rightLowerLeg.CFrame * CFrame.new(0, -0.65 * scaleH, 0),
-			pantsColor,
-			S.Wool,
-			transparency,
-			model
-		)
-		makePart(
-			"Shoe_R",
-			Enum.PartType.Block,
-			Vector3.new(0.88 * scaleW, 0.36 * scaleH, 1.25 * scaleD),
-			rightLowerLeg.CFrame * CFrame.new(0, -0.92 * scaleH, 0.14 * scaleD),
-			shoeColor,
-			S.Leather,
-			transparency,
-			model
-		)
-		makePart(
-			"ShoeSole_R",
-			Enum.PartType.Block,
-			Vector3.new(0.92 * scaleW, 0.08 * scaleH, 1.30 * scaleD),
-			rightLowerLeg.CFrame * CFrame.new(0, -1.12 * scaleH, 0.14 * scaleD),
-			Color3.fromRGB(10, 10, 10),
-			S.Gloss,
-			transparency,
-			model
-		)
-		makePart(
-			"ShoeHeel_R",
-			Enum.PartType.Block,
-			Vector3.new(0.92 * scaleW, 0.12 * scaleH, 0.44 * scaleD),
-			rightLowerLeg.CFrame * CFrame.new(0, -1.06 * scaleH, -0.32 * scaleD),
-			Color3.fromRGB(28, 20, 16),
-			S.Leather,
-			transparency,
-			model
-		)
-	end
-end
-
--- =============================================================================
--- 6 CORE CINEMATIC HORROR MOB ARCHETYPES
--- =============================================================================
-
-local function buildHorrorArchetypes(
-	head: BasePart,
-	upperTorso: BasePart,
-	hrp: BasePart,
-	scaleW: number,
-	scaleH: number,
-	scaleD: number,
-	transparency: number,
-	anomalyId: string?,
-	model: Model
-)
-	if anomalyId == "snapped_neck" then
-		for i = 1, 4 do
-			makePart(
-				`Vertebra_C{i}`,
-				Enum.PartType.Block,
-				Vector3.new(0.24 * scaleW, 0.16 * scaleH, 0.24 * scaleD),
-				head.CFrame * CFrame.new(0.38 * scaleW, (-0.40 - i * 0.14) * scaleH, 0),
-				Color3.fromRGB(236, 230, 218),
-				S.Gloss,
-				0,
-				model
-			)
-		end
-		makePart(
-			"SpinalCore",
-			Enum.PartType.Cylinder,
-			Vector3.new(0.55 * scaleH, 0.12 * scaleW, 0.12 * scaleD),
-			head.CFrame
-				* CFrame.new(0.38 * scaleW, -0.68 * scaleH, 0)
-				* CFrame.Angles(0, 0, math.rad(90)),
-			Color3.fromRGB(180, 160, 140),
-			S.Gloss,
-			0,
-			model
-		)
-		for i = 1, 4 do
-			makePart(
-				`TornMuscle_{i}`,
-				Enum.PartType.Block,
-				Vector3.new(0.18 * scaleW, 0.22 * scaleH, 0.18 * scaleD),
-				head.CFrame
-					* CFrame.new(
-						0.34 * scaleW,
-						(-0.38 - i * 0.12) * scaleH,
-						(i % 2 == 0) and 0.08 or -0.08
-					),
-				Color3.fromRGB(85, 10, 15),
-				S.Skin,
-				0,
-				model
-			)
-		end
-		makePart(
-			"TornTissue_1",
-			Enum.PartType.Block,
-			Vector3.new(0.32 * scaleW, 0.25 * scaleH, 0.32 * scaleD),
-			head.CFrame * CFrame.new(0.36 * scaleW, -0.48 * scaleH, 0),
-			Color3.fromRGB(65, 8, 12),
-			S.Skin,
-			0,
-			model
-		)
-	end
-	if anomalyId == "shadow_entity" then
-		local eyeL = makePart(
-			"Eye_L",
-			Enum.PartType.Block,
-			Vector3.new(0.26 * scaleW, 0.15 * scaleH, 0.06 * scaleD),
-			head.CFrame * CFrame.new(-0.28 * scaleW, 0.15 * scaleH, 0.56 * scaleD),
-			Color3.fromRGB(0, 255, 235),
-			S.Glow,
-			0,
-			model
-		)
-		makePart(
-			"Eye_R",
-			Enum.PartType.Block,
-			Vector3.new(0.26 * scaleW, 0.15 * scaleH, 0.06 * scaleD),
-			head.CFrame * CFrame.new(0.28 * scaleW, 0.15 * scaleH, 0.56 * scaleD),
-			Color3.fromRGB(0, 255, 235),
-			S.Glow,
-			0,
-			model
-		)
-		local cyanLight = Instance.new("PointLight")
-		cyanLight.Color = Color3.fromRGB(0, 255, 235)
-		cyanLight.Brightness = 3.2
-		cyanLight.Range = 8
-		cyanLight.Parent = eyeL
-		local voidParticles = Instance.new("ParticleEmitter")
-		voidParticles.Name = "VoidSmokeEmitter"
-		voidParticles.Rate = 24
-		voidParticles.Speed = NumberRange.new(0.3, 0.8)
-		voidParticles.Lifetime = NumberRange.new(0.8, 1.5)
-		voidParticles.Size = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0.5),
-			NumberSequenceKeypoint.new(1, 1.4),
-		})
-		voidParticles.Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0.2),
-			NumberSequenceKeypoint.new(1, 1.0),
-		})
-		voidParticles.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0))
-		voidParticles.SpreadAngle = Vector2.new(180, 180)
-		voidParticles.Parent = hrp
-	end
-end
-
--- =============================================================================
 -- MAIN GUEST MODEL CONSTRUCTION
 -- =============================================================================
 
@@ -1734,315 +422,152 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local shirtColor = SHIRT_PALETTES[rng:NextInteger(1, #SHIRT_PALETTES)]
 	local pantsColor = PANTS_PALETTES[rng:NextInteger(1, #PANTS_PALETTES)]
 	local tieColor = TIE_PALETTES[rng:NextInteger(1, #TIE_PALETTES)]
-	local eyeColor = IRIS_PALETTES[rng:NextInteger(1, #IRIS_PALETTES)]
 	local hairColor = HAIR_COLORS[rng:NextInteger(1, #HAIR_COLORS)]
+	
+	local HAIR_MESHES = {
+		"rbxassetid://113756968918441",
+		"rbxassetid://100645125889787",
+		"rbxassetid://104867370093409"
+	}
+	local hairMeshId = HAIR_MESHES[rng:NextInteger(1, #HAIR_MESHES)]
 
 	local anomalyId = guestData.anomalyId
 	isCurrentAnomaly = anomalyId ~= nil
 
-	local heightScale = 1.0
-	local widthScale = 1.0
-	local depthScale = 1.0
-	local transparency = 0.0
+	local faceTexture = "rbxassetid://108872266733797" -- base
+		local isMimic = false
+	local isMandela = false
+	local isBrokenNeck = false
+	local isDrowned = false
+	local isVoid = false
+	local isBlinkEnabled = true
 
-	-- Apply Anomaly Property Changes
 	if anomalyId == "colorless_skin" then
 		skinColor = Color3.fromRGB(224, 226, 232)
-	elseif anomalyId == "no_reflection" then
-		transparency = 0.55 -- We will also disable shadows below
-	elseif anomalyId == "shadow_entity" then
-		skinColor = Color3.fromRGB(0, 0, 0)
-		suitColor = Color3.fromRGB(0, 0, 0)
-		shirtColor = Color3.fromRGB(0, 0, 0)
-		pantsColor = Color3.fromRGB(0, 0, 0)
-		tieColor = Color3.fromRGB(0, 0, 0)
-		hairColor = Color3.fromRGB(0, 0, 0)
+	elseif anomalyId == "asymmetric_face" then
+		faceTexture = "rbxassetid://72324569366732"
+	elseif anomalyId == "dilated_pupils" then
+		faceTexture = "rbxassetid://92790091595384"
+	elseif anomalyId == "dark_sclera" then
+		faceTexture = "rbxassetid://72653150459077"
+	elseif anomalyId == "subtle_smile" then
+		faceTexture = "rbxassetid://133455652046697"
+	elseif anomalyId == "no_blinking" then
+		isBlinkEnabled = false
+	elseif anomalyId == "wet_clothing" or anomalyId == "drowned_drifter" then
+		isDrowned = true
+	elseif anomalyId == "flayed_mimic" then
+		isMimic = true
+		skinColor = Color3.fromRGB(200, 200, 200)
+		faceTexture = "rbxassetid://76726493000690" -- uv mimic
+	elseif anomalyId == "cavernous_hollow" then
+		faceTexture = "rbxassetid://123991119403253"
+	elseif anomalyId == "void_silhouette" or anomalyId == "shadow_entity" then
+		isVoid = true
+	elseif anomalyId == "mandela_alternate" then
+		isMandela = true
+	elseif anomalyId == "broken_cervical" then
+		isBrokenNeck = true
 	end
 
-	local desc = Instance.new("HumanoidDescription")
-	desc.HeadColor = skinColor
-	desc.TorsoColor = suitColor
-	desc.LeftArmColor = suitColor
-	desc.RightArmColor = suitColor
-	desc.LeftLegColor = pantsColor
-	desc.RightLegColor = pantsColor
-	desc.HeightScale = heightScale
-	desc.WidthScale = widthScale
-	desc.DepthScale = depthScale
-	desc.HeadScale = 1.0
-	-- No catalog hair accessory. The handle mesh is wider than the head and hid
-	-- the entire sculpted face; buildVolumetricHairCrown does the hair instead.
-	desc.HairAccessory = ""
-	desc.Face = 0
-
-	local model: Model
-	local success, result = pcall(function()
-		return Players:CreateHumanoidModelFromDescription(desc, Enum.HumanoidRigType.R15)
-	end)
-
-	if success and result then
-		model = result
-	else
-		model = Instance.new("Model")
-		local hum = Instance.new("Humanoid")
-		hum.RigType = Enum.HumanoidRigType.R15
-		hum.Parent = model
-		local root = makePart(
-			"HumanoidRootPart",
-			Enum.PartType.Block,
-			Vector3.new(2, 2, 1),
-			CFrame.new(SPAWN_POS),
-			Color3.new(),
-			S.Gloss,
-			1,
-			model
-		)
-		model.PrimaryPart = root
-	end
-
+	local model = Instance.new("Model")
 	model.Name = `Guest_{guestData.name}`
-	model:PivotTo(CFrame.lookAt(SPAWN_POS, DESK_POS))
 
-	local hrp = model:WaitForChild("HumanoidRootPart", 5) :: BasePart?
-	if not hrp then
-		hrp = makePart(
-			"HumanoidRootPart",
-			Enum.PartType.Block,
-			Vector3.new(2, 2, 1),
-			CFrame.new(SPAWN_POS),
-			Color3.new(),
-			S.Gloss,
-			1,
-			model
-		)
-	end
+	local hrp = makePart("HumanoidRootPart", Enum.PartType.Block, Vector3.new(2, 2, 1), CFrame.new(SPAWN_POS), Color3.new(), S.Gloss, 1, model)
 	model.PrimaryPart = hrp
+	model:PivotTo(CFrame.lookAt(SPAWN_POS, DESK_POS))
+	
+	local baseCF = hrp.CFrame
+	local suitMat = if isDrowned then S.WetSuit else S.Suit
 
-	local head = model:WaitForChild("Head", 5) :: BasePart?
-	local upperTorso = model:WaitForChild("UpperTorso", 5) :: BasePart?
-	local lowerTorso = model:WaitForChild("LowerTorso", 5) :: BasePart?
-	local leftHand = model:WaitForChild("LeftHand", 5) :: BasePart?
-	local rightHand = model:WaitForChild("RightHand", 5) :: BasePart?
-	local leftLowerLeg = model:WaitForChild("LeftLowerLeg", 5) :: BasePart?
-	local rightLowerLeg = model:WaitForChild("RightLowerLeg", 5) :: BasePart?
-
-	if head then
-		local faceDecal = head:FindFirstChild("face")
-		if faceDecal then
-			faceDecal:Destroy()
-		end
+	if isVoid then
+		skinColor = Color3.new(0, 0, 0)
+		suitColor = Color3.new(0, 0, 0)
+		shirtColor = Color3.new(0, 0, 0)
+		pantsColor = Color3.new(0, 0, 0)
+		tieColor = Color3.new(0, 0, 0)
+		hairColor = Color3.new(0, 0, 0)
+		suitMat = S.Gloss
 	end
 
-	for _, p in ipairs(model:GetDescendants()) do
-		if p:IsA("BasePart") then
-			p.Anchored = true
-			p.CanCollide = false
-			p.Transparency = transparency
-			if
-				anomalyId == "no_reflection"
-				or anomalyId == "shadow_entity"
-				or anomalyId == "shadow_wrong_angle"
-			then
-				p.CastShadow = false
-			end
-			if anomalyId == "shadow_entity" then
-				p.Color = Color3.fromRGB(0, 0, 0)
-				Materials.applySurface(p, S.Gloss)
-			elseif p.Name:find("Torso") or p.Name:find("Arm") then
-				p.Color = suitColor
-				Materials.applySurface(p, S.Wool)
-			elseif p.Name:find("Leg") or p.Name == "LeftFoot" or p.Name == "RightFoot" then
-				p.Color = pantsColor
-				Materials.applySurface(p, S.Wool)
-			elseif p.Name == "Head" then
-				p.Color = skinColor
-				Materials.applySurface(p, S.Skin)
-			end
-		end
+	makePart("UpperTorso", Enum.PartType.Block, Vector3.new(2, 2, 1), baseCF * CFrame.new(0, 0, 0), suitColor, suitMat, 0, model)
+	makePart("Shirt", Enum.PartType.Block, Vector3.new(0.8, 1.8, 1.05), baseCF * CFrame.new(0, 0, 0), shirtColor, S.Shirt, 0, model)
+	makePart("Tie", Enum.PartType.Block, Vector3.new(0.2, 1.4, 1.1), baseCF * CFrame.new(0, -0.1, 0), tieColor, S.Wool, 0, model)
+	makePart("Belt", Enum.PartType.Block, Vector3.new(2.05, 0.2, 1.05), baseCF * CFrame.new(0, -0.9, 0), Color3.fromRGB(20, 20, 20), S.Leather, 0, model)
+	makePart("Buckle", Enum.PartType.Block, Vector3.new(0.3, 0.3, 1.1), baseCF * CFrame.new(0, -0.9, 0), Color3.fromRGB(200, 200, 200), S.Brass, 0, model)
+
+	makePart("LeftUpperLeg", Enum.PartType.Block, Vector3.new(0.9, 2, 1), baseCF * CFrame.new(-0.5, -2, 0), pantsColor, suitMat, 0, model)
+	makePart("RightUpperLeg", Enum.PartType.Block, Vector3.new(0.9, 2, 1), baseCF * CFrame.new(0.5, -2, 0), pantsColor, suitMat, 0, model)
+
+	makePart("LeftShoe", Enum.PartType.Block, Vector3.new(0.95, 0.4, 1.2), baseCF * CFrame.new(-0.5, -3.2, -0.1), Color3.fromRGB(15, 15, 15), S.Shoe, 0, model)
+	makePart("RightShoe", Enum.PartType.Block, Vector3.new(0.95, 0.4, 1.2), baseCF * CFrame.new(0.5, -3.2, -0.1), Color3.fromRGB(15, 15, 15), S.Shoe, 0, model)
+
+	makePart("LeftUpperArm", Enum.PartType.Block, Vector3.new(1, 2, 1), baseCF * CFrame.new(-1.5, 0, 0), suitColor, suitMat, 0, model)
+	makePart("RightUpperArm", Enum.PartType.Block, Vector3.new(1, 2, 1), baseCF * CFrame.new(1.5, 0, 0), suitColor, suitMat, 0, model)
+
+	local handL = makePart("LeftHand", Enum.PartType.Block, Vector3.new(0.8, 0.4, 0.8), baseCF * CFrame.new(-1.5, -1.2, 0), skinColor, S.Skin, 0, model)
+	local handR = makePart("RightHand", Enum.PartType.Block, Vector3.new(0.8, 0.4, 0.8), baseCF * CFrame.new(1.5, -1.2, 0), skinColor, S.Skin, 0, model)
+
+	local headScaleY = if isMandela then 2.0 else 1.2
+	local headOffset = if isMandela then -0.4 else 0
+	local head = makePart("Head", Enum.PartType.Block, Vector3.new(1.2, headScaleY, 1.2), baseCF * CFrame.new(0, 1.6 + headOffset, 0), skinColor, S.Skin, 0, model)
+
+	if isMandela then
+		makePart("HeadVoid", Enum.PartType.Block, Vector3.new(1.25, 0.8, 1.25), baseCF * CFrame.new(0, 1.0, 0), Color3.new(0, 0, 0), S.Gloss, 0, model)
 	end
 
+	if isVoid then
+		head.Color = Color3.new(0, 0, 0)
+		handL.Color = Color3.new(0, 0, 0)
+		handR.Color = Color3.new(0, 0, 0)
+		Materials.applySurface(head, S.Gloss)
+		Materials.applySurface(handL, S.Gloss)
+		Materials.applySurface(handR, S.Gloss)
+		faceTexture = "rbxassetid://108872266733797" -- cyan faces will be handled by Color3 tint
+	end
+    
+    if isBrokenNeck then
+        head.CFrame = head.CFrame * CFrame.Angles(0, 0, math.rad(85))
+    end
+
+	local faceDecal = Instance.new("Decal")
+	faceDecal.Name = "face"
+	faceDecal.Face = Enum.NormalId.Front
+	faceDecal.Texture = faceTexture
+	faceDecal.Parent = head
+    if isVoid then
+        faceDecal.Color3 = Color3.fromRGB(0, 255, 255)
+    end
+	
 	table.clear(activeEyelids)
 	table.clear(activeUvParts)
-	table.clear(activeUvLights)
-
-	if not upperTorso or not head or not hrp then
-		return model, hrp or model.PrimaryPart :: BasePart, widthScale, heightScale
+	
+	if isBlinkEnabled then
+		faceDecal:SetAttribute("BaseTexture", faceTexture)
+		faceDecal:SetAttribute("BlinkTexture", "rbxassetid://106023531620267")
+		table.insert(activeEyelids, { face = faceDecal })
 	end
 
-	buildAnatomicalFacialContours(
-		head,
-		skinColor,
-		eyeColor,
-		widthScale,
-		heightScale,
-		depthScale,
-		transparency,
-		anomalyId,
-		model,
-		rng
-	)
-	buildVolumetricHairCrown(
-		head,
-		hairColor,
-		widthScale,
-		heightScale,
-		depthScale,
-		transparency,
-		anomalyId == "shadow_entity",
-		model
-	)
-	buildTailoredSuitAndOvercoat(
-		upperTorso,
-		lowerTorso,
-		suitColor,
-		shirtColor,
-		tieColor,
-		widthScale,
-		heightScale,
-		depthScale,
-		transparency,
-		anomalyId == "backward_tie",
-		anomalyId == "shadow_entity",
-		model
-	)
-	buildArticulatedHands(
-		leftHand,
-		rightHand,
-		skinColor,
-		suitColor,
-		widthScale,
-		heightScale,
-		depthScale,
-		transparency,
-		anomalyId == "shadow_entity",
-		model
-	)
-
-	if rightHand then
-		buildExecutiveBriefcase(
-			rightHand,
-			widthScale,
-			heightScale,
-			depthScale,
-			transparency,
-			anomalyId == "shadow_entity",
-			model
-		)
-	end
-	buildTailoredLegsAndShoes(
-		leftLowerLeg,
-		rightLowerLeg,
-		pantsColor,
-		widthScale,
-		heightScale,
-		depthScale,
-		transparency,
-		anomalyId == "shadow_entity",
-		model
-	)
-	buildHorrorArchetypes(
-		head,
-		upperTorso,
-		hrp,
-		widthScale,
-		heightScale,
-		depthScale,
-		transparency,
-		anomalyId,
-		model
-	)
-
-	if anomalyId == "glitch_silhouette" then
-		makePart(
-			"GlitchTear",
-			Enum.PartType.Block,
-			Vector3.new(2.5 * widthScale, 0.05 * heightScale, 1.5 * depthScale),
-			upperTorso.CFrame,
-			Color3.fromRGB(200, 200, 200),
-			S.Glow,
-			1.0,
-			model
-		)
+	if isMimic then
+		local uvDecal = Instance.new("Decal")
+		uvDecal.Name = "UVMimic"
+		uvDecal.Face = Enum.NormalId.Front
+		uvDecal.Texture = "rbxassetid://76726493000690" -- mimic suture
+		uvDecal.Transparency = 1
+		uvDecal.Parent = head
+		table.insert(activeUvParts, uvDecal)
 	end
 
-	if anomalyId == "inverted_pulse" then
-		makePart(
-			"CarotidArtery",
-			Enum.PartType.Block,
-			Vector3.new(0.14 * widthScale, 0.35 * heightScale, 0.14 * depthScale),
-			upperTorso.CFrame * CFrame.new(0.48 * widthScale, 0.70 * heightScale, 0.25 * depthScale),
-			Color3.fromRGB(150, 20, 25),
-			S.Skin,
-			0,
-			model
-		)
-	end
-	if anomalyId == "cold_fog" then
-		local fogEmitterPart = makePart(
-			"FogEmitter",
-			Enum.PartType.Block,
-			Vector3.new(0.1, 0.1, 0.1),
-			head.CFrame * CFrame.new(0, -0.22 * heightScale, 0.65 * depthScale),
-			Color3.fromRGB(240, 245, 255),
-			S.Vapor,
-			1,
-			model
-		)
-		local fog = Instance.new("ParticleEmitter")
-		fog.Name = "BreathVapor"
-		fog.Rate = 4
-		fog.Speed = NumberRange.new(1.0, 1.8)
-		fog.Lifetime = NumberRange.new(0.8, 1.4)
-		fog.Size = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0.15),
-			NumberSequenceKeypoint.new(1, 0.65),
-		})
-		fog.Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0.4),
-			NumberSequenceKeypoint.new(1, 1.0),
-		})
-		fog.Color = ColorSequence.new(Color3.fromRGB(225, 235, 245))
-		fog.SpreadAngle = Vector2.new(12, 12)
-		fog.Parent = fogEmitterPart
-	end
-
-	if anomalyId == "uv_occult_rune" then
-		local rune = makePart(
-			"OccultRuneForehead",
-			Enum.PartType.Block,
-			Vector3.new(0.32 * widthScale, 0.32 * heightScale, 0.05 * depthScale),
-			head.CFrame * CFrame.new(0, 0.35 * heightScale, 0.55 * depthScale),
-			Color3.fromRGB(255, 30, 45),
-			S.Glow,
-			1.0,
-			model
-		)
-		local rLight = Instance.new("PointLight")
-		rLight.Color = Color3.fromRGB(255, 30, 45)
-		rLight.Brightness = 0
-		rLight.Range = 4
-		rLight.Parent = rune
-		table.insert(activeUvParts, rune)
-		table.insert(activeUvLights, rLight)
-	elseif anomalyId == "uv_bloodied_hands" and rightHand then
-		local bloodHands = makePart(
-			"BloodiedHandsUV",
-			Enum.PartType.Block,
-			Vector3.new(0.65 * widthScale, 0.65 * heightScale, 0.65 * depthScale),
-			rightHand.CFrame,
-			Color3.fromRGB(240, 25, 60),
-			S.Glow,
-			1.0,
-			model
-		)
-		local bLight = Instance.new("PointLight")
-		bLight.Color = Color3.fromRGB(240, 25, 60)
-		bLight.Brightness = 0
-		bLight.Range = 4
-		bLight.Parent = bloodHands
-		table.insert(activeUvParts, bloodHands)
-		table.insert(activeUvLights, bLight)
-	end
+	local hair = Instance.new("MeshPart")
+	hair.Name = "Hair"
+	hair.MeshId = hairMeshId
+	hair.Size = Vector3.new(1.4, 0.8, 1.4)
+	hair.CFrame = head.CFrame * CFrame.new(0, (headScaleY/2) + 0.1, 0)
+	hair.Color = hairColor
+	Materials.applySurface(hair, S.Hair)
+	hair.Anchored = true
+	hair.CanCollide = false
+	hair.Parent = model
 
 	table.clear(currentPartInfos)
 	for _, p in ipairs(model:GetDescendants()) do
@@ -2056,9 +581,22 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 		end
 	end
 
-	return model, hrp, widthScale, heightScale
-end
+	if isDrowned then
+		spawnFootprint(SPAWN_POS)
+		spawnFootprint(SPAWN_POS + Vector3.new(0, 0, -2))
+        local emitter = Instance.new("ParticleEmitter")
+        emitter.Texture = "rbxassetid://243660364" 
+        emitter.Color = ColorSequence.new(Color3.fromRGB(20, 20, 20))
+        emitter.Size = NumberSequence.new(0.05)
+        emitter.Rate = 10
+        emitter.Speed = NumberRange.new(0)
+        emitter.Acceleration = Vector3.new(0, -5, 0)
+        emitter.Lifetime = NumberRange.new(1, 2)
+        emitter.Parent = hrp
+	end
 
+	return model, hrp, 1.0, 1.0
+end
 local function animateEntranceDoors(open: boolean)
 	local lobby = Workspace:FindFirstChild("Lobby")
 	if not lobby then
@@ -2240,14 +778,16 @@ function GuestRenderer.arrive(guestData: GuestData)
 							task.wait(rngBlink:NextNumber(3.2, 5.8))
 						end
 						for _, lid in ipairs(activeEyelids) do
-							if lid.Parent then
-								lid.Size = Vector3.new(lid.Size.X, 0.12 * scaleH, lid.Size.Z)
+							local face = lid.face
+							if face and face.Parent then
+								face.Texture = face:GetAttribute("BlinkTexture") or ""
 							end
 						end
 						task.wait(0.12)
 						for _, lid in ipairs(activeEyelids) do
-							if lid.Parent then
-								lid.Size = Vector3.new(lid.Size.X, 0.03 * scaleH, lid.Size.Z)
+							local face = lid.face
+							if face and face.Parent then
+								face.Texture = face:GetAttribute("BaseTexture") or ""
 							end
 						end
 					end

@@ -177,6 +177,50 @@
           "RoughnessMap": "rbxassetid://95168413091361",
           "MetalnessMap": "rbxassetid://128669591648974"
         }
+      },
+      "GuestSuit": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Fabric",
+          "StudsPerTile": 2.0,
+          "ColorMap": "rbxassetid://80362909360459",
+          "NormalMap": "rbxassetid://73957751750400",
+          "RoughnessMap": "rbxassetid://95628980310505",
+          "MetalnessMap": "rbxassetid://89222276190498"
+        }
+      },
+      "GuestShirt": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Fabric",
+          "StudsPerTile": 1.0,
+          "ColorMap": "rbxassetid://106802267803616",
+          "NormalMap": "rbxassetid://95108478887249",
+          "RoughnessMap": "rbxassetid://90811027219747",
+          "MetalnessMap": "rbxassetid://76600761840641"
+        }
+      },
+      "GuestShoe": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Leather",
+          "StudsPerTile": 1.0,
+          "ColorMap": "rbxassetid://70560802417834",
+          "NormalMap": "rbxassetid://106222727841081",
+          "RoughnessMap": "rbxassetid://96033971600171",
+          "MetalnessMap": "rbxassetid://104401151151199"
+        }
+      },
+      "GuestWetSuit": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Fabric",
+          "StudsPerTile": 2.0,
+          "ColorMap": "rbxassetid://86150586847145",
+          "NormalMap": "rbxassetid://129362667705692",
+          "RoughnessMap": "rbxassetid://109742420322989",
+          "MetalnessMap": "rbxassetid://71156046459973"
+        }
       }
     },
     // Color3 here is FLOATS 0-1, never 0-255. Anything above 1.0 clamps to white:

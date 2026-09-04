@@ -163,6 +163,23 @@ rojo build -o nightdesk.rbxl    # standalone place file
   `MaterialService` and reach the place through Rojo. `src/shared/Materials.luau`
   only names them. `BasePart.MaterialVariant` is a plain string and *is* writable
   at runtime -- it is only the variant object that is restricted.
+- **Studio Access to API Services is per-place, and DataStores are per-universe.**
+  Persistence was verified on `106512529474987`. The place that opens as
+  "Anamoli" is `80829108524155`, and on 4 September it was silently running with
+  API access off -- `StudioAccessToApisNotAllowed`, then ProfileStore falling
+  back to an in-memory mock, so every save appeared to work and none of them
+  did. Enabled 4 Sep. If saves ever look wrong again, check the place id first,
+  not the code.
+- **The Assistant plugin can update mid-session and break the MCP bridge.**
+  `Assistant plugin version changed from <a> to <b>. This may cause instability
+  when using Assistant or the MCP server.` When a Studio MCP call hangs on
+  "Calling MCP tool", read the Output window for that line before debugging
+  anything else. The fix is restarting Studio.
+- **`generate_mesh` output lands on the floor, unanchored and often rotated.**
+  `[MeshGen] insertAssetsAsync: no boundingBoxCopy -- falling back to
+  setPositionOnGround`. The model is parented at the top of `Workspace` under the
+  prompt text as its name, at ground level, with no material and no anchor. It
+  worked; it is just not where you expected. Select it in Explorer and press F.
 - **`rojo build` and `selene` cannot see a runtime failure.** Both the white-ambient
   lighting bug and the material bug above built clean, linted clean and warned
   about nothing; the lighting one was only visible on screen and the material one
