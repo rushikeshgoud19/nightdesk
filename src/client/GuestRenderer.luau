@@ -474,6 +474,8 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local isBackwardTie = false
 	local isNoReflection = false
 	local isGlitch = false
+	local isColdFog = false
+	local isMeltingWax = false
 
 	if anomalyId == "colorless_skin" then
 		skinColor = Color3.fromRGB(224, 226, 232)
@@ -497,6 +499,10 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 		isNoReflection = true
 	elseif anomalyId == "glitch_silhouette" then
 		isGlitch = true
+	elseif anomalyId == "cold_fog" then
+		isColdFog = true
+	elseif anomalyId == "melting_wax" then
+		isMeltingWax = true
 	elseif anomalyId == "no_blinking" then
 		isBlinkEnabled = false
 	elseif anomalyId == "wet_clothing" or anomalyId == "drowned_drifter" then
@@ -667,6 +673,26 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 		0,
 		model
 	)
+
+	-- A nose. The model had none, which meant melting_wax -- "the tip of their
+	-- nose appears to have a very faint, unnatural drooping sheen" -- had no
+	-- surface to render on and has never been visible. It also matters for the
+	-- base guest: a face with eyes and a mouth and no nose reads as a sticker.
+	local nose = makePart(
+		"Nose",
+		Enum.PartType.Block,
+		Vector3.new(0.16, 0.22, 0.14),
+		baseCF * CFrame.new(0, 1.58, -0.62),
+		skinColor,
+		if isMeltingWax then S.Wax else S.Skin,
+		0,
+		model
+	)
+	if isMeltingWax then
+		-- Drooping: longer, hanging lower, and wet-looking.
+		nose.Size = Vector3.new(0.16, 0.34, 0.14)
+		nose.CFrame = baseCF * CFrame.new(0, 1.50, -0.62)
+	end
 
 	-- Lapels. Not a tell -- the reference has them and a jacket without them
 	-- reads as a coloured box.
@@ -892,6 +918,42 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	-- Shadows on, so a guest who does not cast one has a visible hole where every
 	-- other guest has a shadow -- readable only if the player has seen a normal
 	-- guest stand in the same place, which is the point of a tier-2 tell.
+	-- "A very faint wisp of vapor escapes their mouth when they speak." There was
+	-- no emitter anywhere on the guest, so this tell has never rendered.
+	if isColdFog then
+		local mouth = Instance.new("Attachment")
+		mouth.Name = "MouthVent"
+		mouth.Position = Vector3.new(0, 1.42, -0.6)
+		mouth.Parent = hrp
+
+		local fog = Instance.new("ParticleEmitter")
+		fog.Name = "ColdBreath"
+		fog.Texture = "rbxassetid://243660364"
+		fog.Color = ColorSequence.new(Color3.fromRGB(226, 232, 240))
+		fog.Size = NumberSequence.new(0.18)
+		fog.Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 1),
+			NumberSequenceKeypoint.new(0.25, 0.72),
+			NumberSequenceKeypoint.new(1, 1),
+		})
+		-- Faint and infrequent on purpose. A steady plume would be a tier-3 tell.
+		fog.Rate = 0
+		fog.Lifetime = NumberRange.new(0.8, 1.4)
+		fog.Speed = NumberRange.new(1.2, 2.0)
+		fog.SpreadAngle = Vector2.new(9, 9)
+		fog.Parent = mouth
+
+		task.spawn(function()
+			while fog.Parent do
+				task.wait(math.random(5, 9))
+				if not fog.Parent then
+					break
+				end
+				fog:Emit(4)
+			end
+		end)
+	end
+
 	if isNoReflection then
 		for _, part in model:GetDescendants() do
 			if part:IsA("BasePart") then
@@ -1110,8 +1172,14 @@ function GuestRenderer.arrive(guestData: GuestData)
 			end
 
 			-- Setup natural eye blinking cycle
+			-- no_blinking is NOT in this list, deliberately. Its tell is "blinks
+			-- once every 14 seconds instead of a natural 4-second rate" -- a
+			-- rhythm you have to wait through and count. Never blinking at all is
+			-- a far louder signal than the tell promises, and it turned a tier-1
+			-- into something you spot in two seconds. The 14-second branch below
+			-- already existed, keyed to `slow_blink`, an id that is not in the
+			-- catalog at all -- so the slow blink has never once been reachable.
 			local hasNoBlink = isStill
-				or guestData.anomalyId == "no_blinking"
 				or guestData.anomalyId == "frozen_smile"
 				or guestData.anomalyId == "mandela_alternate"
 				or guestData.anomalyId == "hollow_eyes"
@@ -1125,7 +1193,7 @@ function GuestRenderer.arrive(guestData: GuestData)
 				blinkThread = task.spawn(function()
 					local rngBlink = Random.new()
 					while currentGuestModel == guest do
-						if guestData.anomalyId == "slow_blink" then
+						if guestData.anomalyId == "no_blinking" then
 							task.wait(rngBlink:NextNumber(13.5, 14.5))
 						else
 							task.wait(rngBlink:NextNumber(3.2, 5.8))
@@ -1195,7 +1263,8 @@ function GuestRenderer.arrive(guestData: GuestData)
 
 					-- Subtle Human Gaze Micro-Saccades
 					if t > nextGazeTime then
-						local delay = guestData.anomalyId == "late_tracking" and 1.5 or 0
+						-- The tell says "exactly a half-second delay". It was 1.5.
+						local delay = guestData.anomalyId == "late_tracking" and 0.5 or 0
 						nextGazeTime = t + math.random(3, 6) + delay
 						gazePitch = math.rad(math.random(-2, 2))
 						gazeYaw = math.rad(math.random(-4, 4))
@@ -1221,13 +1290,23 @@ function GuestRenderer.arrive(guestData: GuestData)
 						state.headSnapCF = baseSnap * twitchAngle
 					end
 
-					-- Nervous Finger Spasms Tell
-					if isFingerTwitch then
+					-- "Their fingers never curl or relax, staying perfectly
+					-- straight." That is the ABSENCE of movement, and the old code
+					-- did the opposite -- it rolled the arm at random 12% of the
+					-- time only when the anomaly was present, so the anomalous
+					-- guest was the fidgeting one and every genuine guest was the
+					-- rigid one. Inverted.
+					--
+					-- A normal guest's hands settle and resettle. This guest's do
+					-- not, and the tell is that stillness.
+					if not isFingerTwitch then
 						if math.random() < 0.12 then
-							state.armRollR = math.rad(math.random(-18, 18))
+							state.armRollR = math.rad(math.random(-14, 14))
 						else
 							state.armRollR = 0
 						end
+					else
+						state.armRollR = 0
 					end
 
 					-- Inverted Throbbing Neck Artery Pulse

@@ -8,10 +8,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Remotes = require(Shared:WaitForChild("Remotes"))
 
+local AnomalyViewer = require(script:WaitForChild("AnomalyViewer"))
 local Atmosphere = require(script:WaitForChild("Atmosphere"))
 local DeskCamera = require(script:WaitForChild("DeskCamera"))
 local DeskProps = require(script:WaitForChild("DeskProps"))
 local DeskUI = require(script:WaitForChild("DeskUI"))
+local GuestRenderer = require(script:WaitForChild("GuestRenderer"))
 local IntroUI = require(script:WaitForChild("IntroUI"))
 local ShopUI = require(script:WaitForChild("ShopUI"))
 local Theme = require(script:WaitForChild("Theme"))
@@ -77,6 +79,13 @@ Viewmodel.init()
 Theme.attachCRTOverlay(gui)
 DeskUI.build(gui)
 ShopUI.build(gui)
+
+-- Studio-only. Steps through all 42 anomalies at the desk so each one can be
+-- looked at directly instead of waited for. It exists because six body tells and
+-- three behaviour tells shipped rendering nothing, and nothing in the game ever
+-- put them next to a genuine guest.
+AnomalyViewer.setRenderer(GuestRenderer.arrive)
+AnomalyViewer.init(gui)
 
 Remotes.get("GuestArrived").OnClientEvent:Connect(DeskUI.onGuest)
 Remotes.get("ShiftUpdate").OnClientEvent:Connect(DeskUI.onResult)

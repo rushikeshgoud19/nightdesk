@@ -419,11 +419,26 @@ end
 -- `upstairsOpen` is the floor_2 upgrade. The second storey is built and visible
 -- from the desk from night one -- what the upgrade buys is the motel actually
 -- letting anyone into it, so guests are only assigned 201-208 once it is owned.
+-- `forced` bypasses the roll entirely and builds a guest carrying exactly that
+-- anomaly. Nothing in the shift uses it -- it exists so the Studio anomaly
+-- viewer can show all 42 on demand, and so a bug in a specific tell can be
+-- reproduced without waiting for the dice.
+-- Look up one anomaly by its catalog id.
+function Anomalies.byId(id: string): Anomaly?
+	for _, a in Anomalies.list do
+		if a.id == id then
+			return a
+		end
+	end
+	return nil
+end
+
 function Anomalies.roll(
 	rng: Random,
 	anomalyChance: number,
 	tierWeights: { [number]: number },
-	upstairsOpen: boolean?
+	upstairsOpen: boolean?,
+	forced: Anomaly?
 ): Guest
 	local name = `{FIRST[rng:NextInteger(1, #FIRST)]} {LAST[rng:NextInteger(1, #LAST)]}`
 	local reservation = string.format("%04d", rng:NextInteger(1000, 9999))
@@ -433,8 +448,8 @@ function Anomalies.roll(
 	end
 	local city = CITIES[rng:NextInteger(1, #CITIES)]
 
-	local anomaly: Anomaly? = nil
-	if rng:NextNumber() < anomalyChance then
+	local anomaly: Anomaly? = forced
+	if not anomaly and rng:NextNumber() < anomalyChance then
 		local pool = Anomalies.rollable()
 		local totalWeight = 0
 		local anomalyWeights = {}
