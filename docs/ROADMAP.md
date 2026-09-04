@@ -27,9 +27,9 @@ Verified against the code on 4 September 2026, not reported:
 | Sanity | A number with client effects. Does not yet distort perception |
 | Economy + shop | Works, persists. 11 items, all of them now real |
 | Persistence | API access enabled on `80829108524155` on 4 Sep, but the round trip has **never been run against that place**. Re-verified in Section 3 |
-| Room art | Materials + lighting pass landed |
-| Guest art | **Direction changed 4 Sep.** Blocky kit, not sculpted anatomy. Not built yet |
-| CCTV | Camera positions and a CRT overlay. **Nothing to see on them** |
+| Room art | Lighting + materials landed Sep 3. **Albedo repainted 4 Sep** — 104 surfaces were RGB(26–48) and no lighting could rescue them |
+| Guest art | Blocky kit landed 4 Sep. PBR surfaces were dropped and then restored — 7 `Guest*` variants now declared in the project file |
+| CCTV | 5 cameras, each composed around a subject. Still nothing *moving* to see — that is Section 6 |
 | Co-op | **Not implemented.** Per-player shifts, client-built guests |
 | Consequences | **Not implemented.** A wrong admit is −40 sanity and the guest vanishes |
 | Evidence chains | **Not implemented.** One guest = one tell |
@@ -80,15 +80,6 @@ to `3` — six times shipped — and the room stayed black, because paint that d
 returns nothing at any brightness. `docs/NEXT.md` fixed the lamp and never
 touched the paint, so **the readable middle range the anomaly design depends on
 still does not exist.** Brief: `docs/prompts/the-motel.md`.
-
-### ~~Section 2 (original)~~ — The Night — §15, §16, §17
-
-A shift stops being "four guests then done" and becomes 12:00 AM → 6:00 AM.
-Phases scale the anomaly rate and the tier mix. A seed makes a night
-reproducible.
-
-**Because every later system needs a schedule to happen on.** Motel events need
-a clock. Difficulty needs phases. Procedural nights need a seed.
 
 ### Section 3 — The Shared Desk — §13, §14
 

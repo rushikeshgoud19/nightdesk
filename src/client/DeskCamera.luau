@@ -10,18 +10,42 @@ local Atmosphere = require(script.Parent:WaitForChild("Atmosphere"))
 
 local DeskCamera = {}
 
+-- Every camera is composed around a subject with something in the foreground, so
+-- that a figure crossing the frame reads as a figure crossing a frame. A camera
+-- pointed at empty floor shows nothing when something walks through it.
+--
+-- CAM 02 used to sit at (-16, 8.5, 12) and was named for rooms 101-108, which are
+-- down the hallway at x = -20 to -54 -- it was aimed at lobby wall the whole time.
+-- That position is also inside the new left balcony now.
 local CCTV_CAMERAS = {
 	{
+		-- Through the glass from outside: the neon sign near, the doors beyond.
+		-- Anything arriving crosses this before it reaches the desk.
 		name = "CAM 01: PARKING LOT / HIGHWAY",
-		cf = CFrame.lookAt(Vector3.new(0, 11.5, -28.0), Vector3.new(0, 4.5, -14.0)),
+		cf = CFrame.lookAt(Vector3.new(0, 12.0, -30.0), Vector3.new(0, 5.5, -15.0)),
 	},
 	{
+		-- The real guest hallway, looking down the row of doors. Deep frame, so a
+		-- figure at the far end is small and unmistakable.
 		name = "CAM 02: GUEST HALLWAY (ROOMS 101-108)",
-		cf = CFrame.lookAt(Vector3.new(-16.0, 8.5, 12.0), Vector3.new(-16.0, 5.0, -4.0)),
+		cf = CFrame.lookAt(Vector3.new(-21.0, 7.5, 3.0), Vector3.new(-50.0, 4.5, 3.0)),
 	},
 	{
+		-- The lounge, over the sofa toward the vending machine.
 		name = "CAM 03: WAITING LOUNGE & VENDING",
-		cf = CFrame.lookAt(Vector3.new(14.0, 9.5, 6.0), Vector3.new(12.0, 3.0, -5.0)),
+		cf = CFrame.lookAt(Vector3.new(9.0, 10.0, 5.0), Vector3.new(14.0, 3.0, -6.0)),
+	},
+	{
+		-- The upstairs walkway, along the railing rather than across it, so the
+		-- balcony recedes and a figure standing at it breaks the line.
+		name = "CAM 04: UPPER WALKWAY (ROOMS 201-208)",
+		cf = CFrame.lookAt(Vector3.new(-13.5, 11.0, 4.0), Vector3.new(-16.0, 8.0, -15.0)),
+	},
+	{
+		-- The lobby from above, both balconies in shot, the desk below. The one
+		-- frame that shows the clerk their own back.
+		name = "CAM 05: LOBBY OVERVIEW",
+		cf = CFrame.lookAt(Vector3.new(0, 13.0, -13.0), Vector3.new(0, 4.0, 4.0)),
 	},
 }
 
