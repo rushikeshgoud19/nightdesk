@@ -12,7 +12,8 @@
 -- an innocent guest, which is the only honest way to judge a 4% difference.
 --
 --   ]   next anomaly          [   previous
---   \   toggle innocent guest  P   jump back to entry 1
+--   \   toggle innocent guest  R   reroll who the guest is
+--   P   open / close
 --
 -- Gated on RunService:IsStudio(), so it does not exist in a published place.
 
@@ -27,6 +28,11 @@ local AnomalyViewer = {}
 
 local index = 1
 local showingInnocent = false
+-- Held fixed across steps ON PURPOSE. If the person changes at the same time as
+-- the anomaly, nothing is comparable -- and comparing is the entire job here,
+-- because most of these tells are a few percent. R rerolls it when you want to
+-- see the same tell on a different face.
+local personSeed = 20260905
 local titleLabel: TextLabel? = nil
 local tellLabel: TextLabel? = nil
 local metaLabel: TextLabel? = nil
@@ -52,7 +58,7 @@ local function show()
 	-- A fixed seed keeps every other visual constant between entries, so the
 	-- only thing that changes as you step through is the anomaly itself.
 	local guest =
-		Anomalies.roll(Random.new(20260905), 1, { [1] = 1, [2] = 1, [3] = 1 }, false, forced)
+		Anomalies.roll(Random.new(personSeed), 1, { [1] = 1, [2] = 1, [3] = 1 }, false, forced)
 
 	renderGuest({
 		name = guest.name,
@@ -73,7 +79,7 @@ local function show()
 		horrorType = if guest.anomaly then guest.anomaly.horrorType else nil,
 		uvSymbol = guest.uvSymbol,
 		isRoomOccupied = guest.isRoomOccupied,
-		visualSeed = 20260905,
+		visualSeed = personSeed,
 		sanity = 100,
 		takings = 0,
 		nightNumber = 1,
@@ -180,6 +186,14 @@ function AnomalyViewer.init(gui: ScreenGui)
 		end
 		return Enum.ContextActionResult.Sink
 	end, false, Enum.KeyCode.BackSlash)
+
+	ContextActionService:BindAction("ndViewerReroll", function(_, state)
+		if state == Enum.UserInputState.Begin and p.Visible then
+			personSeed = math.random(1, 9999999)
+			show()
+		end
+		return Enum.ContextActionResult.Sink
+	end, false, Enum.KeyCode.R)
 
 	ContextActionService:BindAction("ndViewerToggle", function(_, state)
 		if state ~= Enum.UserInputState.Begin then
