@@ -445,8 +445,20 @@ local function buildAnatomicalFacialContours(
 	local isAsymmetricFace = anomalyId == "asymmetric_face"
 	local isSubtleSmile = anomalyId == "subtle_smile"
 	local isMeltingWax = anomalyId == "melting_wax"
-	local asymX = (anomalyId == "perfect_symmetry") and 0 or (math.random(-2, 2) * 0.008)
-	local asymY = (anomalyId == "perfect_symmetry") and 0 or (math.random(-2, 2) * 0.008)
+	-- Real faces are never perfectly symmetric, and `perfect_symmetry` is an
+	-- anomaly whose whole tell is that this one is. So a genuine guest's offset
+	-- must never land on zero: `math.random(-2, 2)` did, on both axes at once,
+	-- for 1 guest in 25 -- rendering a genuine face identical to the anomaly and
+	-- costing the player 20 sanity for reading it correctly.
+	local function asymOffset(): number
+		local magnitude = math.random(1, 2)
+		local sign = if math.random(0, 1) == 0 then -1 else 1
+		return magnitude * sign * 0.008
+	end
+
+	local isPerfectSymmetry = anomalyId == "perfect_symmetry"
+	local asymX = if isPerfectSymmetry then 0 else asymOffset()
+	local asymY = if isPerfectSymmetry then 0 else asymOffset()
 
 	makePart(
 		"Cheekbone_L",

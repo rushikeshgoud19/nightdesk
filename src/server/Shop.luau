@@ -99,6 +99,9 @@ local function buy(player: Player, id: string)
 	p.takings -= upgrade.cost
 	p.owned[upgrade.id] = true
 	push(player)
+	-- A tool bought in the shop has to be usable when the next shift starts, and
+	-- the client only learns what is installed from this remote.
+	Shift.pushLoadout(player)
 end
 
 function Shop.bind()

@@ -65,10 +65,25 @@ function DeskCamera.toggleInspect()
 	Atmosphere.playSound("paper", nil, 0.5)
 end
 
+-- Set by the server's Loadout remote. The CCTV monitor is a $250 upgrade; until
+-- this was here, [C] cycled the cameras whether or not the monitor had been
+-- bought, which made the purchase buy nothing.
+local hasCCTV = false
+
+function DeskCamera.setHasCCTV(owned: boolean)
+	hasCCTV = owned
+	if not owned and currentCamMode == "cctv" then
+		DeskCamera.exitToFPS()
+	end
+end
+
 function DeskCamera.cycleCCTV()
 	local player = Players.LocalPlayer
 	local camera = Workspace.CurrentCamera
 	if not camera then
+		return
+	end
+	if not hasCCTV then
 		return
 	end
 

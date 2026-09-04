@@ -80,8 +80,16 @@ ShopUI.build(gui)
 
 Remotes.get("GuestArrived").OnClientEvent:Connect(DeskUI.onGuest)
 Remotes.get("ShiftUpdate").OnClientEvent:Connect(DeskUI.onResult)
+Remotes.get("SanityUpdate").OnClientEvent:Connect(DeskUI.onSanity)
 Remotes.get("ShiftEnded").OnClientEvent:Connect(DeskUI.onShiftEnded)
 Remotes.get("ShopState").OnClientEvent:Connect(ShopUI.render)
+
+-- Which tools are actually installed. Sent at the start of every shift and
+-- after every purchase.
+Remotes.get("Loadout").OnClientEvent:Connect(function(payload)
+	DeskCamera.setHasCCTV(payload.hasCCTV == true)
+	DeskProps.setHasCoffee(payload.hasCoffee == true)
+end)
 
 -- Display starting cinematic briefing & timecard punch-in on boot
 IntroUI.show(function()

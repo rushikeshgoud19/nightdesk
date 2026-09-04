@@ -25,12 +25,14 @@ end)
 Players.PlayerRemoving:Connect(function(player)
 	State.release(player)
 	Shop.forget(player)
+	Shift.forget(player)
 end)
 
 game:BindToClose(function()
 	for _, player in Players:GetPlayers() do
 		State.release(player)
 		Shop.forget(player)
+		Shift.forget(player)
 	end
 end)
 

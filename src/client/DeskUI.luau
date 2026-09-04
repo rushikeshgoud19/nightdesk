@@ -415,43 +415,56 @@ function DeskUI.onGuest(guest)
 	setPrompt(true)
 end
 
-function DeskUI.onResult(result)
-	setPrompt(false)
-	phoneBannerFrame.Visible = false
+-- The sanity bar and the takings badge. Shared by the verdict path and the
+-- coffee/soda path, which are otherwise nothing alike.
+local function setMeters(sanity: number, takings: number)
+	sanityLabel.Text = `{sanity}%`
 
-	local sVal = result.sanity or 100
-	sanityLabel.Text = `{sVal}%`
-
-	local sColor = if sVal > 65
+	local sColor = if sanity > 65
 		then Color3.fromRGB(75, 205, 235)
-		elseif sVal > 30 then Color3.fromRGB(245, 180, 55)
+		elseif sanity > 30 then Color3.fromRGB(245, 180, 55)
 		else Color3.fromRGB(245, 60, 50)
 	sanityFill.BackgroundColor3 = sColor
 	sanityIcon.TextColor3 = sColor
 	TweenService
 		:Create(sanityFill, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Size = UDim2.fromScale(sVal / 100, 1),
+			Size = UDim2.fromScale(sanity / 100, 1),
 		})
 		:Play()
 
-	takingsLabel.Text = `SAFE: ${result.takings or 0}`
+	takingsLabel.Text = `SAFE: ${takings}`
+	Atmosphere.onSanityChanged(sanity)
+end
 
-	Atmosphere.onSanityChanged(sVal)
+-- Sanity moved, but nobody was judged. Coffee and soda used to arrive on the
+-- verdict remote, so drinking one printed "Correctly admitted genuine guest,
+-- +$40" over a guest still standing at the desk, and cleared their prompt.
+function DeskUI.onSanity(payload)
+	setMeters(payload.sanity or 100, payload.takings or 0)
+end
+
+function DeskUI.onResult(result)
+	setPrompt(false)
+	phoneBannerFrame.Visible = false
+
+	setMeters(result.sanity or 100, result.takings or 0)
 
 	if result.correct then
 		Atmosphere.playSound("cash", nil, 0.8)
 		statusLabel.TextColor3 = Color3.fromRGB(120, 230, 150)
+		local paid = result.paid or 0
 		local truth = if result.wasAnomaly
-			then `✓ Correctly refused anomaly ({result.tell or "unnatural entity"}). Safe +$40.`
-			else "✓ Correctly admitted genuine guest. Safe +$40."
+			then `✓ Correctly refused anomaly ({result.tell or "unnatural entity"}). Safe +${paid}.`
+			else `✓ Correctly admitted genuine guest. Safe +${paid}.`
 		statusLabel.Text = truth
 	else
 		Atmosphere.playSound("heartbeat", nil, 0.9)
 		Atmosphere.shakeCamera()
 		statusLabel.TextColor3 = Color3.fromRGB(245, 80, 70)
+		local lost = result.sanityLost or 0
 		local reason = if result.wasAnomaly
-			then "✗ Breach! Anomaly was admitted into the motel. Sanity damaged (-40%)."
-			else "✗ Mistake! A genuine paying guest was turned away. Sanity damaged (-20%)."
+			then `✗ Breach! Anomaly was admitted into the motel. Sanity damaged (-{lost}%).`
+			else `✗ Mistake! A genuine paying guest was turned away. Sanity damaged (-{lost}%).`
 		statusLabel.Text = reason
 	end
 end

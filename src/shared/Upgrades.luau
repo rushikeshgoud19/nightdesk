@@ -25,14 +25,6 @@ Upgrades.list = {
 		category = "investigation",
 	},
 	{
-		id = "switchboard",
-		name = "Police Dispatch Switchboard",
-		blurb = "Upgrades the rotary phone with direct access to regional highway patrol BOLO records.",
-		cost = 140,
-		category = "investigation",
-		requires = "uv_boost",
-	},
-	{
 		id = "lights",
 		name = "Commercial Halogen Tube Lights",
 		blurb = "Restores reception lighting. Physical anomaly tells show far more clearly.",

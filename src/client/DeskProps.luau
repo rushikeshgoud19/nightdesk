@@ -104,6 +104,21 @@ local function makePart(
 	return p
 end
 
+-- The espresso machine is a purchased upgrade. Its prompt and click target stay
+-- switched off until the server says it has been bought, so the player is never
+-- offered an interaction the server will silently refuse.
+local coffeePrompt: ProximityPrompt? = nil
+local coffeeClick: ClickDetector? = nil
+
+function DeskProps.setHasCoffee(owned: boolean)
+	if coffeePrompt then
+		coffeePrompt.Enabled = owned
+	end
+	if coffeeClick then
+		coffeeClick.MaxActivationDistance = if owned then 14 else 0
+	end
+end
+
 local function addPrompt(
 	parent: BasePart,
 	actionText: string,
@@ -605,7 +620,7 @@ function DeskProps.init()
 	-- 8. Back-Office Commercial Espresso Machine
 	local coffee = lobby:FindFirstChild("CoffeeMachine") :: Model?
 	if coffee and coffee.PrimaryPart then
-		addPrompt(
+		coffeePrompt = addPrompt(
 			coffee.PrimaryPart,
 			"Brew Hot Espresso (+25% Sanity)",
 			"Coffee Maker",
@@ -616,11 +631,12 @@ function DeskProps.init()
 				brewCoffee:FireServer()
 			end
 		)
-		addClick(coffee.PrimaryPart, function()
+		coffeeClick = addClick(coffee.PrimaryPart, function()
 			Atmosphere.playSound("flicker", coffee.PrimaryPart, 0.8)
 			local brewCoffee = Remotes.get("BrewCoffee")
 			brewCoffee:FireServer()
 		end)
+		DeskProps.setHasCoffee(false)
 	end
 
 	-- 9. Hallway Electrical Breaker Box
