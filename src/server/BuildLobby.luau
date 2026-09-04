@@ -408,7 +408,7 @@ local function buildLobby(): Model
 		"LobbyArtwork_Frame",
 		Enum.PartType.Block,
 		Vector3.new(0.2, 4.5, 7.5),
-		CFrame.new(17.4, 7.8, -4.0),
+		CFrame.new(17.4, 3.4, -4.0),
 		Color3.fromRGB(120, 103, 85),
 		Enum.Material.Wood
 	)
@@ -416,7 +416,7 @@ local function buildLobby(): Model
 		"LobbyArtwork_Canvas",
 		Enum.PartType.Block,
 		Vector3.new(0.05, 3.9, 6.9),
-		CFrame.new(17.28, 7.8, -4.0),
+		CFrame.new(17.28, 3.4, -4.0),
 		Color3.fromRGB(100, 113, 120),
 		Enum.Material.SmoothPlastic
 	)
@@ -438,7 +438,7 @@ local function buildLobby(): Model
 		"ArtPictureLight",
 		Enum.PartType.Block,
 		Vector3.new(0.6, 0.2, 3.2),
-		CFrame.new(17.1, 10.3, -4.0),
+		CFrame.new(17.1, 5.5, -4.0),
 		Color3.fromRGB(210, 175, 60),
 		Enum.Material.Metal
 	)
@@ -1978,7 +1978,7 @@ local function buildLobby(): Model
 		"BoxHousing",
 		Enum.PartType.Block,
 		Vector3.new(0.4, 2.2, 1.6),
-		CFrame.new(-17.8, 6.5, -2.0),
+		CFrame.new(-17.8, 3.5, -2.0),
 		Color3.fromRGB(117, 122, 128),
 		Enum.Material.Metal,
 		breakerModel
@@ -1987,7 +1987,7 @@ local function buildLobby(): Model
 		"BreakerLever",
 		Enum.PartType.Cylinder,
 		Vector3.new(0.4, 0.15, 0.15),
-		CFrame.new(-17.5, 6.5, -2.0) * CFrame.Angles(0, 0, math.rad(90)),
+		CFrame.new(-17.5, 3.5, -2.0) * CFrame.Angles(0, 0, math.rad(90)),
 		Color3.fromRGB(229, 117, 104),
 		Enum.Material.Metal,
 		breakerModel
@@ -1996,7 +1996,7 @@ local function buildLobby(): Model
 		"BreakerIndicator",
 		Enum.PartType.Ball,
 		Vector3.new(0.3, 0.3, 0.3),
-		CFrame.new(-17.55, 7.2, -2.0),
+		CFrame.new(-17.55, 4.2, -2.0),
 		Color3.fromRGB(50, 220, 90),
 		Enum.Material.Neon,
 		breakerModel
