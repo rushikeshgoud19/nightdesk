@@ -2255,6 +2255,280 @@ local function buildLobby(): Model
 	)
 
 	-- =========================================================================
+	-- 10C. DRESSING -- the things a motel that opened in 1964 accumulates
+	--
+	-- Everything here is placed against one test: can the clerk see it from
+	-- behind the counter, or does a camera frame it. Design section 23 says do
+	-- not make the player walk, so a prop nobody can see from the desk is set
+	-- dressing for CCTV or it is waste.
+	--
+	-- Built from parts rather than pulled from the toolbox on purpose. The free
+	-- motel fittings on the Creator Store are overwhelmingly ripped commercial
+	-- game art -- Left 4 Dead ice machines, Fallout vending machines credited to
+	-- Bethesda in their own descriptions -- and this game is going to be
+	-- published.
+	-- =========================================================================
+
+	local function makeFramedPrint(name: string, cf: CFrame, w: number, h: number, tint: Color3)
+		local m = Instance.new("Model")
+		m.Name = name
+		makePart(
+			"Frame",
+			Enum.PartType.Block,
+			Vector3.new(w, h, 0.12),
+			cf,
+			Color3.fromRGB(96, 74, 58),
+			Enum.Material.Wood,
+			m
+		)
+		makePart(
+			"Print",
+			Enum.PartType.Block,
+			Vector3.new(w - 0.35, h - 0.35, 0.06),
+			cf * CFrame.new(0, 0, 0.06),
+			tint,
+			Enum.Material.SmoothPlastic,
+			m
+		)
+		m.Parent = lobby
+		return m
+	end
+
+	-- Nobody chose these. Every motel corridor has them.
+	makeFramedPrint(
+		"CorridorPrint_L1",
+		CFrame.new(-17.85, 10.4, -9.5) * CFrame.Angles(0, math.rad(90), 0),
+		2.2,
+		1.6,
+		Color3.fromRGB(96, 104, 92)
+	)
+	makeFramedPrint(
+		"CorridorPrint_L2",
+		CFrame.new(-17.85, 10.4, -1.2) * CFrame.Angles(0, math.rad(90), 0),
+		2.2,
+		1.6,
+		Color3.fromRGB(104, 92, 80)
+	)
+	makeFramedPrint(
+		"CorridorPrint_R1",
+		CFrame.new(17.85, 10.4, -9.5) * CFrame.Angles(0, math.rad(-90), 0),
+		2.2,
+		1.6,
+		Color3.fromRGB(88, 96, 106)
+	)
+	makeFramedPrint(
+		"CorridorPrint_R2",
+		CFrame.new(17.85, 10.4, -1.2) * CFrame.Angles(0, math.rad(-90), 0),
+		2.2,
+		1.6,
+		Color3.fromRGB(100, 90, 84)
+	)
+
+	-- Corridor runner. Breaks up the balcony planking and reads from the desk as
+	-- a line leading away toward the far doors.
+	for _, side in { -1, 1 } do
+		makePart(
+			`BalconyRunner{if side < 0 then "L" else "R"}`,
+			Enum.PartType.Block,
+			Vector3.new(3.2, 0.06, 14.4),
+			CFrame.new(side * 15.8, 6.93, -5.5),
+			Color3.fromRGB(118, 72, 72),
+			Enum.Material.Fabric
+		)
+	end
+
+	-- Housekeeping cart, parked on the left walkway. Something with a silhouette
+	-- up there, so the eye has a reason to go up.
+	local cart = Instance.new("Model")
+	cart.Name = "LinenCart"
+	makePart(
+		"CartBody",
+		Enum.PartType.Block,
+		Vector3.new(1.6, 1.7, 3.0),
+		CFrame.new(-15.4, 7.75, -10.5),
+		Color3.fromRGB(120, 116, 108),
+		Enum.Material.Metal,
+		cart
+	)
+	makePart(
+		"CartLinen",
+		Enum.PartType.Block,
+		Vector3.new(1.35, 0.7, 2.6),
+		CFrame.new(-15.4, 8.75, -10.5),
+		Color3.fromRGB(216, 212, 200),
+		Enum.Material.Fabric,
+		cart
+	)
+	makePart(
+		"CartHandle",
+		Enum.PartType.Block,
+		Vector3.new(0.1, 0.1, 3.0),
+		CFrame.new(-15.4, 8.65, -12.1),
+		Color3.fromRGB(195, 160, 65),
+		Enum.Material.Metal,
+		cart
+	)
+	cart.Parent = lobby
+
+	-- Umbrella stand by the doors. It is raining; people arrive wet.
+	local brolly = Instance.new("Model")
+	brolly.Name = "UmbrellaStand"
+	makePart(
+		"StandPot",
+		Enum.PartType.Cylinder,
+		Vector3.new(1.5, 0.9, 0.9),
+		CFrame.new(-5.4, 1.25, -15.4) * CFrame.Angles(0, 0, math.rad(90)),
+		Color3.fromRGB(112, 104, 92),
+		Enum.Material.Metal,
+		brolly
+	)
+	for i = 1, 3 do
+		makePart(
+			`Umbrella{i}`,
+			Enum.PartType.Cylinder,
+			Vector3.new(2.6, 0.16, 0.16),
+			CFrame.new(-5.4 + (i - 2) * 0.22, 2.5, -15.4)
+				* CFrame.Angles(0, 0, math.rad(90 + (i - 2) * 7)),
+			if i == 2 then Color3.fromRGB(96, 40, 44) else Color3.fromRGB(44, 46, 54),
+			Enum.Material.Fabric,
+			brolly
+		)
+	end
+	brolly.Parent = lobby
+
+	-- Brochure rack on the back wall behind the counter. Reads directly over the
+	-- clerk's shoulder on CAM 05.
+	local rack = Instance.new("Model")
+	rack.Name = "BrochureRack"
+	makePart(
+		"RackBack",
+		Enum.PartType.Block,
+		Vector3.new(2.6, 3.2, 0.12),
+		CFrame.new(6.5, 5.6, 13.85),
+		Color3.fromRGB(96, 74, 58),
+		Enum.Material.Wood,
+		rack
+	)
+	for i = 0, 2 do
+		makePart(
+			`RackShelf{i}`,
+			Enum.PartType.Block,
+			Vector3.new(2.6, 0.1, 0.5),
+			CFrame.new(6.5, 4.4 + i * 1.05, 13.6),
+			Color3.fromRGB(96, 74, 58),
+			Enum.Material.Wood,
+			rack
+		)
+		makePart(
+			`RackLeaflets{i}`,
+			Enum.PartType.Block,
+			Vector3.new(2.2, 0.75, 0.16),
+			CFrame.new(6.5, 4.82 + i * 1.05, 13.6),
+			if i == 1 then Color3.fromRGB(196, 176, 128) else Color3.fromRGB(206, 200, 186),
+			Enum.Material.SmoothPlastic,
+			rack
+		)
+	end
+	rack.Parent = lobby
+
+	-- Wet floor sign near the entrance. Small, specific, and the kind of thing
+	-- that makes a room read as somebody's job rather than a set.
+	local wet = Instance.new("Model")
+	wet.Name = "WetFloorSign"
+	for _, sgn in { -1, 1 } do
+		makePart(
+			`SignPanel{if sgn < 0 then "A" else "B"}`,
+			Enum.PartType.Block,
+			Vector3.new(1.1, 1.9, 0.08),
+			CFrame.new(3.6 + sgn * 0.22, 1.45, -12.0) * CFrame.Angles(math.rad(sgn * 11), 0, 0),
+			Color3.fromRGB(214, 176, 62),
+			Enum.Material.SmoothPlastic,
+			wet
+		)
+	end
+	wet.Parent = lobby
+
+	-- Luggage trolley left by the lounge.
+	local trolley = Instance.new("Model")
+	trolley.Name = "LuggageTrolley"
+	makePart(
+		"TrolleyDeck",
+		Enum.PartType.Block,
+		Vector3.new(2.6, 0.16, 1.7),
+		CFrame.new(11.0, 1.2, -10.5),
+		Color3.fromRGB(96, 74, 58),
+		Enum.Material.Wood,
+		trolley
+	)
+	for _, cx in { -1.1, 1.1 } do
+		makePart(
+			`TrolleyPost{if cx < 0 then "L" else "R"}`,
+			Enum.PartType.Block,
+			Vector3.new(0.12, 3.4, 0.12),
+			CFrame.new(11.0 + cx, 2.9, -11.2),
+			Color3.fromRGB(195, 160, 65),
+			Enum.Material.Metal,
+			trolley
+		)
+	end
+	makePart(
+		"TrolleyRail",
+		Enum.PartType.Block,
+		Vector3.new(2.35, 0.12, 0.12),
+		CFrame.new(11.0, 4.55, -11.2),
+		Color3.fromRGB(195, 160, 65),
+		Enum.Material.Metal,
+		trolley
+	)
+	makePart(
+		"TrolleySuitcase",
+		Enum.PartType.Block,
+		Vector3.new(1.5, 0.95, 1.15),
+		CFrame.new(11.0, 1.78, -10.5),
+		Color3.fromRGB(84, 58, 44),
+		Enum.Material.Leather,
+		trolley
+	)
+	trolley.Parent = lobby
+
+	-- Payphone on the pillar. A second phone the player cannot use is worth
+	-- having: it makes the rotary on the desk read as the one that matters.
+	local pay = Instance.new("Model")
+	pay.Name = "WallPayphone"
+	makePart(
+		"PayBody",
+		Enum.PartType.Block,
+		Vector3.new(0.9, 1.7, 0.55),
+		CFrame.new(-16.9, 4.4, -6.0),
+		Color3.fromRGB(46, 48, 54),
+		Enum.Material.Metal,
+		pay
+	)
+	makePart(
+		"PayHandset",
+		Enum.PartType.Block,
+		Vector3.new(0.3, 0.85, 0.3),
+		CFrame.new(-16.35, 4.5, -6.0),
+		Color3.fromRGB(28, 28, 32),
+		Enum.Material.SmoothPlastic,
+		pay
+	)
+	pay.Parent = lobby
+
+	-- Two more sconces per walkway so the corridor is lit along its length
+	-- rather than only at the ends.
+	makeSconce(
+		"BalconySconceL3",
+		CFrame.new(-17.6, 11.2, -6.2) * CFrame.Angles(0, math.rad(90), 0),
+		lobby
+	)
+	makeSconce(
+		"BalconySconceR3",
+		CFrame.new(17.6, 11.2, -6.2) * CFrame.Angles(0, math.rad(-90), 0),
+		lobby
+	)
+
+	-- =========================================================================
 	-- 11. SPAWN POINT CALIBRATION (0, 3.5, 7.5) FACING DESK COUNTER
 	-- =========================================================================
 	lobby.Parent = Workspace
