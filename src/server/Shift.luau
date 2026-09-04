@@ -351,7 +351,12 @@ function Shift.start(player: Player)
 				local phase = getPhase(p.shiftTime)
 				local chance = phase.chance + (p.nightsWorked * 0.05)
 				if p.rng then
-					p.waitingGuest = Anomalies.roll(p.rng, chance, phase.tiers)
+					p.waitingGuest = Anomalies.roll(
+						p.rng,
+						chance,
+						phase.tiers,
+						Upgrades.stats(p.owned).hasUpstairs
+					)
 				end
 				p.waitingSince = p.shiftTime
 				p.spawnedGuests += 1
@@ -442,11 +447,15 @@ function Shift.bind()
 		-- guest's occupancy, which meant the ledger never had to be read to work
 		-- the phone -- the signature investigation tool answered itself.
 		--
-		-- Rooms 101-108 are the motel. A number outside that range has no line,
-		-- which is how the `invalid_room_109` ledger tell gets confirmed: read
-		-- the room off the document, dial it, and the switchboard says it does
-		-- not exist.
-		if num < 101 or num > 108 then
+		-- Rooms 101-108 are the ground floor and are always open. 201-208 exist
+		-- only once floor_2 has been bought -- before that the switchboard has no
+		-- line to them, which is the same answer it gives for a room that was
+		-- never real. That is how the `invalid_room_109` ledger tell gets
+		-- confirmed: read the room off the document, dial it, get nothing.
+		local upstairs = Upgrades.stats(p.owned).hasUpstairs
+		local groundFloor = num >= 101 and num <= 108
+		local upperFloor = upstairs and num >= 201 and num <= 208
+		if not groundFloor and not upperFloor then
 			phoneResponse:FireClient(player, {
 				success = false,
 				isOccupied = false,

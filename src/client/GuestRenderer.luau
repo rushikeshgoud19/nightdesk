@@ -424,12 +424,21 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local tieColor = TIE_PALETTES[rng:NextInteger(1, #TIE_PALETTES)]
 	local hairColor = HAIR_COLORS[rng:NextInteger(1, #HAIR_COLORS)]
 
+	-- Each hair mesh carries its own generated colour map. A SpecialMesh with an
+	-- empty TextureId renders as flat vertex colour, which throws away the strand
+	-- detail that makes hair read as hair rather than as a helmet.
+	-- The colour map is a generic strand texture, so it reads correctly on any of
+	-- the three shapes. Leaving two of them bare rendered flat vertex colour and
+	-- the hair came out as a smooth cap rather than hair.
+	local HAIR_TEXTURE = "rbxassetid://74823846910036"
 	local HAIR_MESHES = {
-		"rbxassetid://113756968918441",
-		"rbxassetid://100645125889787",
-		"rbxassetid://104867370093409",
+		{ mesh = "rbxassetid://113756968918441", texture = HAIR_TEXTURE },
+		{ mesh = "rbxassetid://100645125889787", texture = HAIR_TEXTURE },
+		{ mesh = "rbxassetid://104867370093409", texture = HAIR_TEXTURE },
 	}
-	local hairMeshId = HAIR_MESHES[rng:NextInteger(1, #HAIR_MESHES)]
+	local hairPick = HAIR_MESHES[rng:NextInteger(1, #HAIR_MESHES)]
+	local hairMeshId = hairPick.mesh
+	local hairTextureId = hairPick.texture
 
 	local anomalyId = guestData.anomalyId
 	isCurrentAnomaly = anomalyId ~= nil
@@ -705,19 +714,33 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local hair = Instance.new("Part")
 	hair.Name = "Hair"
 	hair.Size = Vector3.new(1.4, 0.8, 1.4)
-	hair.CFrame = head.CFrame * CFrame.new(0, (headScaleY / 2) + 0.1, 0)
+	-- Sat down onto the skull rather than perched on it. At -0.15 it read as a
+	-- cap floating above the head instead of hair growing out of it.
+	hair.CFrame = head.CFrame * CFrame.new(0, (headScaleY / 2) - 0.34, 0)
 	hair.Color = hairColor
 	Materials.applySurface(hair, S.Hair)
 	hair.Anchored = true
 	hair.CanCollide = false
-	hair.Transparency = 1 -- Hide the block itself, show the mesh
+	-- A SpecialMesh REPLACES the part's rendering rather than sitting inside it,
+	-- so the part's Transparency applies to the mesh as well. Setting it to 1 to
+	-- "hide the block and show the mesh" hid both, and every guest in the game
+	-- has been bald since the kit landed.
+	hair.Transparency = 0
 
 	local mesh = Instance.new("SpecialMesh")
 	mesh.MeshType = Enum.MeshType.FileMesh
 	mesh.MeshId = hairMeshId
-	mesh.Scale = Vector3.new(1.4, 0.8, 1.4)
-	mesh.TextureId = ""
-	mesh.VertexColor = Vector3.new(hairColor.R, hairColor.G, hairColor.B)
+	-- SpecialMesh.Scale multiplies the mesh's own size; it is not an absolute
+	-- size. These meshes are about 1.45 x 1.5 x 1.3 studs natively and the head
+	-- is a 1.2 cube, so a little under 1 sits it on the skull instead of
+	-- swallowing it.
+	mesh.Scale = Vector3.new(1.08, 0.86, 1.08)
+	mesh.TextureId = hairTextureId
+	-- VertexColor multiplies the texture. Multiplying a mid-brown map by a
+	-- mid-brown tint lands almost black, so the tint is lifted toward white and
+	-- lets the map carry the colour.
+	mesh.VertexColor =
+		Vector3.new(0.45 + hairColor.R * 0.75, 0.45 + hairColor.G * 0.75, 0.45 + hairColor.B * 0.75)
 	mesh.Parent = hair
 
 	hair.Parent = model

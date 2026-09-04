@@ -2150,16 +2150,16 @@ local function buildLobby(): Model
 		makePart(
 			`Balcony{label}_Floor`,
 			Enum.PartType.Block,
-			Vector3.new(5, 0.8, 17),
-			CFrame.new(x, BALCONY_Y, -6.5),
+			Vector3.new(5, 0.8, 15),
+			CFrame.new(x, BALCONY_Y, -5.5),
 			Color3.fromRGB(80, 77, 74),
 			Enum.Material.WoodPlanks
 		)
 		makePart(
 			`Balcony{label}_Soffit`,
 			Enum.PartType.Block,
-			Vector3.new(5, 0.25, 17),
-			CFrame.new(x, BALCONY_Y - 0.5, -6.5),
+			Vector3.new(5, 0.25, 15),
+			CFrame.new(x, BALCONY_Y - 0.5, -5.5),
 			Color3.fromRGB(71, 63, 57),
 			Enum.Material.Plaster
 		)
@@ -2169,16 +2169,16 @@ local function buildLobby(): Model
 		makePart(
 			`Balcony{label}_RailTop`,
 			Enum.PartType.Block,
-			Vector3.new(0.22, 0.22, 17),
-			CFrame.new(railX, 9.5, -6.5),
+			Vector3.new(0.22, 0.22, 15),
+			CFrame.new(railX, 9.5, -5.5),
 			Color3.fromRGB(210, 175, 60),
 			Enum.Material.Metal
 		)
 		makePart(
 			`Balcony{label}_RailMid`,
 			Enum.PartType.Block,
-			Vector3.new(0.14, 0.14, 17),
-			CFrame.new(railX, 8.3, -6.5),
+			Vector3.new(0.14, 0.14, 15),
+			CFrame.new(railX, 8.3, -5.5),
 			Color3.fromRGB(210, 175, 60),
 			Enum.Material.Metal
 		)
@@ -2187,7 +2187,7 @@ local function buildLobby(): Model
 				`Balcony{label}_Post{i}`,
 				Enum.PartType.Block,
 				Vector3.new(0.16, 2.6, 0.16),
-				CFrame.new(railX, 8.2, -14.5 + i * 2.0),
+				CFrame.new(railX, 8.2, -12.5 + i * 1.8),
 				Color3.fromRGB(210, 175, 60),
 				Enum.Material.Metal
 			)
@@ -2208,7 +2208,7 @@ local function buildLobby(): Model
 
 		makeSconce(
 			`BalconySconce{label}1`,
-			CFrame.new(side * 17.6, 11.2, -15.0) * CFrame.Angles(0, math.rad(side * -90), 0),
+			CFrame.new(side * 17.6, 11.2, -12.0) * CFrame.Angles(0, math.rad(side * -90), 0),
 			lobby
 		)
 		makeSconce(
@@ -2221,18 +2221,38 @@ local function buildLobby(): Model
 	makeBalcony(-1, "L")
 	makeBalcony(1, "R")
 
-	-- Stair up, tucked into the front-left corner so it stays out of the desk's
-	-- line to the entrance.
+	-- Stair up, running along the entrance wall rather than under the balcony.
+	-- The first version climbed at x = -15.5 straight up through the left
+	-- balcony slab -- top step at Y 6.76, slab underside at 6.1 -- so it ended
+	-- buried inside the floor it was meant to reach. It hugs the front wall now
+	-- and lands on the balcony's near end, clear of the glass doors at
+	-- x = -3.8 to 0.
 	for i = 0, 8 do
 		makePart(
 			`UpperStair_{i}`,
 			Enum.PartType.Block,
-			Vector3.new(4.2, 0.7, 1.5),
-			CFrame.new(-15.5, 1.0 + i * 0.72, -15.6 + i * 1.45),
+			Vector3.new(1.35, 0.72, 4.0),
+			CFrame.new(-5.6 - i * 1.3, 1.05 + i * 0.72, -15.2),
 			Color3.fromRGB(71, 63, 57),
 			Enum.Material.Wood
 		)
 	end
+	makePart(
+		"UpperStairLanding",
+		Enum.PartType.Block,
+		Vector3.new(3.4, 0.8, 5.0),
+		CFrame.new(-17.8, 6.5, -14.2),
+		Color3.fromRGB(80, 77, 74),
+		Enum.Material.WoodPlanks
+	)
+	makePart(
+		"UpperStairRail",
+		Enum.PartType.Block,
+		Vector3.new(13.5, 0.18, 0.18),
+		CFrame.new(-11.6, 5.2, -13.3) * CFrame.Angles(0, 0, math.rad(29)),
+		Color3.fromRGB(210, 175, 60),
+		Enum.Material.Metal
+	)
 
 	-- =========================================================================
 	-- 11. SPAWN POINT CALIBRATION (0, 3.5, 7.5) FACING DESK COUNTER

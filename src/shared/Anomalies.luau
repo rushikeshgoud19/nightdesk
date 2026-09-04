@@ -416,14 +416,21 @@ function Anomalies.rollable(): { Anomaly }
 	return pool
 end
 
+-- `upstairsOpen` is the floor_2 upgrade. The second storey is built and visible
+-- from the desk from night one -- what the upgrade buys is the motel actually
+-- letting anyone into it, so guests are only assigned 201-208 once it is owned.
 function Anomalies.roll(
 	rng: Random,
 	anomalyChance: number,
-	tierWeights: { [number]: number }
+	tierWeights: { [number]: number },
+	upstairsOpen: boolean?
 ): Guest
 	local name = `{FIRST[rng:NextInteger(1, #FIRST)]} {LAST[rng:NextInteger(1, #LAST)]}`
 	local reservation = string.format("%04d", rng:NextInteger(1000, 9999))
 	local roomNum = rng:NextInteger(101, 108)
+	if upstairsOpen and rng:NextNumber() < 0.5 then
+		roomNum = rng:NextInteger(201, 208)
+	end
 	local city = CITIES[rng:NextInteger(1, #CITIES)]
 
 	local anomaly: Anomaly? = nil

@@ -114,6 +114,7 @@ export type Stats = {
 	hasCCTV: boolean,
 	hasShutter: boolean,
 	hasCoffee: boolean,
+	hasUpstairs: boolean,
 }
 
 local BASE_GUESTS = 4
@@ -156,6 +157,7 @@ function Upgrades.stats(owned: { [string]: boolean }): Stats
 		hasCCTV = owned.cctv_monitor == true,
 		hasShutter = owned.steel_shutter == true,
 		hasCoffee = owned.coffee_maker == true,
+		hasUpstairs = owned.floor_2 == true,
 	}
 end
 
