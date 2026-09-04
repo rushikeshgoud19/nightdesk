@@ -12,6 +12,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Remotes = require(Shared:WaitForChild("Remotes"))
 local Upgrades = require(Shared:WaitForChild("Upgrades"))
 
+local Session = require(script.Parent:WaitForChild("Session"))
 local Shift = require(script.Parent:WaitForChild("Shift"))
 local State = require(script.Parent:WaitForChild("State"))
 
@@ -81,7 +82,9 @@ local function buy(player: Player, id: string)
 	-- Refuse to sell mid-shift. The shop is a between-nights space; allowing a
 	-- purchase while a guest is at the desk would let a player buy their way out
 	-- of a call they had already been shown.
-	if p.shiftActive then
+	-- The shop is a between-nights space. Buying while a guest is at the desk
+	-- would let a player buy their way out of a call they had already been shown.
+	if Session.get().active then
 		return
 	end
 
@@ -120,8 +123,10 @@ function Shop.bind()
 			return
 		end
 		local p = State.get(player)
-		if not p or p.shiftActive then
-			return -- already working a shift
+		-- One shift for the server, so a second player pressing start during a
+		-- night in progress is a no-op rather than a second night.
+		if not p or Session.get().active then
+			return
 		end
 		Shift.start(player)
 	end)

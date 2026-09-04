@@ -15,6 +15,7 @@ local Anomalies = require(Shared:WaitForChild("Anomalies"))
 local Remotes = require(Shared:WaitForChild("Remotes"))
 local Upgrades = require(Shared:WaitForChild("Upgrades"))
 
+local Session = require(script.Parent:WaitForChild("Session"))
 local State = require(script.Parent:WaitForChild("State"))
 
 local guestArrived = Remotes.get("GuestArrived")
@@ -90,13 +91,6 @@ local GAP_AFTER_JUDGEMENT = 1.8
 -- behind a wait, and the bell can ask for one during that wait -- without a
 -- token both land and the second overwrites `p.current` while the client is
 -- still showing the first.
-local arrivalToken: { [Player]: number } = {}
-
-local function claimArrival(player: Player): number
-	local token = (arrivalToken[player] or 0) + 1
-	arrivalToken[player] = token
-	return token
-end
 
 local Shift = {}
 
@@ -115,8 +109,8 @@ local function pushSanity(player: Player)
 	if not p then
 		return
 	end
-	sanityUpdate:FireClient(player, {
-		sanity = p.sanity,
+	Session.fireAll(sanityUpdate, {
+		sanity = Session.get().sanity,
 		takings = p.takings,
 	})
 end
@@ -138,80 +132,58 @@ end
 
 Shift.pushLoadout = pushLoadout
 
-local function endShift(player: Player, survived: boolean)
-	local p = State.get(player)
-	if not p or not p.shiftActive then
+-- The night ends once, for everyone. Each wallet is then settled on its own,
+-- because takings and upgrades are per player -- your progress is yours whoever
+-- you happen to have played with.
+local function endShift(survived: boolean)
+	local sh = Session.get()
+	if not sh.active then
 		return
 	end
+	Session.stop()
 
-	p.current = nil
-	p.shiftActive = false
-	p.waitingGuest = nil
-	p.lastShiftSurvived = survived
-	local bonus = 0
+	for _, player in Session.players() do
+		local p = State.get(player)
+		if p then
+			p.lastShiftSurvived = survived
+			local bonus = 0
 
-	if survived then
-		if p.sanity > 50 then
-			bonus = 50
-			p.takings += bonus
+			if survived then
+				if sh.sanity > 50 then
+					bonus = 50
+					p.takings += bonus
+				end
+				-- Night 5 Campaign Grand Survivor Bonus
+				if p.nightsWorked == 4 then
+					bonus += 500
+					p.takings += 500
+				end
+			else
+				p.takings = p.shiftStartTakings
+			end
+
+			p.nightsWorked += 1
+			shiftEnded:FireClient(player, {
+				nightsWorked = p.nightsWorked,
+				takings = p.takings,
+				mistakes = sh.mistakes,
+				sanity = sh.sanity,
+				survived = survived,
+				bonus = bonus,
+				seed = sh.seed,
+			})
+			if onShiftEnd then
+				onShiftEnd(player)
+			end
 		end
-		-- Night 5 Campaign Grand Survivor Bonus
-		if p.nightsWorked == 4 then
-			bonus += 500
-			p.takings += 500
-		end
-	else
-		p.takings = p.shiftStartTakings
-	end
-
-	p.nightsWorked += 1
-	shiftEnded:FireClient(player, {
-		nightsWorked = p.nightsWorked,
-		takings = p.takings,
-		mistakes = p.mistakes,
-		sanity = p.sanity,
-		survived = survived,
-		bonus = bonus,
-		seed = p.shiftSeed,
-	})
-	if onShiftEnd then
-		onShiftEnd(player)
 	end
 end
 
-local function sendNext(player: Player)
+-- The payload one player receives. Identical for everyone except `tell` and the
+-- player's own takings.
+local function sendGuestTo(player: Player, guest: any, textVisible: boolean, visualSeed: number)
+	local sh = Session.get()
 	local p = State.get(player)
-	if not p or not p.shiftActive then
-		return
-	end
-	if p.current then
-		return
-	end
-
-	if p.sanity <= 0 then
-		endShift(player, false)
-		return
-	end
-
-	if not p.waitingGuest then
-		return
-	end
-
-	-- Occasional blackout fuse blowout on Night 3+
-	if p.nightsWorked >= 2 and p.rng and p.rng:NextNumber() < 0.25 and not p.breakerTripped then
-		p.breakerTripped = true
-		breakerTripped:FireClient(player)
-	end
-
-	local guest = p.waitingGuest
-	p.waitingGuest = nil
-	p.waitingSince = nil
-	p.current = guest
-
-	local stats = Upgrades.stats(p.owned)
-	local textVisible = guest.anomaly ~= nil and p.rng and p.rng:NextNumber() < stats.tellChance
-	p.tellVisible = textVisible
-
 	guestArrived:FireClient(player, {
 		name = guest.name,
 		reservation = guest.reservation,
@@ -231,158 +203,229 @@ local function sendNext(player: Player)
 		horrorType = if guest.anomaly then guest.anomaly.horrorType else nil,
 		uvSymbol = guest.uvSymbol,
 		isRoomOccupied = guest.isRoomOccupied,
-		sanity = p.sanity,
-		takings = p.takings,
-		nightNumber = p.nightsWorked + 1,
-		-- Falling back to a constant here gave every guest in the shift the same
-		-- seed, so every guest rendered as the same person. If the shift RNG is
-		-- missing the night is already non-reproducible; identical faces on top
-		-- of that is just a harder bug to see.
-		visualSeed = if p.rng then p.rng:NextInteger(1, 9999999) else math.random(1, 9999999),
+		sanity = sh.sanity,
+		takings = if p then p.takings else 0,
+		nightNumber = sh.nightNumber,
+		-- Passed in, NOT drawn here. Drawing it per player would give every
+		-- client a different number for the same guest, and two people at one
+		-- desk would be looking at two different faces -- which is precisely the
+		-- thing co-op has to make impossible.
+		visualSeed = visualSeed,
 	})
 end
 
-local function resolve(player: Player, admitted: boolean)
-	local p = State.get(player)
-	if not p then
+-- One guest, called up to the desk, shown to everyone working it.
+local function sendNext()
+	local sh = Session.get()
+	if not sh.active or sh.current then
 		return
 	end
 
-	local guest = p.current
+	if sh.sanity <= 0 then
+		endShift(false)
+		return
+	end
+
+	if not sh.waitingGuest then
+		return
+	end
+
+	-- Occasional blackout fuse blowout on Night 3+
+	if sh.nightNumber >= 3 and sh.rng and sh.rng:NextNumber() < 0.25 and not sh.breakerTripped then
+		sh.breakerTripped = true
+		Session.fireAll(breakerTripped, nil)
+	end
+
+	local guest = sh.waitingGuest
+	sh.waitingGuest = nil
+	sh.waitingSince = nil
+	sh.current = guest
+
+	-- The hint roll is taken ONCE per guest so the whole crew is looking at the
+	-- same coin, then each player is told the answer only if their own upgrades
+	-- earned it. tellChance is personal on purpose: two people disagreeing about
+	-- what they can even see is the conversation this game is for.
+	local hintRoll = if sh.rng then sh.rng:NextNumber() else 1
+	-- Drawn once, for the guest, not once per player.
+	local visualSeed = if sh.rng then sh.rng:NextInteger(1, 9999999) else math.random(1, 9999999)
+	sh.currentVisualSeed = visualSeed
+
+	for _, player in Session.players() do
+		local p = State.get(player)
+		if p then
+			local stats = Upgrades.stats(p.owned)
+			local textVisible = guest.anomaly ~= nil and hintRoll < stats.tellChance
+			sendGuestTo(player, guest, textVisible, visualSeed)
+		end
+	end
+end
+
+-- Whoever stamps first passes the verdict for the crew. A second stamp a frame
+-- later finds no guest and does nothing, so nobody gets paid or penalised twice.
+local function resolve(player: Player, admitted: boolean)
+	local sh = Session.get()
+	local guest = sh.current
 	if not guest then
 		return
 	end
-	p.current = nil
+	sh.current = nil
 
+	local judgedBy = player.Name
 	local isAnomaly = guest.anomaly ~= nil
 	local correct = (isAnomaly and not admitted) or (not isAnomaly and admitted)
-	local stats = Upgrades.stats(p.owned)
 
 	-- The client used to hardcode "+$40" and "-40%" in its verdict line. Both
 	-- move with upgrades -- neon_restoration raises the payout, steel_shutter
 	-- halves the penalty -- so the numbers on screen were wrong the moment
 	-- anything was bought. The server owns them, so the server states them.
-	local paid = 0
 	local sanityLost = 0
-
-	if correct then
-		paid = stats.payout
-		p.takings += paid
-	else
+	if not correct then
+		-- The shutter is a motel fixture, so the session takes the best one
+		-- anybody present owns. A well-equipped player visibly protects the crew.
+		local anyShutter = false
+		for _, pl in Session.players() do
+			local pp = State.get(pl)
+			if pp and Upgrades.stats(pp.owned).hasShutter then
+				anyShutter = true
+				break
+			end
+		end
 		local basePenalty = if isAnomaly and admitted then 40 else 20
-		sanityLost = if stats.hasShutter then math.floor(basePenalty * 0.5) else basePenalty
-		p.sanity = math.max(0, p.sanity - sanityLost)
-		p.mistakes += 1
+		sanityLost = if anyShutter then math.floor(basePenalty * 0.5) else basePenalty
+		-- Sanity is the motel's, not the clerk's. A wrong admission costs
+		-- everyone, which is what gives the argument stakes.
+		sh.sanity = math.max(0, sh.sanity - sanityLost)
+		sh.mistakes += 1
 	end
 
-	shiftUpdate:FireClient(player, {
-		correct = correct,
-		wasAnomaly = isAnomaly,
-		anomalyId = if isAnomaly and guest.anomaly then guest.anomaly.id else nil,
-		tell = if isAnomaly and guest.anomaly then guest.anomaly.tell else nil,
-		paid = paid,
-		sanityLost = sanityLost,
-		takings = p.takings,
-		mistakes = p.mistakes,
-		sanity = p.sanity,
-		nightNumber = p.nightsWorked + 1,
-	})
+	-- Everyone sees the outcome. Each player is paid into their own wallet, at
+	-- their own rate, so "who let him in" is answerable and progress stays yours.
+	for _, pl in Session.players() do
+		local pp = State.get(pl)
+		if pp then
+			local paid = 0
+			if correct then
+				paid = Upgrades.stats(pp.owned).payout
+				pp.takings += paid
+			end
+			shiftUpdate:FireClient(pl, {
+				correct = correct,
+				wasAnomaly = isAnomaly,
+				judgedBy = judgedBy,
+				anomalyId = if isAnomaly and guest.anomaly then guest.anomaly.id else nil,
+				tell = if isAnomaly and guest.anomaly then guest.anomaly.tell else nil,
+				paid = paid,
+				sanityLost = sanityLost,
+				takings = pp.takings,
+				mistakes = sh.mistakes,
+				sanity = sh.sanity,
+				nightNumber = sh.nightNumber,
+			})
+		end
+	end
 
-	local token = claimArrival(player)
+	local token = Session.claimArrival()
 	task.wait(GAP_AFTER_JUDGEMENT)
-	if arrivalToken[player] ~= token then
+	if not Session.arrivalStillValid(token) then
 		return -- the bell already brought the next guest up
 	end
-	sendNext(player)
+	sendNext()
 end
 
-function Shift.start(player: Player)
-	local p = State.get(player)
-	if not p then
+-- Any player may start the night. There is no ready-check: the crew is whoever
+-- is standing here, and a session that waits for consensus is a session nobody
+-- starts.
+--
+-- Motel-wide capacity is the best anyone present owns. A player who has bought
+-- rooms brings them to the whole crew, which is the intended feeling -- turning
+-- up well-equipped visibly helps everybody.
+function Shift.start(_starter: Player)
+	local sh = Session.get()
+	if sh.active then
 		return
 	end
-	local stats = Upgrades.stats(p.owned)
-	local nightBonus = math.clamp(p.nightsWorked, 0, 4)
-	local totalGuests = stats.guestsPerShift + nightBonus
 
-	p.shiftSeed = math.random(10000, 99999)
-	p.rng = Random.new(p.shiftSeed)
+	local nightNumber, totalGuests = 1, 0
+	local anyUpstairs = false
+	for _, player in Session.players() do
+		local p = State.get(player)
+		if p then
+			local stats = Upgrades.stats(p.owned)
+			local nightBonus = math.clamp(p.nightsWorked, 0, 4)
+			totalGuests = math.max(totalGuests, stats.guestsPerShift + nightBonus)
+			nightNumber = math.max(nightNumber, p.nightsWorked + 1)
+			anyUpstairs = anyUpstairs or stats.hasUpstairs
+			-- Each wallet remembers what it opened the night with, so a failed
+			-- shift forfeits that player's own takings and nobody else's.
+			p.shiftStartTakings = p.takings
+			pushLoadout(player)
+		end
+	end
+	if totalGuests <= 0 then
+		return
+	end
 
-	p.sanity = 100
-	p.shiftStartTakings = p.takings
-	p.shiftActive = true
-	p.mistakes = 0
-	p.hasBrewedCoffee = false
-	p.breakerTripped = false
-	p.current = nil
-	p.shiftTime = 0
-	p.waitingGuest = nil
-	p.waitingSince = nil
-	p.spawnedGuests = 0
-	p.nextArrivalMin = 360 / (totalGuests + 1)
-
-	pushLoadout(player)
+	Session.reset(nightNumber, totalGuests, math.random(10000, 99999))
 
 	task.spawn(function()
-		while p.shiftActive do
+		while sh.active do
 			task.wait(1)
-			if not p.shiftActive then
+			if not sh.active then
 				break
 			end
 
-			p.shiftTime += 0.5
+			sh.time += 0.5
 
-			if p.shiftTime >= 360 then
-				endShift(player, true)
+			if sh.time >= 360 then
+				endShift(true)
 				break
 			end
 
-			if p.sanity <= 0 then
-				endShift(player, false)
+			if sh.sanity <= 0 then
+				endShift(false)
 				break
 			end
 
 			if
-				p.spawnedGuests < totalGuests
-				and p.shiftTime >= p.nextArrivalMin
-				and not p.waitingGuest
-				and not p.current
+				sh.spawnedGuests < sh.totalGuests
+				and sh.time >= sh.nextArrivalMin
+				and not sh.waitingGuest
+				and not sh.current
 			then
-				local phase = getPhase(p.shiftTime)
-				local chance = phase.chance + (p.nightsWorked * 0.05)
-				if p.rng then
-					p.waitingGuest = Anomalies.roll(
-						p.rng,
-						chance,
-						phase.tiers,
-						Upgrades.stats(p.owned).hasUpstairs
-					)
+				local phase = getPhase(sh.time)
+				local chance = phase.chance + ((sh.nightNumber - 1) * 0.05)
+				if sh.rng then
+					sh.waitingGuest = Anomalies.roll(sh.rng, chance, phase.tiers, anyUpstairs)
 				end
-				p.waitingSince = p.shiftTime
-				p.spawnedGuests += 1
-				p.nextArrivalMin = (360 / (totalGuests + 1)) * (p.spawnedGuests + 1)
+				sh.waitingSince = sh.time
+				sh.spawnedGuests += 1
+				sh.nextArrivalMin = (360 / (sh.totalGuests + 1)) * (sh.spawnedGuests + 1)
 			end
 
-			if p.waitingGuest and p.waitingSince and (p.shiftTime - p.waitingSince) > 20 then
-				p.waitingGuest = nil
-				p.waitingSince = nil
-				-- "revenue that walked out" -> deduction
-				p.takings = math.max(0, p.takings - 10)
+			if sh.waitingGuest and sh.waitingSince and (sh.time - sh.waitingSince) > 20 then
+				sh.waitingGuest = nil
+				sh.waitingSince = nil
+				-- Revenue that walked back out into the rain. It comes off every
+				-- wallet, because the crew let it happen together.
+				for _, pl in Session.players() do
+					local pp = State.get(pl)
+					if pp then
+						pp.takings = math.max(0, pp.takings - 10)
+					end
+				end
 			end
 
 			-- A guest arrives, waits, and after 20 in-game minutes walks out and
-			-- costs $10. None of that was ever sent to the client, so the player
-			-- was fined for missing something they had no way to perceive -- the
-			-- exact complaint the first playtest made. The client needs to know
-			-- somebody is at the door and roughly how long they will stand there.
+			-- costs $10. None of that used to reach the client, so the player was
+			-- fined for missing something they had no way to perceive.
 			local waitLeft: number? = nil
-			if p.waitingGuest and p.waitingSince then
-				waitLeft = math.max(0, 20 - (p.shiftTime - p.waitingSince))
+			if sh.waitingGuest and sh.waitingSince then
+				waitLeft = math.max(0, 20 - (sh.time - sh.waitingSince))
 			end
 
-			timeTick:FireClient(player, {
-				time = p.shiftTime,
-				waiting = p.waitingGuest ~= nil,
+			Session.fireAll(timeTick, {
+				time = sh.time,
+				waiting = sh.waitingGuest ~= nil,
 				waitLeft = waitLeft,
 			})
 		end
@@ -411,10 +454,11 @@ function Shift.bind()
 
 		bellRang:FireAllClients(player)
 
-		local p = State.get(player)
-		if p and p.shiftActive and not p.current and p.waitingGuest then
-			claimArrival(player)
-			sendNext(player)
+		-- Anybody can ring it, and it calls the waiting guest up for everyone.
+		local sh = Session.get()
+		if sh.active and not sh.current and sh.waitingGuest then
+			Session.claimArrival()
+			sendNext()
 		end
 	end)
 
@@ -429,8 +473,8 @@ function Shift.bind()
 		end
 		lastPhoneCall[player] = now
 
-		local p = State.get(player)
-		if not p or not p.current then
+		local sh = Session.get()
+		if not sh.current then
 			phoneResponse:FireClient(player, {
 				success = false,
 				message = "Line dead. No active guest at desk.",
@@ -439,7 +483,7 @@ function Shift.bind()
 			return
 		end
 
-		local guest = p.current
+		local guest = sh.current
 		local num = tonumber(roomNum) or guest.roomNumber
 
 		-- The phone answers about the room that was dialled, not about whoever
@@ -452,7 +496,16 @@ function Shift.bind()
 		-- line to them, which is the same answer it gives for a room that was
 		-- never real. That is how the `invalid_room_109` ledger tell gets
 		-- confirmed: read the room off the document, dial it, get nothing.
-		local upstairs = Upgrades.stats(p.owned).hasUpstairs
+		-- The second floor is a motel fixture, not a personal tool, so the
+		-- switchboard reaches it if anyone on the crew has reopened it.
+		local upstairs = false
+		for _, pl in Session.players() do
+			local pp = State.get(pl)
+			if pp and Upgrades.stats(pp.owned).hasUpstairs then
+				upstairs = true
+				break
+			end
+		end
 		local groundFloor = num >= 101 and num <= 108
 		local upperFloor = upstairs and num >= 201 and num <= 208
 		if not groundFloor and not upperFloor then
@@ -505,9 +558,9 @@ function Shift.bind()
 		if typeof(enabled) ~= "boolean" then
 			return
 		end
-		local p = State.get(player)
-		local hasSymbol = p and p.current and p.current.uvSymbol ~= nil
-		local symbolType = if p and p.current then p.current.uvSymbol else nil
+		local sh = Session.get()
+		local hasSymbol = sh.current and sh.current.uvSymbol ~= nil
+		local symbolType = if sh.current then sh.current.uvSymbol else nil
 
 		uvState:FireClient(player, {
 			enabled = enabled,
@@ -527,12 +580,13 @@ function Shift.bind()
 		end
 		lastInterrogate[player] = now
 
-		local p = State.get(player)
-		if not p or not p.current then
+		local sh = Session.get()
+		if not sh.current or not sh.rng then
 			return
 		end
 
-		local guest = p.current
+		local rng = sh.rng
+		local guest = sh.current
 		local isAnomaly = guest.anomaly ~= nil
 		local aId = if guest.anomaly then guest.anomaly.id else ""
 		local answer = ""
@@ -545,7 +599,7 @@ function Shift.bind()
 					"Long haul drive from Spokane. Need a bed until sunrise.",
 					"Business delivery in Portland tomorrow morning.",
 				}
-				answer = NORMAL_PURPOSES[p.rng:NextInteger(1, #NORMAL_PURPOSES)]
+				answer = NORMAL_PURPOSES[rng:NextInteger(1, #NORMAL_PURPOSES)]
 			else
 				isCreepy = true
 				if aId == "frozen_smile" then
@@ -563,7 +617,7 @@ function Shift.bind()
 		elseif questionId == "plate" then
 			if not isAnomaly then
 				answer =
-					`Oregon plates: {p.rng:NextInteger(100, 999)}-XNV on the sedan parked outside.`
+					`Oregon plates: {rng:NextInteger(100, 999)}-XNV on the sedan parked outside.`
 			else
 				isCreepy = true
 				answer = "I did not require a vehicle to arrive here."
@@ -592,7 +646,8 @@ function Shift.bind()
 
 	brewCoffee.OnServerEvent:Connect(function(player: Player)
 		local p = State.get(player)
-		if not p or not p.shiftActive or p.hasBrewedCoffee then
+		local sh = Session.get()
+		if not p or not sh.active or sh.hasBrewedCoffee then
 			return
 		end
 		-- The espresso machine is a $100 upgrade. It used to work whether or not
@@ -600,28 +655,34 @@ function Shift.bind()
 		if not Upgrades.stats(p.owned).hasCoffee then
 			return
 		end
-		p.hasBrewedCoffee = true
-		p.sanity = math.min(100, p.sanity + 25)
+		-- One pot per night, for the motel. Four people do not get four pots.
+		sh.hasBrewedCoffee = true
+		sh.sanity = math.min(100, sh.sanity + 25)
 		pushSanity(player)
 	end)
 
 	buySoda.OnServerEvent:Connect(function(player: Player)
 		local p = State.get(player)
-		if not p or not p.shiftActive or p.takings < 5 then
+		local sh = Session.get()
+		if not p or not sh.active or p.takings < 5 then
 			return
 		end
 		p.takings -= 5
-		p.sanity = math.min(100, p.sanity + 10)
+		sh.sanity = math.min(100, sh.sanity + 10)
 		pushSanity(player)
 	end)
 
-	resetBreaker.OnServerEvent:Connect(function(player: Player)
-		local p = State.get(player)
+	resetBreaker.OnServerEvent:Connect(function(_player: Player)
 		-- Requires a breaker that is actually tripped. Without the check a client
 		-- could fire this on a loop and never experience a blackout at all.
-		if p and p.breakerTripped then
-			p.breakerTripped = false
-			breakerRestored:FireClient(player)
+		-- The breaker is the motel's, so restoring it restores it for the crew.
+		-- Narrowing this to one client was correct when the state was per player;
+		-- the guard requiring it to actually be tripped is the part that matters
+		-- and it stays.
+		local sh = Session.get()
+		if sh.breakerTripped then
+			sh.breakerTripped = false
+			Session.fireAll(breakerRestored, nil)
 		end
 	end)
 end
@@ -632,7 +693,6 @@ function Shift.forget(player: Player)
 	lastBellRing[player] = nil
 	lastPhoneCall[player] = nil
 	lastInterrogate[player] = nil
-	arrivalToken[player] = nil
 end
 
 return Shift

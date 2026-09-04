@@ -22,7 +22,7 @@ Verified against the code on 4 September 2026, not reported:
 | system | state |
 |---|---|
 | Reception loop | Works. Bell → observe → ledger → phone → UV → intercom → stamp |
-| Anomaly catalog | 42 tells, 25/14/3 across tiers 1/2/3, all rollable |
+| Anomaly catalog | 42 tells, all rollable and **all now rendering** — 9 were dead or inverted and were rebuilt 4–5 Sep. Studio viewer on `P` |
 | Investigation tools | All five have something to find |
 | Sanity | A number with client effects. Does not yet distort perception |
 | Economy + shop | Works, persists. 11 items, all of them now real |
@@ -30,7 +30,7 @@ Verified against the code on 4 September 2026, not reported:
 | Room art | Lighting + materials landed Sep 3. **Albedo repainted 4 Sep** — 104 surfaces were RGB(26–48) and no lighting could rescue them |
 | Guest art | Blocky kit landed 4 Sep. PBR surfaces were dropped and then restored — 7 `Guest*` variants now declared in the project file |
 | CCTV | 5 cameras, each composed around a subject. Still nothing *moving* to see — that is Section 6 |
-| Co-op | **Not implemented.** Per-player shifts, client-built guests |
+| Co-op | Session refactor landed 5 Sep — one shared night, shared sanity, individual wallets. **Not yet played with 2 clients** |
 | Consequences | **Not implemented.** A wrong admit is −40 sanity and the guest vanishes |
 | Evidence chains | **Not implemented.** One guest = one tell |
 
@@ -81,7 +81,7 @@ returns nothing at any brightness. `docs/NEXT.md` fixed the lamp and never
 touched the paint, so **the readable middle range the anomaly design depends on
 still does not exist.** Brief: `docs/prompts/the-motel.md`.
 
-### Section 3 — The Shared Desk — §13, §14
+### Section 3 — The Shared Desk — §13, §14  *(server-side landed 5 Sep; needs a 2-client playtest)*
 
 Co-op, 2–4 players. The shift becomes a session rather than a per-player loop:
 one guest, seen by everyone, judged by any of them, on shared sanity and shared

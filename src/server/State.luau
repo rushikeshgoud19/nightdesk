@@ -2,35 +2,17 @@
 -- Per-player profile, server-side only. Single owner of the numbers that matter.
 
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-
-local Shared = ReplicatedStorage:WaitForChild("Shared")
-local Anomalies = require(Shared:WaitForChild("Anomalies"))
 
 local ProfileStore =
 	require(ServerScriptService:WaitForChild("Packages"):WaitForChild("ProfileStore"))
 
 export type Profile = {
 	takings: number,
-	mistakes: number,
-	sanity: number,
 	shiftStartTakings: number,
 	lastShiftSurvived: boolean?,
 	nightsWorked: number,
 	owned: { [string]: boolean },
-	current: Anomalies.Guest?,
-	tellVisible: boolean,
-	guestsLeft: number,
-	shiftActive: boolean,
-	hasBrewedCoffee: boolean,
-	shiftTime: number,
-	rng: Random?,
-	shiftSeed: number?,
-	waitingGuest: Anomalies.Guest?,
-	waitingSince: number?,
-	nextArrivalMin: number,
-	spawnedGuests: number,
 }
 
 local profileTemplate = {
@@ -80,22 +62,16 @@ function State.load(player: Player): Profile
 		if player:IsDescendantOf(Players) then
 			activeProfiles[player] = profile
 
+			-- The night itself lives in Session now -- the guest, the clock, the
+			-- seed, the sanity, the breaker -- because the server is one shared
+			-- shift and those are facts about the motel, not about a person.
+			--
+			-- What is left here is what genuinely belongs to this player: their
+			-- wallet and upgrades, which persist, and what their own takings were
+			-- when the night began, so a failed shift forfeits theirs and nobody
+			-- else's.
 			local proxy = {
-				mistakes = 0,
-				sanity = 100,
 				shiftStartTakings = profile.Data.takings,
-				current = nil,
-				tellVisible = false,
-				guestsLeft = 0,
-				shiftActive = false,
-				hasBrewedCoffee = false,
-				shiftTime = 0,
-				rng = nil,
-				shiftSeed = nil,
-				waitingGuest = nil,
-				waitingSince = nil,
-				nextArrivalMin = 0,
-				spawnedGuests = 0,
 			}
 
 			setmetatable(proxy, {
