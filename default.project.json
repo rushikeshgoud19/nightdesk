@@ -57,6 +57,97 @@
     // the detail stretches into invisible blur.
     "MaterialService": {
       "$className": "MaterialService",
+      // GUEST SURFACES. These seven were generated in Studio during the guest-kit
+      // pass and never written here -- and Rojo OWNS MaterialService, so the next
+      // sync replaced the whole service with the Motel* set and the Guest* names
+      // stopped resolving. A MaterialVariant name that does not resolve renders as
+      // the purple-and-black checkerboard, which was then misread as a capability
+      // error and worked around by dropping to stock materials with colour tints.
+      // Declared here, they survive the sync. That was the whole bug.
+      // Pores and a broken specular. The surface colorless_skin and the tier-1 skin-tone tells have to read against.
+      "GuestSkin": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "SmoothPlastic",
+          "StudsPerTile": 0.5,
+          "ColorMap": "rbxassetid://97295374627629",
+          "NormalMap": "rbxassetid://107498800381317",
+          "RoughnessMap": "rbxassetid://125175590849695",
+          "MetalnessMap": "rbxassetid://96277239383984"
+        }
+      },
+      // Strand sheen on the sculpted hair mesh.
+      "GuestHair": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "SmoothPlastic",
+          "StudsPerTile": 0.6,
+          "ColorMap": "rbxassetid://90404303434662",
+          "NormalMap": "rbxassetid://104159192870966",
+          "RoughnessMap": "rbxassetid://107792511953909",
+          "MetalnessMap": "rbxassetid://118720678239663"
+        }
+      },
+      // The jacket and trousers. Wool twill weave.
+      "GuestSuit": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Fabric",
+          "StudsPerTile": 2.0,
+          "ColorMap": "rbxassetid://80362909360459",
+          "NormalMap": "rbxassetid://73957751750400",
+          "RoughnessMap": "rbxassetid://95628980310505",
+          "MetalnessMap": "rbxassetid://89222276190498"
+        }
+      },
+      // Tighter weave for lapels and small tailored pieces.
+      "GuestWool": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Fabric",
+          "StudsPerTile": 0.8,
+          "ColorMap": "rbxassetid://139386158308488",
+          "NormalMap": "rbxassetid://120934904965337",
+          "RoughnessMap": "rbxassetid://95168413091361",
+          "MetalnessMap": "rbxassetid://128669591648974"
+        }
+      },
+      // Cream poplin. Matte against the suit's sheen.
+      "GuestShirt": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Fabric",
+          "StudsPerTile": 1.0,
+          "ColorMap": "rbxassetid://106802267803616",
+          "NormalMap": "rbxassetid://95108478887249",
+          "RoughnessMap": "rbxassetid://90811027219747",
+          "MetalnessMap": "rbxassetid://76600761840641"
+        }
+      },
+      // Polished oxford. Hard shine at the toe.
+      "GuestShoe": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Leather",
+          "StudsPerTile": 1.0,
+          "ColorMap": "rbxassetid://70560802417834",
+          "NormalMap": "rbxassetid://106222727841081",
+          "RoughnessMap": "rbxassetid://96033971600171",
+          "MetalnessMap": "rbxassetid://104401151151199"
+        }
+      },
+      // Soaked cloth for the Drowned Drifter.
+      "GuestWetSuit": {
+        "$className": "MaterialVariant",
+        "$properties": {
+          "BaseMaterial": "Fabric",
+          "StudsPerTile": 2.0,
+          "ColorMap": "rbxassetid://86150586847145",
+          "NormalMap": "rbxassetid://129362667705692",
+          "RoughnessMap": "rbxassetid://109742420322989",
+          "MetalnessMap": "rbxassetid://71156046459973"
+        }
+      },
       "MotelSmoothPlastic": {
         "$className": "MaterialVariant",
         "$properties": {

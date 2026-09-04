@@ -43,14 +43,22 @@ local MOTEL: { [Enum.Material]: string } = {
 -- Skin is the one that carries weight. colorless_skin is a desaturation, and a
 -- colour shift that small has nothing to read against on a flat plastic surface
 -- -- it needs pores and a broken specular to sit on.
+--
+-- These seven variants were generated once, then lost, then blamed on the wrong
+-- thing. They existed in MaterialService but were never declared in
+-- default.project.json -- and Rojo owns that service, so the next sync replaced
+-- it with the Motel* set only. A MaterialVariant name that does not resolve
+-- renders as the purple-and-black checkerboard. That was read as a capability
+-- error and worked around by assigning stock materials with colour tints, which
+-- is what the guests shipped with. They are declared in the project file now.
 Materials.guest = table.freeze({
-	Skin = surface(Enum.Material.SmoothPlastic),
-	Hair = surface(Enum.Material.SmoothPlastic),
-	Wool = surface(Enum.Material.Fabric),
-	Suit = surface(Enum.Material.Fabric),
-	Shirt = surface(Enum.Material.Fabric),
-	Shoe = surface(Enum.Material.Leather),
-	WetSuit = surface(Enum.Material.Plastic),
+	Skin = surface(Enum.Material.SmoothPlastic, "GuestSkin"),
+	Hair = surface(Enum.Material.SmoothPlastic, "GuestHair"),
+	Wool = surface(Enum.Material.Fabric, "GuestWool"),
+	Suit = surface(Enum.Material.Fabric, "GuestSuit"),
+	Shirt = surface(Enum.Material.Fabric, "GuestShirt"),
+	Shoe = surface(Enum.Material.Leather, "GuestShoe"),
+	WetSuit = surface(Enum.Material.Fabric, "GuestWetSuit"),
 	Leather = surface(Enum.Material.Leather, "MotelLeather"),
 	Brass = surface(Enum.Material.Metal, "MotelMetal"),
 	-- Wet, hard and clean: eyeballs, teeth, bone, suit buttons, shoe soles.
