@@ -47,7 +47,7 @@ verdict line was reporting numbers the server had not paid.
 
 Repairs §19, §20.
 
-### Section 1 — The Guest Kit — §5.1, §7, §25 Phase 1
+### ~~Section 1~~ — The Guest Kit — §5.1, §7, §25 Phase 1  *(landed 4 Sep, with gaps)*
 
 Rebuild the guest as a modular blocky kit with cinematic surface detail: face as
 texture, hair as sculpted mesh, clothing as PBR. Reference:
@@ -64,7 +64,24 @@ It also makes Section 3 cheaper: a guest assembled from a seeded choice of parts
 is deterministic by construction. The current renderer draws from unseeded
 `math.random` in fifteen places.
 
-### Section 2 — The Night — §15, §16, §17
+### ~~Section 2~~ — The Night — §15, §16, §17  *(landed 4 Sep)*
+
+Clock, phases and a shift seed all shipped. `guestsLeft` is gone and the HUD
+that still read it has been fixed.
+
+### Section 2.5 — The Motel — §25 Phase 1, §21
+
+Two storeys, dressed with real props, and the two repairs the guest-kit pass
+left behind: **the room's albedo** and **the guest PBR surfaces**.
+
+The albedo one matters more than it sounds. Measured in the running place: floor
+RGB(36,32,28), ceiling RGB(26,26,28). Ambient was raised to `0.85` and Brightness
+to `3` — six times shipped — and the room stayed black, because paint that dark
+returns nothing at any brightness. `docs/NEXT.md` fixed the lamp and never
+touched the paint, so **the readable middle range the anomaly design depends on
+still does not exist.** Brief: `docs/prompts/the-motel.md`.
+
+### ~~Section 2 (original)~~ — The Night — §15, §16, §17
 
 A shift stops being "four guests then done" and becomes 12:00 AM → 6:00 AM.
 Phases scale the anomaly rate and the tier mix. A seed makes a night
