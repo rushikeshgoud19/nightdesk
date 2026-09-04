@@ -2,6 +2,10 @@
 
 Written 28 August 2026, at the point where the game first works end to end.
 
+> **Superseded as a plan.** The art pass below landed on 3 September 2026. The
+> live build order is now `docs/ROADMAP.md`. This file is kept for the art-pass
+> record and its review checklist, not for its order of work.
+
 ---
 
 ## Where the project actually is
