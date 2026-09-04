@@ -465,6 +465,15 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 	local isDrowned = false
 	local isVoid = false
 	local isBlinkEnabled = true
+	-- Six body tells were being rolled, shown to the player, and judged against,
+	-- while rendering nothing at all. Five had no branch here; inverted_pulse had
+	-- one in the idle loop that animated a part called CarotidArtery which
+	-- nothing ever built. The parts exist now and these carry them.
+	local isButtonWrong = false
+	local isWrongCufflink = false
+	local isBackwardTie = false
+	local isNoReflection = false
+	local isGlitch = false
 
 	if anomalyId == "colorless_skin" then
 		skinColor = Color3.fromRGB(224, 226, 232)
@@ -478,6 +487,16 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 		faceTexture = FACE_SUBTLE_SMILE
 	elseif anomalyId == "perfect_symmetry" then
 		faceTexture = FACE_PERFECT_SYMMETRY
+	elseif anomalyId == "button_wrong" then
+		isButtonWrong = true
+	elseif anomalyId == "wrong_cufflink" then
+		isWrongCufflink = true
+	elseif anomalyId == "backward_tie" then
+		isBackwardTie = true
+	elseif anomalyId == "no_reflection" then
+		isNoReflection = true
+	elseif anomalyId == "glitch_silhouette" then
+		isGlitch = true
 	elseif anomalyId == "no_blinking" then
 		isBlinkEnabled = false
 	elseif anomalyId == "wet_clothing" or anomalyId == "drowned_drifter" then
@@ -545,11 +564,21 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 		0,
 		model
 	)
+	-- The tie sits proud of the shirt at the front. backward_tie pins it to the
+	-- back of the collar instead, so from the desk the guest reads as wearing no
+	-- tie at all -- and the collar is visibly wrong from the side and on CCTV.
 	makePart(
 		"Tie",
 		Enum.PartType.Block,
-		Vector3.new(0.2, 1.4, 1.1),
-		baseCF * CFrame.new(0, -0.1, 0),
+		-- A slab sitting proud of the shirt (which spans z +/-0.525), not a block
+		-- through the torso. Size must be positive, so the side is chosen by the
+		-- offset's sign.
+		Vector3.new(0.2, 1.4, 0.12),
+		-- baseCF is turned to face the desk, so the guest's chest is at local -Z.
+		-- Measured in the running game: the innocent tie was landing 0.57 BEHIND
+		-- the shirt, i.e. every normal guest wore their tie on their back and
+		-- backward_tie put it on their chest. Exactly inverted.
+		baseCF * CFrame.new(0, -0.1, if isBackwardTie then 0.57 else -0.57),
 		tieColor,
 		S.Wool,
 		0,
@@ -635,6 +664,91 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 		baseCF * CFrame.new(1.5, 0, 0),
 		suitColor,
 		suitMat,
+		0,
+		model
+	)
+
+	-- Lapels. Not a tell -- the reference has them and a jacket without them
+	-- reads as a coloured box.
+	for _, sd in { -1, 1 } do
+		makePart(
+			`Lapel_{if sd < 0 then "L" else "R"}`,
+			Enum.PartType.Block,
+			Vector3.new(0.42, 1.5, 0.1),
+			baseCF * CFrame.new(sd * 0.5, 0.2, -0.53) * CFrame.Angles(0, 0, math.rad(sd * 7)),
+			suitColor,
+			S.Wool,
+			0,
+			model
+		)
+	end
+
+	-- Three jacket buttons down the closure. Evenly spaced on a normal guest.
+	-- `button_wrong` moves the middle one into the hole below its own, which
+	-- pulls the closure out of line -- the tell is the spacing, not the button.
+	for i = 1, 3 do
+		local y = 0.55 - (i - 1) * 0.5
+		local x = 0.24
+		if isButtonWrong and i == 2 then
+			y -= 0.22
+			x += 0.1
+		end
+		makePart(
+			`JacketButton_{i}`,
+			Enum.PartType.Cylinder,
+			Vector3.new(0.05, 0.14, 0.14),
+			baseCF * CFrame.new(x, y, -0.56) * CFrame.Angles(0, math.rad(90), 0),
+			Color3.fromRGB(24, 22, 22),
+			S.Gloss,
+			0,
+			model
+		)
+	end
+
+	-- Cuff buttons at each wrist. Matched pair normally. `wrong_cufflink` makes
+	-- them mismatched metals, which is only visible if the player looks at both
+	-- hands rather than one.
+	local cuffL = if isWrongCufflink
+		then Color3.fromRGB(212, 175, 65)
+		else Color3.fromRGB(198, 200, 205)
+	local cuffR = Color3.fromRGB(198, 200, 205)
+	for _, sd in { -1, 1 } do
+		makePart(
+			`ShirtCuff_{if sd < 0 then "L" else "R"}`,
+			Enum.PartType.Block,
+			Vector3.new(1.02, 0.22, 1.02),
+			baseCF * CFrame.new(sd * 1.5, -0.94, 0),
+			shirtColor,
+			S.Shirt,
+			0,
+			model
+		)
+		makePart(
+			`CuffButton_{if sd < 0 then "L" else "R"}`,
+			Enum.PartType.Cylinder,
+			Vector3.new(0.05, 0.12, 0.12),
+			baseCF * CFrame.new(sd * 1.53, -0.94, -0.3) * CFrame.Angles(0, math.rad(90), 0),
+			if sd < 0 then cuffL else cuffR,
+			S.Brass,
+			0,
+			model
+		)
+	end
+
+	-- The neck artery. `inverted_pulse` has animated a part of this name in the
+	-- idle loop since the tell was written; nothing ever built it, so the tell
+	-- has never once been visible.
+	makePart(
+		"CarotidArtery",
+		Enum.PartType.Cylinder,
+		Vector3.new(0.35, 0.14, 0.14),
+		baseCF * CFrame.new(0.22, 1.14, -0.18) * CFrame.Angles(0, 0, math.rad(90)),
+		Color3.fromRGB(
+			math.floor(skinColor.R * 236),
+			math.floor(skinColor.G * 198),
+			math.floor(skinColor.B * 196)
+		),
+		S.Skin,
 		0,
 		model
 	)
@@ -772,6 +886,52 @@ local function createGuestModel(guestData: GuestData): (Model, BasePart, number,
 				origTransparency = p.Transparency,
 			})
 		end
+	end
+
+	-- "casts no solid shadow on the counter". The desk lamp is a SpotLight with
+	-- Shadows on, so a guest who does not cast one has a visible hole where every
+	-- other guest has a shadow -- readable only if the player has seen a normal
+	-- guest stand in the same place, which is the point of a tier-2 tell.
+	if isNoReflection then
+		for _, part in model:GetDescendants() do
+			if part:IsA("BasePart") then
+				part.CastShadow = false
+			end
+		end
+	end
+
+	-- "a single horizontal static tear line flashes across their suit" every 30
+	-- seconds. One thin bright band, parked invisible, swept up the torso when it
+	-- fires. Looking away for four seconds means missing it entirely.
+	if isGlitch then
+		local tear = makePart(
+			"GlitchTear",
+			Enum.PartType.Block,
+			Vector3.new(2.25, 0.09, 1.25),
+			baseCF * CFrame.new(0, 0, 0),
+			Color3.fromRGB(226, 232, 240),
+			S.Glow,
+			1,
+			model
+		)
+		tear.CastShadow = false
+		task.spawn(function()
+			while tear.Parent do
+				task.wait(math.random(24, 34))
+				if not tear.Parent then
+					break
+				end
+				for i = 0, 14 do
+					if not tear.Parent then
+						break
+					end
+					tear.CFrame = hrp.CFrame * CFrame.new(0, -1.05 + i * 0.15, 0)
+					tear.Transparency = 0.35
+					task.wait(0.02)
+				end
+				tear.Transparency = 1
+			end
+		end)
 	end
 
 	if isDrowned then
